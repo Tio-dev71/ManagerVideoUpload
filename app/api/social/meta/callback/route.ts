@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const credentials = await getCredentials();
+    const credentials = await getCredentials(session.user.id);
     const clientId = credentials.META_APP_ID!;
     const clientSecret = credentials.META_APP_SECRET!;
     const redirectUri = process.env.META_REDIRECT_URI || `${process.env.AUTH_URL || 'http://localhost:3000'}/api/social/meta/callback`;

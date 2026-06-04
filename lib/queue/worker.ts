@@ -65,13 +65,11 @@ async function processPublishJob(job: Job<{ postId: string }>) {
       YOUTUBE_SHORTS: 'YOUTUBE',
     };
     
-    // Security/Role fix: Staff members create posts, but ADMINs connect accounts.
-    // We must find any ADMIN social account that matches the provider.
-    const socialAccount = await prisma.socialAccount.findFirst({
+    const socialAccount = await prisma.socialAccount.findUnique({
       where: {
-        provider: providerMap[postPlatform.platform] as any,
-        user: {
-          role: 'ADMIN',
+        userId_provider: {
+          userId: post.createdById,
+          provider: providerMap[postPlatform.platform] as any,
         },
       },
     });

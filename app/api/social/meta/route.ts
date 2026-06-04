@@ -6,11 +6,11 @@ import { getCredentials } from '@/lib/credentials';
 export async function GET() {
   try {
     const session = await auth();
-    if (!session?.user?.id || session.user.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const credentials = await getCredentials();
+    const credentials = await getCredentials(session.user.id);
     const clientId = credentials.META_APP_ID;
     const redirectUri = process.env.META_REDIRECT_URI || `${process.env.AUTH_URL || 'http://localhost:3000'}/api/social/meta/callback`;
 

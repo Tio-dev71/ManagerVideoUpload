@@ -66,6 +66,7 @@ model User {
   posts          Post[]
   videoAssets    VideoAsset[]
   socialAccounts SocialAccount[]
+  userCredentials UserCredential[]
   invitedEmails  AllowedEmail[]
 }
 
@@ -105,6 +106,24 @@ enum SocialProvider {
   META
   YOUTUBE
   GOOGLE_DRIVE
+}
+
+model UserCredential {
+  id           String         @id @default(cuid())
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String
+  provider     CredentialProvider
+  clientId     String         @db.Text
+  clientSecret String         @db.Text
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  @@unique([userId, provider])
+}
+
+enum CredentialProvider {
+  META
+  GOOGLE
 }
 
 model VideoAsset {

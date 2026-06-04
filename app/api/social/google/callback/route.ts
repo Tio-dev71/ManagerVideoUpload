@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const credentials = await getCredentials();
+    const credentials = await getCredentials(session.user.id);
     const clientId = credentials.GOOGLE_CLIENT_ID!;
     const clientSecret = credentials.GOOGLE_CLIENT_SECRET!;
     const redirectUri = process.env.GOOGLE_REDIRECT_URI || `${process.env.AUTH_URL || 'http://localhost:3000'}/api/social/google/callback`;
