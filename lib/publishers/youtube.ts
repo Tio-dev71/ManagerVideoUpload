@@ -1,0 +1,110 @@
+import type { Publisher, PublishResult } from './types';
+import type { Post, VideoAsset, SocialAccount, PostPlatform } from '@prisma/client';
+import { getStorage } from '@/lib/storage';
+import { decryptToken } from '@/lib/crypto';
+import fs from 'fs';
+
+/**
+ * YouTube Shorts publisher using YouTube Data API v3.
+ * 
+ * Flow:
+ * 1. Upload video via videos.insert (resumable upload)
+ * 2. Set title with #Shorts tag
+ * 
+ * Required scopes: youtube.upload
+ * Required SocialAccount fields: youtubeChannelId, accessToken, refreshToken
+ */
+export class YouTubeShortsPublisher implements Publisher {
+  async publishReel(
+    post: Post,
+    videoAsset: VideoAsset,
+    socialAccount: SocialAccount,
+    _platform: PostPlatform
+  ): Promise<PublishResult> {
+    try {
+      const token = decryptToken(socialAccount.accessToken);
+      const storage = getStorage();
+      const videoPath = storage.getPath(videoAsset.storageUrl);
+
+      // Ensure title includes #Shorts for YouTube to recognize it
+      let title = post.title;
+      if (!title.toLowerCase().includes('#shorts')) {
+        title = `${title} #Shorts`;
+      }
+
+      const description = [post.caption, post.hashtags].filter(Boolean).join('\n\n');
+
+      // Step 1: Initialize resumable upload
+      const initRes = await fetch(
+        'https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet,status',
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            snippet: {
+              title,
+              description,
+              categoryId: '22', // People & Blogs
+            },
+            status: {
+              privacyStatus: 'public',
+              selfDeclaredMadeForKids: false,
+            },
+          }),
+        }
+      );
+
+      const uploadUrl = initRes.headers.get('location');
+      if (!uploadUrl) {
+        return { success: false, errorMessage: `Failed to init upload: ${initRes.status} ${initRes.statusText}` };
+      }
+
+      // Step 2: Upload video binary
+      const videoBuffer = fs.readFileSync(videoPath);
+      const uploadRes = await fetch(uploadUrl, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': videoAsset.mimeType,
+          'Content-Length': videoBuffer.length.toString(),
+        },
+        body: videoBuffer,
+      });
+
+      const uploadData = await uploadRes.json();
+      if (uploadData.id) {
+        // Step 3: Post the first comment if provided
+        if (post.firstComment) {
+          try {
+            await fetch('https://www.googleapis.com/youtube/v3/commentThreads?part=snippet', {
+              method: 'POST',
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                snippet: {
+                  videoId: uploadData.id,
+                  topLevelComment: {
+                    snippet: {
+                      textOriginal: post.firstComment,
+                    },
+                  },
+                },
+              }),
+            });
+          } catch (commentError) {
+            console.error('Failed to post YouTube first comment:', commentError);
+          }
+        }
+        return { success: true, externalPostId: uploadData.id };
+      }
+
+      return { success: false, errorMessage: `Upload failed: ${JSON.stringify(uploadData)}` };
+    } catch (error: any) {
+      return { success: false, errorMessage: `YouTube Shorts error: ${error.message}` };
+    }
+  }
+}

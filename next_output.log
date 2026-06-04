@@ -1,0 +1,26 @@
+
+> autoreel-lite@0.1.0 dev
+> next dev
+
+node:fs:441
+    return binding.readFileUtf8(path, stringToFlags(options.flag));
+                   ^
+
+Error: ETIMEDOUT: connection timed out, read
+    at Object.readFileSync (node:fs:441:20)
+    at defaultLoadImpl (node:internal/modules/cjs/loader:1088:17)
+    at loadSource (node:internal/modules/cjs/loader:1715:20)
+    at Object..js (node:internal/modules/cjs/loader:1813:44)
+    at Module.load (node:internal/modules/cjs/loader:1423:32)
+    at Function._load (node:internal/modules/cjs/loader:1246:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1445:12)
+    at Module.mod.require (/Users/tiodev/Desktop/M9/autoreel-lite/node_modules/next/src/server/require-hook.ts:85:26) {
+  errno: -60,
+  code: 'ETIMEDOUT',
+  syscall: 'read'
+}
+
+Node.js v22.18.0
+[?25h

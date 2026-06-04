@@ -1,0 +1,224 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "windows", "darwin", "darwin-arm64"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ──────────────────────────────────────────────
+// NextAuth Models
+// ──────────────────────────────────────────────
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ──────────────────────────────────────────────
+// Application Models
+// ──────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  role          Role      @default(STAFF)
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts       Account[]
+  sessions       Session[]
+  posts          Post[]
+  videoAssets    VideoAsset[]
+  socialAccounts SocialAccount[]
+  invitedEmails  AllowedEmail[]
+}
+
+enum Role {
+  ADMIN
+  STAFF
+}
+
+model AllowedEmail {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  role        Role     @default(STAFF)
+  invitedBy   User     @relation(fields: [invitedById], references: [id])
+  invitedById String
+  createdAt   DateTime @default(now())
+}
+
+model SocialAccount {
+  id                  String         @id @default(cuid())
+  userId              String
+  user                User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider            SocialProvider
+  accessToken         String         @db.Text
+  refreshToken        String?        @db.Text
+  expiresAt           DateTime?
+  accountName         String?
+  pageId              String?
+  instagramBusinessId String?
+  youtubeChannelId    String?
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+
+  @@unique([userId, provider])
+}
+
+enum SocialProvider {
+  META
+  YOUTUBE
+  GOOGLE_DRIVE
+}
+
+model VideoAsset {
+  id                String      @id @default(cuid())
+  originalFileName  String
+  titleFromFileName String
+  storageUrl        String
+  source            VideoSource
+  mimeType          String
+  size              Int
+  duration          Int?
+  createdBy         User        @relation(fields: [createdById], references: [id])
+  createdById       String
+  createdAt         DateTime    @default(now())
+
+  posts Post[]
+
+  @@index([createdById])
+}
+
+enum VideoSource {
+  LOCAL_UPLOAD
+  GOOGLE_DRIVE
+}
+
+model Post {
+  id           String     @id @default(cuid())
+  title        String
+  caption      String?    @db.Text
+  firstComment String?    @db.Text
+  hashtags     String?
+  videoAsset   VideoAsset @relation(fields: [videoAssetId], references: [id])
+  videoAssetId String
+  createdBy    User       @relation(fields: [createdById], references: [id])
+  createdById  String
+  status       PostStatus @default(DRAFT)
+  scheduledAt  DateTime?
+  publishedAt  DateTime?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  platforms PostPlatform[]
+  logs      PublishLog[]
+
+  @@index([createdById])
+  @@index([status])
+  @@index([scheduledAt])
+}
+
+enum PostStatus {
+  DRAFT
+  SCHEDULED
+  PUBLISHING
+  PUBLISHED
+  FAILED
+  PARTIAL_FAILED
+}
+
+model PostPlatform {
+  id             String         @id @default(cuid())
+  post           Post           @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId         String
+  platform       Platform
+  status         PlatformStatus @default(PENDING)
+  externalPostId String?
+  errorMessage   String?        @db.Text
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@unique([postId, platform])
+  @@index([postId])
+  @@index([status])
+}
+
+enum Platform {
+  FACEBOOK_REELS
+  INSTAGRAM_REELS
+  YOUTUBE_SHORTS
+}
+
+enum PlatformStatus {
+  PENDING
+  PUBLISHING
+  PUBLISHED
+  FAILED
+}
+
+model PublishLog {
+  id        String   @id @default(cuid())
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    String
+  platform  Platform
+  level     LogLevel
+  message   String   @db.Text
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([postId])
+}
+
+enum LogLevel {
+  INFO
+  ERROR
+}
+
+// ──────────────────────────────────────────────
+// System Settings
+// ──────────────────────────────────────────────
+
+model SystemSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String   @db.Text
+  updatedAt DateTime @updatedAt
+
+  @@index([key])
+}
