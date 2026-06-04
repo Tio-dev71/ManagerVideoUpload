@@ -27,6 +27,7 @@ interface PostDetail {
   id: string;
   title: string;
   caption: string | null;
+  firstComment: string | null;
   hashtags: string | null;
   status: string;
   scheduledAt: string | null;
