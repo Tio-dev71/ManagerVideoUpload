@@ -65,10 +65,21 @@ async function processPublishJob(job: Job<{ postId: string }>) {
       YOUTUBE_SHORTS: 'YOUTUBE',
     };
     
+    let adminUserId = post.createdById;
+    
+    if (post.createdBy.role === 'STAFF') {
+      const allowedEmail = await prisma.allowedEmail.findUnique({
+        where: { email: post.createdBy.email },
+      });
+      if (allowedEmail) {
+        adminUserId = allowedEmail.invitedById;
+      }
+    }
+
     const socialAccount = await prisma.socialAccount.findUnique({
       where: {
         userId_provider: {
-          userId: post.createdById,
+          userId: adminUserId,
           provider: providerMap[postPlatform.platform] as any,
         },
       },

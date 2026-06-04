@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const email = body.email;
+    const email = body.email?.trim();
 
     if (!email || typeof email !== 'string' || !emailRegex.test(email)) {
       return NextResponse.json(

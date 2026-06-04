@@ -6,8 +6,8 @@ import { getCredentials } from '@/lib/credentials';
 export async function GET(req: NextRequest) {
   try {
     const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!session?.user?.id || session.user.role !== 'ADMIN') {
+      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 
     const credentials = await getCredentials(session.user.id);
