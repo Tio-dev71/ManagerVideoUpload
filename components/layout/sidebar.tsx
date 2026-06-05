@@ -20,7 +20,6 @@ import { useState } from 'react';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Create Reel', href: '/create', icon: PlusCircle },
   { name: 'Posts', href: '/posts', icon: Calendar },
 ];
 
