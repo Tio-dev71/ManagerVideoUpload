@@ -9,6 +9,7 @@ import {
   Loader2,
   Shield,
   Clock,
+  Link2,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
@@ -27,6 +28,7 @@ export default function TeamPage() {
   const [email, setEmail] = useState('');
   const [adding, setAdding] = useState(false);
   const [updating, setUpdating] = useState<string | null>(null);
+  const [generating, setGenerating] = useState<string | null>(null);
 
   useEffect(() => {
     fetchMembers();
@@ -111,6 +113,28 @@ export default function TeamPage() {
       toast.error('Failed to update role');
     } finally {
       setUpdating(null);
+    }
+  }
+
+  async function generateMagicLink(memberEmail: string) {
+    setGenerating(memberEmail);
+    try {
+      const res = await fetch('/api/team/magic-link', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: memberEmail }),
+      });
+      const data = await res.json();
+      if (res.ok && data.link) {
+        await navigator.clipboard.writeText(data.link);
+        toast.success('Magic link copied to clipboard!');
+      } else {
+        toast.error(data.error || 'Failed to generate link');
+      }
+    } catch {
+      toast.error('Failed to generate link');
+    } finally {
+      setGenerating(null);
     }
   }
 
@@ -215,15 +239,31 @@ export default function TeamPage() {
                       </p>
                     </div>
                   </div>
-                  {member.role !== 'ADMIN' && (
+                  <div className="flex items-center gap-2">
                     <button
-                      onClick={() => removeMember(member.id, member.email)}
-                      className="p-2 rounded-lg hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100"
-                      title="Remove member"
+                      onClick={() => generateMagicLink(member.email)}
+                      disabled={generating === member.email}
+                      className="p-2 rounded-lg hover:bg-blue-50 transition-colors text-[var(--color-muted-foreground)] hover:text-blue-600 flex items-center gap-1.5"
+                      title="Generate and copy login link (Bypass Email)"
                     >
-                      <Trash2 className="w-4 h-4 text-red-400" />
+                      {generating === member.email ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Link2 className="w-4 h-4" />
+                      )}
+                      <span className="text-[12px] font-medium hidden sm:inline">Copy Link</span>
                     </button>
-                  )}
+
+                    {member.role !== 'ADMIN' && (
+                      <button
+                        onClick={() => removeMember(member.id, member.email)}
+                        className="p-2 rounded-lg hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100"
+                        title="Remove member"
+                      >
+                        <Trash2 className="w-4 h-4 text-red-400" />
+                      </button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
