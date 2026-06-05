@@ -10,9 +10,9 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get connected accounts
+    // Get connected accounts for the workspace
     const socialAccounts = await prisma.socialAccount.findMany({
-      where: { userId: session.user.id },
+      where: { workspaceId: (session.user as any).workspaceId },
       select: {
         id: true,
         provider: true,

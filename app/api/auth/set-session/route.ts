@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(new URL('/login?error=InvalidLink', req.url));
   }
 
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const maxAge = 30 * 24 * 60 * 60; // 30 days
 
   // NextAuth uses __Secure- prefix in production

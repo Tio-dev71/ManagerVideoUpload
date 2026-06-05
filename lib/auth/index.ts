@@ -29,11 +29,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         return false;
       }
 
-      // Update user role to match allowed email role
+      // Update user role and workspace to match allowed email
       if (user.id) {
         await prisma.user.update({
           where: { id: user.id },
-          data: { role: allowed.role },
+          data: { 
+            role: allowed.role,
+            workspaceId: allowed.workspaceId,
+          },
         });
       }
 
@@ -43,10 +46,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (session.user) {
         const dbUser = await prisma.user.findUnique({
           where: { id: user.id },
-          select: { id: true, role: true },
+          select: { id: true, role: true, workspaceId: true },
         });
         session.user.id = user.id;
         session.user.role = dbUser?.role ?? 'STAFF';
+        (session.user as any).workspaceId = dbUser?.workspaceId ?? null;
       }
       return session;
     },

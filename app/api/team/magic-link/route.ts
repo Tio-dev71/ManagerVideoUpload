@@ -27,7 +27,12 @@ export async function POST(req: NextRequest) {
     let user = await prisma.user.findUnique({ where: { email: email.toLowerCase() } });
     if (!user) {
       user = await prisma.user.create({
-        data: { email: email.toLowerCase(), role: allowed.role }
+        data: { email: email.toLowerCase(), role: allowed.role, workspaceId: allowed.workspaceId }
+      });
+    } else {
+      user = await prisma.user.update({
+        where: { id: user.id },
+        data: { role: allowed.role, workspaceId: allowed.workspaceId }
       });
     }
 

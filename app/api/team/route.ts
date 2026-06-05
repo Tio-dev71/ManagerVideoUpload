@@ -12,7 +12,10 @@ export async function GET() {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 
+    const workspaceId = (session.user as any).workspaceId;
+
     const members = await prisma.allowedEmail.findMany({
+      where: { workspaceId },
       include: {
         invitedBy: {
           select: { name: true, email: true },
@@ -62,6 +65,7 @@ export async function POST(req: NextRequest) {
         email: email.toLowerCase(),
         role: 'STAFF',
         invitedById: session.user.id,
+        workspaceId: (session.user as any).workspaceId,
       },
       include: {
         invitedBy: {
@@ -91,8 +95,9 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: 'Member ID required' }, { status: 400 });
     }
 
+    const workspaceId = (session.user as any).workspaceId;
     const member = await prisma.allowedEmail.findUnique({ where: { id } });
-    if (!member) {
+    if (!member || member.workspaceId !== workspaceId) {
       return NextResponse.json({ error: 'Member not found' }, { status: 404 });
     }
 
@@ -126,8 +131,9 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
     }
 
+    const workspaceId = (session.user as any).workspaceId;
     const member = await prisma.allowedEmail.findUnique({ where: { id } });
-    if (!member) {
+    if (!member || member.workspaceId !== workspaceId) {
       return NextResponse.json({ error: 'Member not found' }, { status: 404 });
     }
 

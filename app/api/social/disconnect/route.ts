@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
 
     await prisma.socialAccount.deleteMany({
       where: {
-        userId: session.user.id,
+        workspaceId: (session.user as any).workspaceId,
         provider: provider as any,
       },
     });
