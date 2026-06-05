@@ -1,8 +1,8 @@
 FROM node:20-alpine AS base
+RUN apk add --no-cache libc6-compat openssl
 
 # Install dependencies only when needed
 FROM base AS deps
-RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 # Install dependencies based on the preferred package manager
@@ -58,4 +58,4 @@ ENV HOSTNAME "0.0.0.0"
 
 # CMD ["node", "server.js"]
 # For local DB migration before start:
-CMD npx prisma migrate deploy && node server.js
+CMD npx -y prisma migrate deploy && node server.js
