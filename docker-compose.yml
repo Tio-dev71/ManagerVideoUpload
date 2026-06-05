@@ -1,28 +1,32 @@
 version: '3.8'
 
 services:
-  postgres:
-    image: postgres:16-alpine
-    container_name: autoreel-postgres
-    restart: unless-stopped
+  db:
+    image: postgres:15-alpine
     environment:
-      POSTGRES_USER: autoreel
-      POSTGRES_PASSWORD: autoreel
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
       POSTGRES_DB: autoreel
     ports:
-      - '5433:5432'
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  redis:
-    image: redis:7-alpine
-    container_name: autoreel-redis
-    restart: unless-stopped
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
-      - '6379:6379'
-    volumes:
-      - redis_data:/data
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@db:5432/autoreel?schema=public
+      # Cấu hình SMTP để gửi mail đăng nhập (Khách tự điền)
+      - EMAIL_SERVER=smtp://username:password@smtp.gmail.com:587
+      - EMAIL_FROM=noreply@example.com
+      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_SECRET=local_secret_key_12345
+    depends_on:
+      - db
 
 volumes:
   postgres_data:
-  redis_data:
