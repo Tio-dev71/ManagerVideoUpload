@@ -12,7 +12,8 @@
     "db:seed": "prisma db seed",
     "db:reset": "prisma migrate reset",
     "db:studio": "prisma studio",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "get-link": "tsx --env-file=.env scripts/get-login-link.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
