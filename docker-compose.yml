@@ -28,14 +28,12 @@ services:
     restart: always
     ports:
       - "3000:3000"
+    env_file:
+      - .env
     environment:
       - DATABASE_URL=postgresql://postgres:password@db:5432/autoreel?schema=public
       - REDIS_URL=redis://redis:6379
-      # Cấu hình SMTP để gửi mail đăng nhập (Khách tự điền)
-      - EMAIL_SERVER=smtp://username:password@smtp.gmail.com:587
-      - EMAIL_FROM=noreply@example.com
       - NEXTAUTH_URL=http://localhost:3000
-      - NEXTAUTH_SECRET=local_secret_key_12345
     depends_on:
       - db
       - redis
@@ -46,13 +44,12 @@ services:
       dockerfile: Dockerfile
     restart: always
     command: node dist/worker.js
+    env_file:
+      - .env
     environment:
       - DATABASE_URL=postgresql://postgres:password@db:5432/autoreel?schema=public
       - REDIS_URL=redis://redis:6379
-      - EMAIL_SERVER=smtp://username:password@smtp.gmail.com:587
-      - EMAIL_FROM=noreply@example.com
       - NEXTAUTH_URL=http://localhost:3000
-      - NEXTAUTH_SECRET=local_secret_key_12345
     depends_on:
       - db
       - redis

@@ -20,10 +20,33 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async signIn({ user }) {
       if (!user.email) return false;
       
+      const adminEmail = process.env.ADMIN_EMAIL?.toLowerCase();
+      const userEmail = user.email.toLowerCase();
+
       // Check if email is in the allowed list
-      const allowed = await prisma.allowedEmail.findUnique({
-        where: { email: user.email },
+      let allowed = await prisma.allowedEmail.findUnique({
+        where: { email: userEmail },
       });
+
+      // Auto-seed admin if allowed list is completely empty and user is admin
+      if (!allowed && userEmail === adminEmail) {
+        const count = await prisma.allowedEmail.count();
+        if (count === 0) {
+          const workspace = await prisma.workspace.upsert({
+            where: { id: 'default-workspace' },
+            update: {},
+            create: { id: 'default-workspace', name: 'Default Workspace' },
+          });
+          
+          allowed = await prisma.allowedEmail.create({
+            data: {
+              email: userEmail,
+              role: 'SUPER_ADMIN',
+              workspaceId: workspace.id,
+            }
+          });
+        }
+      }
 
       if (!allowed) {
         return false;
