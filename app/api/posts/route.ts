@@ -27,10 +27,12 @@ export async function GET(req: NextRequest) {
     const status = url.searchParams.get('status');
     const limit = parseInt(url.searchParams.get('limit') || '50', 10);
 
-    const where: any = {};
+    const where: any = {
+      workspaceId: (session.user as any).workspaceId,
+    };
 
-    // Staff can only see their own posts
-    if (session.user.role !== 'ADMIN') {
+    // Staff can only see their own posts, unless they are ADMIN or SUPER_ADMIN
+    if (session.user.role === 'STAFF') {
       where.createdById = session.user.id;
     }
 
@@ -82,13 +84,13 @@ export async function POST(req: NextRequest) {
 
     const { title, caption, firstComment, hashtags, videoAssetId, platforms, publishMode, scheduledAt } = parsed.data;
 
-    // Verify video asset exists
+    // Verify video asset exists and belongs to workspace
     const videoAsset = await prisma.videoAsset.findUnique({
       where: { id: videoAssetId },
     });
 
-    if (!videoAsset) {
-      return NextResponse.json({ error: 'Video asset not found' }, { status: 404 });
+    if (!videoAsset || videoAsset.workspaceId !== (session.user as any).workspaceId) {
+      return NextResponse.json({ error: 'Video asset not found in your workspace' }, { status: 404 });
     }
 
     // Create post with platforms
@@ -100,6 +102,7 @@ export async function POST(req: NextRequest) {
         hashtags,
         videoAssetId,
         createdById: session.user.id,
+        workspaceId: (session.user as any).workspaceId,
         status: publishMode === 'now' ? 'PUBLISHING' : 'SCHEDULED',
         scheduledAt: scheduledAt ? new Date(scheduledAt) : null,
         platforms: {

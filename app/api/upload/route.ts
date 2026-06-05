@@ -47,12 +47,13 @@ export async function POST(req: NextRequest) {
     const videoAsset = await prisma.videoAsset.create({
       data: {
         originalFileName: file.name,
-        titleFromFileName: title,
-        storageUrl,
+        titleFromFileName: file.name.replace(/\.[^/.]+$/, ""), // Remove extension
+        storageUrl: storageUrl,
         source: 'LOCAL_UPLOAD',
         mimeType: file.type,
         size: file.size,
         createdById: session.user.id,
+        workspaceId: (session.user as any).workspaceId,
       },
     });
 

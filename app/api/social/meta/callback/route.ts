@@ -85,6 +85,7 @@ export async function GET(req: NextRequest) {
       },
       create: {
         userId: session.user.id,
+        workspaceId: (session.user as any).workspaceId,
         provider: 'META',
         accessToken: encryptedAccessToken,
         expiresAt: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),

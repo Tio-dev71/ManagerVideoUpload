@@ -51,6 +51,21 @@ model VerificationToken {
 // Application Models
 // ──────────────────────────────────────────────
 
+model Workspace {
+  id        String   @id @default(cuid())
+  name      String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users          User[]
+  allowedEmails  AllowedEmail[]
+  socialAccounts SocialAccount[]
+  videoAssets    VideoAsset[]
+  posts          Post[]
+  publishLogs    PublishLog[]
+}
+
 model User {
   id            String    @id @default(cuid())
   email         String    @unique
@@ -60,6 +75,9 @@ model User {
   image         String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+
+  workspaceId   String?
+  workspace     Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
   accounts       Account[]
   sessions       Session[]
@@ -71,6 +89,7 @@ model User {
 }
 
 enum Role {
+  SUPER_ADMIN
   ADMIN
   STAFF
 }
@@ -81,6 +100,10 @@ model AllowedEmail {
   role        Role     @default(STAFF)
   invitedBy   User     @relation(fields: [invitedById], references: [id])
   invitedById String
+  
+  workspaceId String?
+  workspace   Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
   createdAt   DateTime @default(now())
 }
 
@@ -98,6 +121,9 @@ model SocialAccount {
   youtubeChannelId    String?
   createdAt           DateTime       @default(now())
   updatedAt           DateTime       @updatedAt
+
+  workspaceId         String?
+  workspace           Workspace?     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
   @@unique([userId, provider])
 }
@@ -139,9 +165,13 @@ model VideoAsset {
   createdById       String
   createdAt         DateTime    @default(now())
 
+  workspaceId       String?
+  workspace         Workspace?  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
   posts Post[]
 
   @@index([createdById])
+  @@index([workspaceId])
 }
 
 enum VideoSource {
@@ -165,10 +195,14 @@ model Post {
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 
+  workspaceId  String?
+  workspace    Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
   platforms PostPlatform[]
   logs      PublishLog[]
 
   @@index([createdById])
+  @@index([workspaceId])
   @@index([status])
   @@index([scheduledAt])
 }
@@ -221,7 +255,11 @@ model PublishLog {
   metadata  Json?
   createdAt DateTime @default(now())
 
+  workspaceId String?
+  workspace   Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
   @@index([postId])
+  @@index([workspaceId])
 }
 
 enum LogLevel {

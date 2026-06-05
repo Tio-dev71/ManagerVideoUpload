@@ -36,7 +36,7 @@ export async function GET(
     }
 
     // Staff can only view their own posts
-    if (session.user.role !== 'ADMIN' && post.createdById !== session.user.id) {
+    if ((session.user.role !== 'ADMIN' && session.user.role !== 'SUPER_ADMIN') && post.createdById !== session.user.id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -65,7 +65,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'Post not found' }, { status: 404 });
     }
 
-    if (session.user.role !== 'ADMIN' && post.createdById !== session.user.id) {
+    if ((session.user.role !== 'ADMIN' && session.user.role !== 'SUPER_ADMIN') && post.createdById !== session.user.id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -108,7 +108,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Post not found' }, { status: 404 });
     }
 
-    if (session.user.role !== 'ADMIN' && post.createdById !== session.user.id) {
+    if ((session.user.role !== 'ADMIN' && session.user.role !== 'SUPER_ADMIN') && post.createdById !== session.user.id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 

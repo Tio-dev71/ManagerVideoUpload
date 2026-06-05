@@ -57,7 +57,7 @@ export default function CreateReelPage() {
         toast.error(`Invalid file type: ${f.name}`);
         return false;
       }
-      if (f.size > 500 * 1024 * 1024) {
+      if (f.size > 2000 * 1024 * 1024) {
         toast.error(`File too large: ${f.name}`);
         return false;
       }
@@ -263,7 +263,7 @@ export default function CreateReelPage() {
                   Drop videos here or <span className="text-[var(--color-primary)]">browse</span>
                 </p>
                 <p className="text-[13px] text-[var(--color-muted-foreground)] mt-1">
-                  Upload multiple MP4, MOV, or WebM (up to 500MB each)
+                  Upload multiple MP4, MOV, or WebM (up to 2GB each)
                 </p>
               </div>
             </div>

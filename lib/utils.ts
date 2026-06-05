@@ -48,7 +48,7 @@ export function isAllowedVideoType(mimeType: string): boolean {
  * Max file size in bytes
  */
 export function getMaxFileSize(): number {
-  const mb = parseInt(process.env.MAX_FILE_SIZE_MB || '500', 10);
+  const mb = parseInt(process.env.MAX_FILE_SIZE_MB || '2000', 10);
   return mb * 1024 * 1024;
 }
 

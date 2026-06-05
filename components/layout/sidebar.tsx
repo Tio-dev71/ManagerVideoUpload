@@ -14,6 +14,7 @@ import {
   Play,
   ChevronLeft,
   Menu,
+  Building2,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -28,6 +29,10 @@ const adminNavigation = [
   { name: 'Settings', href: '/settings', icon: Settings },
 ];
 
+const superAdminNavigation = [
+  { name: 'Workspaces', href: '/super-admin', icon: Building2 },
+];
+
 import { ThemeToggle } from '@/components/theme-toggle';
 
 export function Sidebar() {
@@ -36,8 +41,12 @@ export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const isAdmin = session?.user?.role === 'ADMIN';
-  const allNavItems = [...navigation, ...(isAdmin ? adminNavigation : [])];
+  const isSuperAdmin = session?.user?.role === 'SUPER_ADMIN';
+  const isAdmin = session?.user?.role === 'ADMIN' || isSuperAdmin;
+  
+  let allNavItems = [...navigation];
+  if (isAdmin) allNavItems = [...allNavItems, ...adminNavigation];
+  if (isSuperAdmin) allNavItems = [...allNavItems, ...superAdminNavigation];
 
   const isActive = (href: string) => {
     if (href === '/dashboard') return pathname === '/dashboard';
@@ -149,7 +158,7 @@ export function Sidebar() {
                   {session?.user?.name || session?.user?.email?.split('@')[0]}
                 </p>
                 <p className="text-[11px] text-[var(--color-muted-foreground)] dark:text-neutral-500 truncate">
-                  {session?.user?.role === 'ADMIN' ? 'Admin' : 'Staff'}
+                  {session?.user?.role === 'SUPER_ADMIN' ? 'Super Admin' : session?.user?.role === 'ADMIN' ? 'Admin' : 'Staff'}
                 </p>
               </div>
             )}

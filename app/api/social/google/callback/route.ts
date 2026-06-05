@@ -106,6 +106,7 @@ export async function GET(req: NextRequest) {
       },
       create: {
         userId: session.user.id,
+        workspaceId: (session.user as any).workspaceId,
         provider: provider as any,
         accessToken: encryptedAccessToken,
         refreshToken: encryptedRefreshToken,

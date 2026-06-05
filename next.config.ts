@@ -1,10 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Allow large file uploads (500MB)
+  output: 'standalone',
+  // Allow large file uploads (2GB)
   experimental: {
     serverActions: {
-      bodySizeLimit: '500mb',
+      bodySizeLimit: '2000mb',
     },
     optimizePackageImports: ['lucide-react', 'date-fns', 'framer-motion'],
   },

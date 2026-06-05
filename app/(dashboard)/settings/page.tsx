@@ -17,6 +17,7 @@ import {
   Save,
   Shield,
 } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 import { toast } from 'sonner';
 
 interface SocialConnection {
@@ -82,6 +83,7 @@ const API_FIELDS = [
 ];
 
 export default function SettingsPage() {
+  const { data: session } = useSession();
   const [connections, setConnections] = useState<SocialConnection[]>([]);
   const [loading, setLoading] = useState(true);
   const [envStatus, setEnvStatus] = useState<Record<string, boolean>>({});
@@ -187,18 +189,25 @@ export default function SettingsPage() {
       </div>
 
       {/* ─── API Configuration ─── */}
-      <div>
-        <div className="flex items-center gap-2.5 mb-5">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
-            <Key className="w-4 h-4 text-white" />
+      {(session?.user?.role === 'SUPER_ADMIN' || session?.user?.role === 'ADMIN') && (
+        <div>
+          <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                <Key className="w-4 h-4 text-white" />
+              </div>
+              <div>
+                <h2 className="text-[17px] font-semibold">
+                  {session.user.role === 'SUPER_ADMIN' ? 'System API Configuration' : 'Workspace API Configuration'}
+                </h2>
+                <p className="text-[12px] text-[var(--color-muted-foreground)]">
+                  {session.user.role === 'SUPER_ADMIN' 
+                    ? 'Configure OAuth client credentials globally. These act as fallback for all workspaces.'
+                    : 'Configure your custom OAuth client credentials for this workspace.'}
+                </p>
+              </div>
+            </div>
           </div>
-          <div>
-            <h2 className="text-[17px] font-semibold">API Configuration</h2>
-            <p className="text-[12px] text-[var(--color-muted-foreground)]">
-              Enter your API credentials to enable social publishing
-            </p>
-          </div>
-        </div>
 
         <div className="space-y-5">
           {API_FIELDS.map((group) => (
@@ -276,6 +285,7 @@ export default function SettingsPage() {
           </div>
         </div>
       </div>
+      )}
 
       {/* ─── Divider ─── */}
       <div className="border-t border-[var(--color-border)]" />

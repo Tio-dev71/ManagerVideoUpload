@@ -12,7 +12,8 @@
     "db:seed": "prisma db seed",
     "db:reset": "prisma migrate reset",
     "db:studio": "prisma studio",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "get-link": "tsx --env-file=.env scripts/get-login-link.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -55,6 +56,7 @@
     "eslint-config-next": "16.2.7",
     "prisma": "^5.21.0",
     "tailwindcss": "^4",
+    "tsup": "^8.5.1",
     "tsx": "^4.22.4",
     "typescript": "5.9.3"
   }

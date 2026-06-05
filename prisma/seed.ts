@@ -12,15 +12,28 @@ async function main() {
 
   console.log(`🌱 Seeding database...`);
 
+  // Create default workspace
+  const workspace = await prisma.workspace.upsert({
+    where: { id: 'default-workspace' },
+    update: {},
+    create: {
+      id: 'default-workspace',
+      name: 'Default Workspace',
+    },
+  });
+
+  console.log(`✅ Default workspace created: ${workspace.id}`);
+
   // Create or update admin user
   const admin = await prisma.user.upsert({
     where: { email: adminEmail },
-    update: { role: 'ADMIN' },
+    update: { role: 'SUPER_ADMIN', workspaceId: workspace.id },
     create: {
       email: adminEmail,
-      name: 'Admin',
-      role: 'ADMIN',
+      name: 'Super Admin',
+      role: 'SUPER_ADMIN',
       emailVerified: new Date(),
+      workspaceId: workspace.id,
     },
   });
 
@@ -29,11 +42,12 @@ async function main() {
   // Add admin email to allowed emails
   await prisma.allowedEmail.upsert({
     where: { email: adminEmail },
-    update: {},
+    update: { role: 'SUPER_ADMIN', workspaceId: workspace.id },
     create: {
       email: adminEmail,
-      role: 'ADMIN',
+      role: 'SUPER_ADMIN',
       invitedById: admin.id,
+      workspaceId: workspace.id,
     },
   });
 

@@ -6,7 +6,7 @@ import { getCredentials } from '@/lib/credentials';
 export async function GET() {
   try {
     const session = await auth();
-    if (!session?.user?.id || session.user.role !== 'ADMIN') {
+    if (!session?.user?.id || (session.user.role !== 'ADMIN' && session.user.role !== 'SUPER_ADMIN')) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 
