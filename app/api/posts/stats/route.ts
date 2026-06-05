@@ -11,7 +11,7 @@ export async function GET() {
     }
 
     const where: any = {};
-    if (session.user.role !== 'ADMIN') {
+    if (session.user.role !== 'ADMIN' && session.user.role !== 'SUPER_ADMIN') {
       where.createdById = session.user.id;
     }
 

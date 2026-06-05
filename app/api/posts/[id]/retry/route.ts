@@ -25,7 +25,7 @@ export async function POST(
       return NextResponse.json({ error: 'Post not found' }, { status: 404 });
     }
 
-    if (session.user.role !== 'ADMIN' && post.createdById !== session.user.id) {
+    if ((session.user.role !== 'ADMIN' && session.user.role !== 'SUPER_ADMIN') && post.createdById !== session.user.id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
