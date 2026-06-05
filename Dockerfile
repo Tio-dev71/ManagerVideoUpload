@@ -35,6 +35,9 @@ ENV NEXT_TELEMETRY_DISABLED 1
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
+# Install prisma globally to avoid npx download delays
+RUN npm install -g prisma
+
 COPY --from=builder /app/public ./public
 
 # Set the correct permission for prerender cache
@@ -49,6 +52,14 @@ COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/scripts ./scripts
 COPY --from=builder /app/dist ./dist
 
+# Create a startup script
+RUN echo '#!/bin/sh' > /app/start.sh && \
+    echo 'echo "Waiting for database..."' >> /app/start.sh && \
+    echo 'sleep 5' >> /app/start.sh && \
+    echo 'prisma migrate deploy' >> /app/start.sh && \
+    echo 'node server.js' >> /app/start.sh && \
+    chmod +x /app/start.sh
+
 USER nextjs
 
 EXPOSE 3000
@@ -56,6 +67,4 @@ EXPOSE 3000
 ENV PORT 3000
 ENV HOSTNAME "0.0.0.0"
 
-# CMD ["node", "server.js"]
-# For local DB migration before start:
-CMD npx -y prisma migrate deploy && node server.js
+CMD ["/app/start.sh"]
