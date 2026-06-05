@@ -42,3 +42,8 @@ next-env.d.ts
 
 # uploads
 /uploads
+
+# dist
+/dist
+/node_modules*
+package-lock*.json

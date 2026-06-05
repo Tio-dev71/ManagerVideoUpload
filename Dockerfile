@@ -1,4 +1,4 @@
-FROM node:18-alpine AS base
+FROM node:20-alpine AS base
 
 # Install dependencies only when needed
 FROM base AS deps
@@ -7,7 +7,7 @@ WORKDIR /app
 
 # Install dependencies based on the preferred package manager
 COPY package.json package-lock.json* ./
-RUN npm ci
+RUN npm ci --ignore-scripts
 
 # Rebuild the source code only when needed
 FROM base AS builder
@@ -24,7 +24,6 @@ RUN npm run build
 
 # Build Worker
 RUN npx -y tsup worker.ts --format cjs --target node18
-
 
 # Production image, copy all the files and run next
 FROM base AS runner
