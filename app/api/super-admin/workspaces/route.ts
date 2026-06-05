@@ -14,6 +14,10 @@ export async function GET() {
         _count: {
           select: { users: true, posts: true, socialAccounts: true },
         },
+        allowedEmails: {
+          where: { role: 'ADMIN' },
+          select: { email: true },
+        },
       },
       orderBy: { createdAt: 'desc' },
     });

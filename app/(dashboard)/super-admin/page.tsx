@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Building2, Plus, Users, Mail, Loader2 } from 'lucide-react';
+import { Building2, Plus, Users, Mail, Loader2, Link2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 
@@ -15,6 +15,7 @@ interface Workspace {
     posts: number;
     socialAccounts: number;
   };
+  allowedEmails: { email: string }[];
 }
 
 export default function SuperAdminPage() {
@@ -23,6 +24,7 @@ export default function SuperAdminPage() {
   const [name, setName] = useState('');
   const [adminEmail, setAdminEmail] = useState('');
   const [adding, setAdding] = useState(false);
+  const [generating, setGenerating] = useState<string | null>(null);
 
   useEffect(() => {
     fetchWorkspaces();
@@ -39,6 +41,28 @@ export default function SuperAdminPage() {
       console.error('Failed to fetch workspaces');
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function generateMagicLink(memberEmail: string) {
+    setGenerating(memberEmail);
+    try {
+      const res = await fetch('/api/team/magic-link', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: memberEmail }),
+      });
+      const data = await res.json();
+      if (res.ok && data.link) {
+        await navigator.clipboard.writeText(data.link);
+        toast.success(`Magic link for ${memberEmail} copied to clipboard!`);
+      } else {
+        toast.error(data.error || 'Failed to generate link');
+      }
+    } catch {
+      toast.error('Failed to generate link');
+    } finally {
+      setGenerating(null);
     }
   }
 
@@ -133,17 +157,39 @@ export default function SuperAdminPage() {
                 <div key={ws.id} className="flex items-center justify-between p-4">
                   <div>
                     <h3 className="font-medium text-[15px]">{ws.name}</h3>
+                    {ws.allowedEmails?.[0]?.email && (
+                      <p className="text-[13px] text-purple-600 font-medium mt-0.5">
+                        {ws.allowedEmails[0].email}
+                      </p>
+                    )}
                     <p className="text-[12px] text-gray-500 mt-1">
                       Created {format(new Date(ws.createdAt), 'MMM d, yyyy')}
                     </p>
                   </div>
-                  <div className="flex gap-4 text-[13px] text-gray-500">
-                    <div className="flex items-center gap-1">
-                      <Users className="w-4 h-4" /> {ws._count.users} Users
+                  <div className="flex items-center gap-4">
+                    <div className="flex gap-4 text-[13px] text-gray-500">
+                      <div className="flex items-center gap-1">
+                        <Users className="w-4 h-4" /> {ws._count.users} Users
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Building2 className="w-4 h-4" /> {ws._count.socialAccounts} Accounts
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <Building2 className="w-4 h-4" /> {ws._count.socialAccounts} Accounts
-                    </div>
+                    {ws.allowedEmails?.[0]?.email && (
+                      <button
+                        onClick={() => generateMagicLink(ws.allowedEmails[0].email)}
+                        disabled={generating === ws.allowedEmails[0].email}
+                        className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors flex items-center gap-1.5"
+                        title="Copy Admin Login Link"
+                      >
+                        {generating === ws.allowedEmails[0].email ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Link2 className="w-4 h-4" />
+                        )}
+                        <span className="text-[12px] font-medium hidden sm:inline">Copy Link</span>
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}
