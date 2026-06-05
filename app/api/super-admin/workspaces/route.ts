@@ -74,3 +74,31 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id || session.user.role !== 'SUPER_ADMIN') {
+      return NextResponse.json({ error: 'Super Admin access required' }, { status: 403 });
+    }
+
+    const url = new URL(req.url);
+    const id = url.searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json({ error: 'Workspace ID is required' }, { status: 400 });
+    }
+
+    if (id === 'default-workspace') {
+      return NextResponse.json({ error: 'Cannot delete the default workspace' }, { status: 400 });
+    }
+
+    await prisma.workspace.delete({
+      where: { id },
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}

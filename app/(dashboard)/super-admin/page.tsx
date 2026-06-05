@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Building2, Plus, Users, Mail, Loader2, Link2 } from 'lucide-react';
+import { Building2, Plus, Users, Mail, Loader2, Link2, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 
@@ -26,6 +26,8 @@ export default function SuperAdminPage() {
   const [adding, setAdding] = useState(false);
   const [generating, setGenerating] = useState<string | null>(null);
 
+  const [deleting, setDeleting] = useState<string | null>(null);
+
   useEffect(() => {
     fetchWorkspaces();
   }, []);
@@ -41,6 +43,28 @@ export default function SuperAdminPage() {
       console.error('Failed to fetch workspaces');
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function deleteWorkspace(id: string, name: string) {
+    if (!confirm(`Are you sure you want to completely delete the workspace "${name}" and all its users, posts, and data? This action cannot be undone.`)) return;
+
+    setDeleting(id);
+    try {
+      const res = await fetch(`/api/super-admin/workspaces?id=${id}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        toast.success(`Workspace ${name} deleted successfully`);
+        fetchWorkspaces();
+      } else {
+        const data = await res.json();
+        toast.error(data.error || 'Failed to delete workspace');
+      }
+    } catch {
+      toast.error('Failed to delete workspace');
+    } finally {
+      setDeleting(null);
     }
   }
 
@@ -188,6 +212,20 @@ export default function SuperAdminPage() {
                           <Link2 className="w-4 h-4" />
                         )}
                         <span className="text-[12px] font-medium hidden sm:inline">Copy Link</span>
+                      </button>
+                    )}
+                    {ws.id !== 'default-workspace' && (
+                      <button
+                        onClick={() => deleteWorkspace(ws.id, ws.name)}
+                        disabled={deleting === ws.id}
+                        className="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors flex items-center justify-center w-8 h-8 flex-shrink-0"
+                        title="Delete Workspace"
+                      >
+                        {deleting === ws.id ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Trash2 className="w-4 h-4" />
+                        )}
                       </button>
                     )}
                   </div>
