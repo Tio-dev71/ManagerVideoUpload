@@ -110,3 +110,51 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
+// PATCH /api/team — Update team member role (Admin only)
+export async function PATCH(req: NextRequest) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id || session.user.role !== 'ADMIN') {
+      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
+    }
+
+    const body = await req.json();
+    const { id, role } = body;
+
+    if (!id || !role || !['ADMIN', 'STAFF'].includes(role)) {
+      return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
+    }
+
+    const member = await prisma.allowedEmail.findUnique({ where: { id } });
+    if (!member) {
+      return NextResponse.json({ error: 'Member not found' }, { status: 404 });
+    }
+
+    // Protect self-demotion
+    if (member.email === session.user.email && role !== 'ADMIN') {
+      return NextResponse.json({ error: 'Cannot demote yourself' }, { status: 400 });
+    }
+
+    const updated = await prisma.allowedEmail.update({
+      where: { id },
+      data: { role },
+      include: {
+        invitedBy: {
+          select: { name: true, email: true },
+        },
+      },
+    });
+
+    // Also update the User role if the user has already signed in
+    await prisma.user.updateMany({
+      where: { email: member.email },
+      data: { role },
+    });
+
+    return NextResponse.json(updated);
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+

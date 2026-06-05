@@ -26,6 +26,7 @@ export default function TeamPage() {
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState('');
   const [adding, setAdding] = useState(false);
+  const [updating, setUpdating] = useState<string | null>(null);
 
   useEffect(() => {
     fetchMembers();
@@ -85,6 +86,31 @@ export default function TeamPage() {
       }
     } catch {
       toast.error('Failed to remove member');
+    }
+  }
+
+  async function updateMemberRole(id: string, newRole: string) {
+    setUpdating(id);
+    try {
+      const res = await fetch('/api/team', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, role: newRole }),
+      });
+      
+      if (res.ok) {
+        toast.success(`Role updated to ${newRole}`);
+        setMembers((prev) =>
+          prev.map((m) => (m.id === id ? { ...m, role: newRole } : m))
+        );
+      } else {
+        const error = await res.json();
+        toast.error(error.error || 'Failed to update role');
+      }
+    } catch {
+      toast.error('Failed to update role');
+    } finally {
+      setUpdating(null);
     }
   }
 
@@ -169,13 +195,19 @@ export default function TeamPage() {
                     <div>
                       <div className="flex items-center gap-2">
                         <p className="text-[14px] font-medium">{member.email}</p>
-                        <span className={`badge text-[11px] ${member.role === 'ADMIN' ? 'bg-purple-50 text-purple-700' : 'bg-gray-100 text-gray-600'}`}>
-                          {member.role === 'ADMIN' ? (
-                            <><Shield className="w-3 h-3 mr-1" />Admin</>
-                          ) : (
-                            'Staff'
-                          )}
-                        </span>
+                        <select
+                          value={member.role}
+                          onChange={(e) => updateMemberRole(member.id, e.target.value)}
+                          disabled={updating === member.id}
+                          className={`text-[11px] font-medium px-2 py-0.5 rounded-full outline-none cursor-pointer border ${
+                            member.role === 'ADMIN'
+                              ? 'bg-purple-50 text-purple-700 border-purple-200'
+                              : 'bg-gray-100 text-gray-700 border-gray-200'
+                          } ${updating === member.id ? 'opacity-50' : ''}`}
+                        >
+                          <option value="STAFF">Staff</option>
+                          <option value="ADMIN">Admin</option>
+                        </select>
                       </div>
                       <p className="text-[12px] text-[var(--color-muted-foreground)] flex items-center gap-1 mt-0.5">
                         <Clock className="w-3 h-3" />

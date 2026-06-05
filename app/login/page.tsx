@@ -32,7 +32,11 @@ function LoginForm() {
       });
 
       if (result?.error) {
-        setError('This email is not authorized. Ask your admin to add you.');
+        if (result.error === 'AccessDenied') {
+          setError('This email is not authorized. Ask your admin to add you.');
+        } else {
+          setError(`Email failed to send (${result.error}). Please check SMTP configuration in .env.`);
+        }
       } else {
         setSent(true);
       }
@@ -149,7 +153,7 @@ function LoginForm() {
         <div className="mt-8 text-center">
           <div className="inline-flex items-center gap-1.5 text-[13px] text-[var(--color-muted-foreground)]">
             <Zap className="w-3.5 h-3.5" />
-            <span>Powered by AutoReel Lite</span>
+            <span>Powered by Tiodev</span>
           </div>
         </div>
       </div>
