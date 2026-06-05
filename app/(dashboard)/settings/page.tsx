@@ -189,7 +189,7 @@ export default function SettingsPage() {
       </div>
 
       {/* ─── API Configuration ─── */}
-      {session?.user?.role === 'SUPER_ADMIN' && (
+      {(session?.user?.role === 'SUPER_ADMIN' || session?.user?.role === 'ADMIN') && (
         <div>
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-2.5">
@@ -197,9 +197,13 @@ export default function SettingsPage() {
                 <Key className="w-4 h-4 text-white" />
               </div>
               <div>
-                <h2 className="text-[17px] font-semibold">System API Configuration</h2>
+                <h2 className="text-[17px] font-semibold">
+                  {session.user.role === 'SUPER_ADMIN' ? 'System API Configuration' : 'Workspace API Configuration'}
+                </h2>
                 <p className="text-[12px] text-[var(--color-muted-foreground)]">
-                  Configure OAuth client credentials globally. Only Super Admin can view this.
+                  {session.user.role === 'SUPER_ADMIN' 
+                    ? 'Configure OAuth client credentials globally. These act as fallback for all workspaces.'
+                    : 'Configure your custom OAuth client credentials for this workspace.'}
                 </p>
               </div>
             </div>
