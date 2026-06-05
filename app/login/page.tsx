@@ -25,18 +25,32 @@ function LoginForm() {
     setError('');
 
     try {
+      const normalizedEmail = email.trim().toLowerCase();
+
+      // Step 1: Check if email is in allowed list BEFORE calling signIn
+      const checkRes = await fetch('/api/team/check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: normalizedEmail }),
+      });
+      const checkData = await checkRes.json();
+
+      if (!checkData.allowed) {
+        setError('This email is not authorized. Ask your admin to add you.');
+        return;
+      }
+
+      // Step 2: Email IS authorized, now attempt signIn (sends magic link)
       const result = await signIn('email', {
-        email: email.trim().toLowerCase(),
+        email: normalizedEmail,
         redirect: false,
         callbackUrl,
       });
 
       if (result?.error) {
-        if (result.error === 'AccessDenied') {
-          setError('This email is not authorized. Ask your admin to add you.');
-        } else {
-          setError(`Email failed to send (${result.error}). Please check SMTP configuration in .env.`);
-        }
+        // Since we already confirmed the email is authorized,
+        // any error here is an SMTP / email delivery issue
+        setError('Failed to send magic link email. Please check SMTP configuration (EMAIL_SERVER in .env).');
       } else {
         setSent(true);
       }
