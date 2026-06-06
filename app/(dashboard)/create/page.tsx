@@ -86,6 +86,14 @@ export default function CreateReelPage() {
           const result = await res.json();
           setVideos((prev) => [...prev, { ...result, title: result.titleFromFileName }]);
           successCount++;
+        } else {
+          const errorText = await res.text();
+          try {
+            const errorJson = JSON.parse(errorText);
+            toast.error(`Failed: ${errorJson.error || res.statusText}`);
+          } catch {
+            toast.error(`Failed: ${res.statusText}`);
+          }
         }
       } catch (error) {
         toast.error(`Failed to upload ${file.name}`);
