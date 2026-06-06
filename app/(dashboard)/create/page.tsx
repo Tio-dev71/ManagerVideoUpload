@@ -29,6 +29,9 @@ interface UploadedVideo {
   mimeType: string;
   // User editable
   title: string;
+  caption: string;
+  firstComment: string;
+  hashtags: string;
 }
 
 export default function CreateReelPage() {
@@ -42,9 +45,6 @@ export default function CreateReelPage() {
   const [videos, setVideos] = useState<UploadedVideo[]>([]);
 
   // Global Form state
-  const [caption, setCaption] = useState('');
-  const [firstComment, setFirstComment] = useState('');
-  const [hashtags, setHashtags] = useState('');
   const [platforms, setPlatforms] = useState<Platform[]>([]);
   const [publishMode, setPublishMode] = useState<PublishMode>('now');
   const [scheduledAt, setScheduledAt] = useState('');
@@ -84,7 +84,16 @@ export default function CreateReelPage() {
 
         if (res.ok) {
           const result = await res.json();
-          setVideos((prev) => [...prev, { ...result, title: result.titleFromFileName }]);
+          setVideos((prev) => [
+            ...prev,
+            {
+              ...result,
+              title: result.titleFromFileName,
+              caption: '',
+              firstComment: '',
+              hashtags: '',
+            },
+          ]);
           successCount++;
         } else {
           const errorText = await res.text();
@@ -151,8 +160,8 @@ export default function CreateReelPage() {
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  const updateVideoTitle = (id: string, newTitle: string) => {
-    setVideos(prev => prev.map(v => v.id === id ? { ...v, title: newTitle } : v));
+  const updateVideoField = (id: string, field: keyof UploadedVideo, value: string) => {
+    setVideos(prev => prev.map(v => v.id === id ? { ...v, [field]: value } : v));
   };
 
   // Submit all
@@ -182,9 +191,9 @@ export default function CreateReelPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             title: video.title.trim() || video.titleFromFileName,
-            caption: caption.trim() || null,
-            firstComment: firstComment.trim() || null,
-            hashtags: hashtags.trim() || null,
+            caption: video.caption.trim() || null,
+            firstComment: video.firstComment.trim() || null,
+            hashtags: video.hashtags.trim() || null,
             videoAssetId: video.id,
             platforms,
             publishMode,
@@ -280,91 +289,82 @@ export default function CreateReelPage() {
 
         {/* Video Previews */}
         {videos.length > 0 && (
-          <div className="space-y-3 animate-fade-in">
-            <h3 className="text-[14px] font-medium">Uploaded Videos ({videos.length})</h3>
-            <div className="grid gap-3">
+          <div className="space-y-6 animate-fade-in">
+            <h3 className="text-[16px] font-medium border-b border-[var(--color-border)] pb-2">
+              Video Details ({videos.length})
+            </h3>
+            <div className="grid gap-6">
               {videos.map(v => (
-                <div key={v.id} className="card-apple p-4 flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-lg bg-black flex items-center justify-center flex-shrink-0 overflow-hidden">
-                    <video src={v.storageUrl} className="w-full h-full object-cover" muted />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <input
-                      type="text"
-                      value={v.title}
-                      onChange={(e) => updateVideoTitle(v.id, e.target.value)}
-                      className="input-apple py-1.5 px-3 text-[13px] w-full mb-1"
-                      placeholder="Video Title"
-                      required
-                    />
-                    <p className="text-[12px] text-[var(--color-muted-foreground)]">
-                      {formatFileSize(v.size)} • {v.mimeType.split('/')[1].toUpperCase()}
-                    </p>
-                  </div>
+                <div key={v.id} className="card-apple p-5 space-y-4 relative">
                   <button
                     type="button"
                     onClick={() => removeVideo(v.id)}
-                    className="p-2 rounded-xl hover:bg-[var(--color-muted)] transition-colors text-red-500"
+                    className="absolute top-4 right-4 p-2 rounded-xl bg-red-50 text-red-500 hover:bg-red-100 transition-colors"
                     title="Remove video"
                   >
                     <X className="w-4 h-4" />
                   </button>
+
+                  <div className="flex items-start gap-4 pr-10">
+                    <div className="w-24 h-24 rounded-lg bg-black flex items-center justify-center flex-shrink-0 overflow-hidden">
+                      <video src={v.storageUrl} className="w-full h-full object-cover" muted />
+                    </div>
+                    <div className="flex-1 space-y-3 min-w-0">
+                      <div>
+                        <input
+                          type="text"
+                          value={v.title}
+                          onChange={(e) => updateVideoField(v.id, 'title', e.target.value)}
+                          className="input-apple py-2 px-3 text-[14px] font-medium w-full"
+                          placeholder="Video Title"
+                          required
+                        />
+                        <p className="text-[12px] text-[var(--color-muted-foreground)] mt-1">
+                          {formatFileSize(v.size)} • {v.mimeType.split('/')[1].toUpperCase()}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="sm:col-span-2">
+                      <textarea
+                        value={v.caption}
+                        onChange={(e) => updateVideoField(v.id, 'caption', e.target.value)}
+                        className="input-apple min-h-[80px] resize-y text-[13px]"
+                        placeholder="Caption / Description..."
+                        rows={2}
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="text"
+                        value={v.hashtags}
+                        onChange={(e) => updateVideoField(v.id, 'hashtags', e.target.value)}
+                        className="input-apple text-[13px]"
+                        placeholder="#viral #trending"
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="text"
+                        value={v.firstComment}
+                        onChange={(e) => updateVideoField(v.id, 'firstComment', e.target.value)}
+                        className="input-apple text-[13px]"
+                        placeholder="Auto First Comment..."
+                      />
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        {/* Form Fields */}
+        {/* Global Settings */}
         {videos.length > 0 && (
-          <div className="space-y-6 animate-fade-in">
+          <div className="space-y-6 animate-fade-in border-t border-[var(--color-border)] pt-6">
             
-            {/* Caption */}
-            <div>
-              <label className="block text-[14px] font-medium mb-1.5">
-                Caption / Description (Applies to all)
-              </label>
-              <textarea
-                value={caption}
-                onChange={(e) => setCaption(e.target.value)}
-                className="input-apple min-h-[80px] resize-y"
-                placeholder="Write a caption for your reels..."
-                rows={3}
-              />
-            </div>
-
-            {/* First Comment */}
-            <div>
-              <label className="flex items-center gap-2 text-[14px] font-medium mb-1.5">
-                <MessageCircle className="w-4 h-4 text-[var(--color-primary)]" />
-                Auto First Comment (Applies to all)
-              </label>
-              <textarea
-                value={firstComment}
-                onChange={(e) => setFirstComment(e.target.value)}
-                className="input-apple min-h-[60px] resize-y"
-                placeholder="Write a comment to post immediately after publishing..."
-                rows={2}
-              />
-              <p className="text-[12px] text-[var(--color-muted-foreground)] mt-1.5">
-                Automatically pins/posts this comment to YouTube Shorts and Facebook Reels.
-              </p>
-            </div>
-
-            {/* Hashtags */}
-            <div>
-              <label className="block text-[14px] font-medium mb-1.5">
-                Hashtags (Applies to all)
-              </label>
-              <input
-                type="text"
-                value={hashtags}
-                onChange={(e) => setHashtags(e.target.value)}
-                className="input-apple"
-                placeholder="#viral #trending #reels"
-              />
-            </div>
-
             {/* Platform Selection */}
             <div>
               <label className="block text-[14px] font-medium mb-3">

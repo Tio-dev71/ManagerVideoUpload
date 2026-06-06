@@ -1,7 +1,7 @@
 import type { Publisher, PublishResult } from './types';
 import type { Post, VideoAsset, SocialAccount, PostPlatform } from '@prisma/client';
 import { getStorage } from '@/lib/storage';
-import { decryptToken } from '@/lib/crypto';
+import { getValidAccessToken } from './googleAuth';
 import fs from 'fs';
 
 /**
@@ -22,7 +22,7 @@ export class YouTubeShortsPublisher implements Publisher {
     _platform: PostPlatform
   ): Promise<PublishResult> {
     try {
-      const token = decryptToken(socialAccount.accessToken);
+      const token = await getValidAccessToken(socialAccount);
       const storage = getStorage();
       const videoPath = storage.getPath(videoAsset.storageUrl);
 
