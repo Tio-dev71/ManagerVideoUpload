@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { getCredentials } from '@/lib/credentials';
 
+const META_GRAPH_API_VERSION = process.env.META_GRAPH_API_VERSION || 'v25.0';
+
 // GET /api/social/meta — Initiate Meta OAuth flow
 export async function GET() {
   try {
@@ -25,12 +27,11 @@ export async function GET() {
       'pages_manage_posts',
       'pages_read_engagement',
       'pages_show_list',
-      'business_management',
       'instagram_basic',
       'instagram_content_publish',
     ].join(',');
 
-    const authUrl = `https://www.facebook.com/v19.0/dialog/oauth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scopes}&response_type=code&state=meta`;
+    const authUrl = `https://www.facebook.com/${META_GRAPH_API_VERSION}/dialog/oauth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scopes}&response_type=code&state=meta`;
 
     return NextResponse.redirect(authUrl);
   } catch (error: any) {
