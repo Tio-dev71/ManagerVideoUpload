@@ -6,13 +6,13 @@ import { getCredentials } from '@/lib/credentials';
 
 // GET /api/social/meta/callback — Handle Meta OAuth callback
 export async function GET(req: NextRequest) {
+  const baseUrl = process.env.AUTH_URL || new URL(req.url).origin;
   try {
     const session = await auth();
     if (!session?.user?.id) {
-      return NextResponse.redirect(new URL('/login', req.url));
+      return NextResponse.redirect(new URL('/login', baseUrl));
     }
 
-    const baseUrl = process.env.AUTH_URL || new URL(req.url).origin;
     const url = new URL(req.url);
     const code = url.searchParams.get('code');
     const error = url.searchParams.get('error');
@@ -103,7 +103,7 @@ export async function GET(req: NextRequest) {
   } catch (error: any) {
     console.error('Meta callback error:', error);
     return NextResponse.redirect(
-      new URL('/settings?error=meta_callback_error', req.url)
+      new URL('/settings?error=meta_callback_error', baseUrl)
     );
   }
 }
