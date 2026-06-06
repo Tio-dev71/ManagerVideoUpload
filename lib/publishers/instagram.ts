@@ -4,8 +4,6 @@ import { getStorage } from '@/lib/storage';
 import { decryptToken } from '@/lib/crypto';
 import fs from 'fs';
 
-const META_GRAPH_API_VERSION = process.env.META_GRAPH_API_VERSION || 'v25.0';
-
 /**
  * Instagram Reels publisher using Meta Graph API.
  * 
@@ -41,7 +39,7 @@ export class InstagramReelsPublisher implements Publisher {
 
       // Step 1: Create media container
       const containerRes = await fetch(
-        `https://graph.facebook.com/${META_GRAPH_API_VERSION}/${igId}/media`,
+        `https://graph.facebook.com/v19.0/${igId}/media`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -67,7 +65,7 @@ export class InstagramReelsPublisher implements Publisher {
         await new Promise((r) => setTimeout(r, 10000));
 
         const statusRes = await fetch(
-          `https://graph.facebook.com/${META_GRAPH_API_VERSION}/${containerId}?fields=status_code&access_token=${token}`
+          `https://graph.facebook.com/v19.0/${containerId}?fields=status_code&access_token=${token}`
         );
         const statusData = await statusRes.json();
 
@@ -85,7 +83,7 @@ export class InstagramReelsPublisher implements Publisher {
 
       // Step 3: Publish
       const publishRes = await fetch(
-        `https://graph.facebook.com/${META_GRAPH_API_VERSION}/${igId}/media_publish`,
+        `https://graph.facebook.com/v19.0/${igId}/media_publish`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -101,7 +99,7 @@ export class InstagramReelsPublisher implements Publisher {
         // Step 4: Post first comment if provided
         if (post.firstComment) {
           try {
-            await fetch(`https://graph.facebook.com/${META_GRAPH_API_VERSION}/${publishData.id}/comments`, {
+            await fetch(`https://graph.facebook.com/v19.0/${publishData.id}/comments`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({

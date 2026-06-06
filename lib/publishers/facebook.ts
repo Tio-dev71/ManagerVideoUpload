@@ -5,8 +5,6 @@ import { decryptToken } from '@/lib/crypto';
 import fs from 'fs';
 import path from 'path';
 
-const META_GRAPH_API_VERSION = process.env.META_GRAPH_API_VERSION || 'v25.0';
-
 /**
  * Facebook Reels publisher using Meta Graph API.
  * 
@@ -35,7 +33,7 @@ export class FacebookReelsPublisher implements Publisher {
 
       // Step 1: Initialize upload session
       const initRes = await fetch(
-        `https://graph.facebook.com/${META_GRAPH_API_VERSION}/${socialAccount.pageId}/video_reels`,
+        `https://graph.facebook.com/v19.0/${socialAccount.pageId}/video_reels`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -56,7 +54,7 @@ export class FacebookReelsPublisher implements Publisher {
       // Step 2: Upload video binary
       const videoBuffer = fs.readFileSync(videoPath);
       const uploadRes = await fetch(
-        `https://rupload.facebook.com/video-upload/${META_GRAPH_API_VERSION}/${videoId}`,
+        `https://rupload.facebook.com/video-upload/v19.0/${videoId}`,
         {
           method: 'POST',
           headers: {
@@ -77,14 +75,13 @@ export class FacebookReelsPublisher implements Publisher {
       // Step 3: Publish reel
       const description = [post.caption, post.hashtags].filter(Boolean).join('\n\n');
       const publishRes = await fetch(
-        `https://graph.facebook.com/${META_GRAPH_API_VERSION}/${socialAccount.pageId}/video_reels`,
+        `https://graph.facebook.com/v19.0/${socialAccount.pageId}/video_reels`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             upload_phase: 'finish',
             video_id: videoId,
-            video_state: 'PUBLISHED',
             title: post.title,
             description,
             access_token: accessToken,
@@ -97,7 +94,7 @@ export class FacebookReelsPublisher implements Publisher {
         // Step 4: Post first comment if provided
         if (post.firstComment) {
           try {
-            await fetch(`https://graph.facebook.com/${META_GRAPH_API_VERSION}/${videoId}/comments`, {
+            await fetch(`https://graph.facebook.com/v19.0/${videoId}/comments`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
