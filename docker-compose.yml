@@ -28,6 +28,8 @@ services:
     restart: always
     ports:
       - "3000:3000"
+    volumes:
+      - uploads_data:/app/uploads
     env_file:
       - .env
     environment:
@@ -43,6 +45,8 @@ services:
       dockerfile: Dockerfile
     restart: always
     command: node dist/worker.js
+    volumes:
+      - uploads_data:/app/uploads
     env_file:
       - .env
     environment:
@@ -55,3 +59,4 @@ services:
 volumes:
   postgres_data:
   redis_data:
+  uploads_data:
