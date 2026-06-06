@@ -52,6 +52,7 @@ export async function GET(req: NextRequest) {
       `https://graph.facebook.com/v19.0/me/accounts?access_token=${accessToken}`
     );
     const pagesData = await pagesRes.json();
+    console.log('DEBUG_META_PAGES:', JSON.stringify(pagesData, null, 2));
     const page = pagesData.data?.[0]; // Use first page
 
     // Get Instagram Business Account
