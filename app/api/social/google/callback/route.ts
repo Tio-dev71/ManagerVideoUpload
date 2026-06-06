@@ -12,6 +12,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.redirect(new URL('/login', req.url));
     }
 
+    const baseUrl = process.env.AUTH_URL || new URL(req.url).origin;
     const url = new URL(req.url);
     const code = url.searchParams.get('code');
     const state = url.searchParams.get('state');
@@ -19,7 +20,7 @@ export async function GET(req: NextRequest) {
 
     if (error || !code) {
       return NextResponse.redirect(
-        new URL('/settings?error=google_auth_failed', req.url)
+        new URL('/settings?error=google_auth_failed', baseUrl)
       );
     }
 
@@ -46,7 +47,7 @@ export async function GET(req: NextRequest) {
     if (!tokenData.access_token) {
       console.error('Google token exchange failed:', tokenData);
       return NextResponse.redirect(
-        new URL('/settings?error=token_exchange_failed', req.url)
+        new URL('/settings?error=token_exchange_failed', baseUrl)
       );
     }
 
@@ -117,12 +118,12 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.redirect(
-      new URL(`/settings?success=${provider.toLowerCase()}`, req.url)
+      new URL(`/settings?success=${provider.toLowerCase()}`, baseUrl)
     );
   } catch (error: any) {
     console.error('Google callback error:', error);
     return NextResponse.redirect(
-      new URL('/settings?error=google_callback_error', req.url)
+      new URL('/settings?error=google_callback_error', baseUrl)
     );
   }
 }
