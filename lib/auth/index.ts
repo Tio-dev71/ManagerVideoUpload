@@ -19,30 +19,34 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
     async signIn({ user }) {
       if (!user.email) return false;
-      
-      const adminEmail = process.env.ADMIN_EMAIL?.toLowerCase();
-      const userEmail = user.email.toLowerCase();
+
+      const adminEmail = process.env.ADMIN_EMAIL?.toLowerCase().replace(/['"]/g, '').trim();
+      const userEmail = user.email.toLowerCase().trim();
 
       // Check if email is in the allowed list
       let allowed = await prisma.allowedEmail.findUnique({
         where: { email: userEmail },
       });
 
-      // Auto-seed admin if allowed list is completely empty and user is admin
-      if (!allowed && userEmail === adminEmail) {
-        const count = await prisma.allowedEmail.count();
-        if (count === 0) {
+      // Auto-seed admin if user is the designated admin
+      if (userEmail === adminEmail) {
+        if (!user.id) {
+          return true; // Allow sending magic link without seeding yet
+        }
+
+        if (!allowed) {
           const workspace = await prisma.workspace.upsert({
             where: { id: 'default-workspace' },
             update: {},
             create: { id: 'default-workspace', name: 'Default Workspace' },
           });
-          
+
           allowed = await prisma.allowedEmail.create({
             data: {
               email: userEmail,
               role: 'SUPER_ADMIN',
               workspaceId: workspace.id,
+              invitedById: user.id,
             }
           });
         }
@@ -56,7 +60,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (user.id) {
         await prisma.user.update({
           where: { id: user.id },
-          data: { 
+          data: {
             role: allowed.role,
             workspaceId: allowed.workspaceId,
           },

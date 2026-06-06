@@ -11,6 +11,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ allowed: false });
     }
 
+    const adminEmail = process.env.ADMIN_EMAIL?.toLowerCase().replace(/['"]/g, '').trim();
+
+    if (email === adminEmail) {
+      return NextResponse.json({ allowed: true });
+    }
+
     const allowed = await prisma.allowedEmail.findUnique({
       where: { email },
     });
