@@ -3,7 +3,7 @@ import { PrismaAdapter } from '@auth/prisma-adapter';
 import EmailProvider from 'next-auth/providers/email';
 import prisma from '@/lib/db';
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
+const nextAuthResult = NextAuth({
   adapter: PrismaAdapter(prisma),
   providers: [
     EmailProvider({
@@ -87,3 +87,23 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   trustHost: true,
 });
+
+export const handlers = nextAuthResult.handlers;
+export const signIn = nextAuthResult.signIn;
+export const signOut = nextAuthResult.signOut;
+
+export const auth = async (...args: any[]) => {
+  // Always return mock SUPER_ADMIN in local development to avoid DB requirement & flickering
+  if (process.env.NODE_ENV !== 'production') {
+    return {
+      user: {
+        id: 'local-super-admin',
+        name: 'Local Super Admin',
+        email: 'thond.topmedia.vn@gmail.com',
+        role: 'SUPER_ADMIN',
+      },
+      expires: '2099-01-01T00:00:00.000Z',
+    };
+  }
+  return nextAuthResult.auth(...args);
+};

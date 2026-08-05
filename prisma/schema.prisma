@@ -64,6 +64,7 @@ model Workspace {
   videoAssets    VideoAsset[]
   posts          Post[]
   publishLogs    PublishLog[]
+  facebookAccounts FacebookAccount[]
 }
 
 model User {
@@ -278,4 +279,77 @@ model SystemSetting {
   updatedAt DateTime @updatedAt
 
   @@index([key])
+}
+
+// ──────────────────────────────────────────────
+// Multi-Account Automation Models
+// ──────────────────────────────────────────────
+
+model FacebookAccount {
+  id              String      @id @default(cuid())
+  name            String
+  uid             String?
+  password        String?
+  twoFactorCode   String?
+  cookie          String?     @db.Text
+  profileId       String      @unique // The folder name inside ~/.autopost/profiles/
+  proxy           String?
+  status          FbAccountStatus @default(LIVE)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  workspaceId     String?
+  workspace       Workspace?  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId])
+  @@index([status])
+}
+
+enum FbAccountStatus {
+  LIVE
+  CHECKPOINT
+  DEAD
+}
+
+model Proxy {
+  id        String   @id @default(cuid())
+  protocol  String   @default("http")
+  host      String
+  port      Int
+  username  String?
+  password  String?
+  status    String   @default("ACTIVE")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AutomationTask {
+  id          String   @id @default(cuid())
+  name        String
+  type        String
+  config      Json?
+  profileIds  Json?    // Array of FB account profile IDs
+  status      TaskStatus @default(IDLE)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum TaskStatus {
+  IDLE
+  RUNNING
+  DONE
+  FAILED
+}
+
+model AutomationLog {
+  id          String   @id @default(cuid())
+  profileId   String
+  accountName String?
+  actionType  String   // 'COMMENT', 'POST_REEL', 'ADD_FRIEND', 'INVITE_GROUP'
+  link        String?  @db.Text
+  message     String?  @db.Text
+  createdAt   DateTime @default(now())
+
+  @@index([profileId])
+  @@index([actionType])
 }

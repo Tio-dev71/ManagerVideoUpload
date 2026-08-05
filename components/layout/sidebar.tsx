@@ -15,12 +15,21 @@ import {
   ChevronLeft,
   Menu,
   Building2,
+  Download,
+  Globe,
+  Activity,
 } from 'lucide-react';
 import { useState } from 'react';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { name: 'Live Dashboard', href: '/live', icon: Play },
   { name: 'Posts', href: '/posts', icon: Calendar },
+  { name: 'Downloader', href: '/downloader', icon: Download },
+  { name: 'FB Accounts', href: '/accounts', icon: Users },
+  { name: 'Proxies', href: '/proxies', icon: Globe },
+  { name: 'Automation', href: '/automation', icon: Play },
+  { name: 'History', href: '/history', icon: Activity },
 ];
 
 const adminNavigation = [

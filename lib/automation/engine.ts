@@ -1,0 +1,518 @@
+import { chromium, Page, BrowserContext } from 'playwright';
+import path from 'path';
+import os from 'os';
+import fs from 'fs';
+import { browserManager } from '@/lib/automation/browserManager';
+import { prisma } from '@/lib/db';
+
+export interface TaskConfig {
+  targetUrl?: string;
+  actionCount: number;
+  comments?: string[];
+  type: string;
+}
+
+export class AutomationEngine {
+  static checkStop(profileId: string) {
+    if (browserManager.isStopped(profileId)) {
+      throw new Error('Task stopped by user');
+    }
+  }
+
+  static async safeWait(page: Page, ms: number, profileId: string) {
+    const start = Date.now();
+    while (Date.now() - start < ms) {
+      this.checkStop(profileId);
+      await page.waitForTimeout(Math.min(500, ms - (Date.now() - start)));
+    }
+  }
+
+
+  static async humanScroll(page: Page, profileId: string, scrolls = 3) {
+    for (let i = 0; i < scrolls; i++) {
+      const distance = 300 + Math.random() * 500;
+      const chunks = 15;
+      const step = distance / chunks;
+
+      for (let j = 0; j < chunks; j++) {
+        await page.mouse.wheel(0, step);
+        await this.safeWait(page, 20 + Math.random() * 20, profileId);
+      }
+
+      if (Math.random() > 0.8) {
+        await page.mouse.wheel(0, -200);
+      }
+
+      await this.safeWait(page, 1500 + Math.random() * 2000, profileId);
+    }
+  }
+
+  static async randomInteract(page: Page, config: TaskConfig, profileId: string, chance = 0.3) {
+    const action = Math.random();
+    if (action > chance) return;
+
+    const isLike = Math.random() < 0.6;
+
+    if (isLike) {
+      console.log('Liking a post/reel');
+      await page.evaluate(() => {
+        function isVisible(el: Element) {
+          const rect = el.getBoundingClientRect();
+          return rect.top >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight);
+        }
+        const likes = Array.from(document.querySelectorAll('div[aria-label="Thích"], div[aria-label="Like"], div[aria-label="Bày tỏ cảm xúc"], div[aria-label="Thích bài viết"]')).filter(isVisible) as HTMLElement[];
+        if (likes.length > 0) {
+          likes[Math.floor(Math.random() * likes.length)].click();
+        }
+      });
+      await this.safeWait(page, 2000, profileId);
+    } else if (config.comments && config.comments.length > 0) {
+      console.log('Commenting on a post/reel');
+      const comment = config.comments[Math.floor(Math.random() * config.comments.length)];
+
+      const clicked = await page.evaluate(() => {
+        function isVisible(el: Element) {
+          const rect = el.getBoundingClientRect();
+          return rect.top >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight);
+        }
+        
+        let allBtns = Array.from(document.querySelectorAll('div[role="button"], a, span'));
+        let commentBtn = allBtns.find(el => {
+          if (!isVisible(el)) return false;
+          let text = (el as HTMLElement).innerText?.toLowerCase() || '';
+          let aria = el.getAttribute('aria-label')?.toLowerCase() || '';
+          return aria.includes('bình luận') || aria.includes('comment') || aria.includes('viết bình luận') ||
+                 text === 'bình luận' || text === 'comment';
+        });
+
+        if (commentBtn) {
+          const target = commentBtn.closest('[role="button"]') || commentBtn;
+          (target as HTMLElement).click();
+          return true;
+        }
+        return false;
+      });
+
+      if (clicked) {
+        await this.safeWait(page, 3000, profileId);
+
+        await page.evaluate(() => {
+          const box = document.querySelector('form[action*="/comment/"] textarea, form div[contenteditable="true"], div[aria-label="Viết bình luận"], div[aria-label="Write a comment"]') as HTMLElement;
+          if (box) box.focus();
+        });
+
+        await page.keyboard.type(comment, { delay: 50 });
+        await this.safeWait(page, 500, profileId);
+        await page.keyboard.press('Enter');
+
+        const postLink = await page.evaluate(() => {
+          if (window.location.href.includes('/reel/') || window.location.href.includes('/watch/')) {
+            return window.location.href;
+          }
+          const box = document.activeElement;
+          if (box) {
+            const article = box.closest('div[role="article"]') || box.closest('div[data-pagelet*="FeedUnit"]');
+            if (article) {
+              const links = Array.from(article.querySelectorAll('a'));
+              const linkEl = links.find(a => a.href.includes('/posts/') || a.href.includes('/videos/') || a.href.includes('/photo') || /\/permalink\//.test(a.href));
+              if (linkEl) return linkEl.href;
+            }
+          }
+          return window.location.href; // Fallback
+        });
+
+        try {
+          await prisma.automationLog.create({
+            data: {
+              profileId,
+              actionType: 'COMMENT',
+              link: postLink,
+              message: comment
+            }
+          });
+        } catch (e) {
+          console.error('[AutomationLog] Failed to log comment:', e);
+        }
+
+        await this.safeWait(page, 3000, profileId);
+        await page.keyboard.press('Escape');
+        await this.safeWait(page, 1000, profileId);
+      }
+    }
+  }
+
+  static async taskFbFarmReels(page: Page, config: TaskConfig, profileId: string) {
+    let reelsUrl = config.targetUrl || 'https://www.facebook.com/reels/';
+
+    if (!config.targetUrl) {
+      console.log(`Farming general reels`);
+      await page.goto(reelsUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
+      await this.safeWait(page, 5000, profileId);
+
+      await page.evaluate(() => {
+        const reel = document.querySelector('a[href*="/reel/"]') as HTMLElement;
+        if (reel) reel.click();
+      });
+      await this.safeWait(page, 5000, profileId);
+
+      for (let i = 0; i < config.actionCount; i++) {
+        console.log(`Watching reel ${i + 1}/${config.actionCount}`);
+        await this.safeWait(page, 10000 + Math.random() * 15000, profileId);
+        await this.randomInteract(page, config, profileId, 0.2);
+
+        if (Math.random() > 0.8 && i > 0) {
+          await page.keyboard.press('ArrowUp');
+        } else {
+          await page.keyboard.press('ArrowDown');
+        }
+        await this.safeWait(page, 2000, profileId);
+      }
+      return;
+    }
+
+    if (!reelsUrl.endsWith('/reels/') && !reelsUrl.endsWith('/reels')) {
+      reelsUrl = reelsUrl.replace(/\/$/, '') + '/reels/';
+    }
+
+    console.log(`Farming fanpage reels at ${reelsUrl}`);
+
+    for (let i = 0; i < config.actionCount; i++) {
+      await page.goto(reelsUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
+      await this.safeWait(page, 4000, profileId);
+
+      if (i > 4) {
+        await this.humanScroll(page, profileId, Math.floor(i / 4));
+      }
+
+      const clicked = await page.evaluate((index) => {
+        const reels = Array.from(document.querySelectorAll('a[href*="/reel/"]')) as HTMLElement[];
+        if (reels.length > index) {
+          reels[index].click();
+          return true;
+        } else if (reels.length > 0) {
+          reels[Math.floor(Math.random() * reels.length)].click();
+          return true;
+        }
+        return false;
+      }, i);
+
+      if (clicked) {
+        console.log(`Watching fanpage reel ${i + 1}/${config.actionCount}`);
+        await this.safeWait(page, 10000 + Math.random() * 15000, profileId);
+        await this.randomInteract(page, config, profileId, 0.2);
+      } else {
+        console.log(`Could not find reel ${i + 1}`);
+        break;
+      }
+    }
+  }
+
+  static async taskFbAutoInteract(page: Page, config: TaskConfig, profileId: string) {
+    const targetUrl = config.targetUrl || 'https://www.facebook.com/';
+    console.log(`Farming feed at ${targetUrl}`);
+    await page.goto(targetUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
+    await this.safeWait(page, 4000, profileId);
+
+    for (let i = 0; i < config.actionCount; i++) {
+      console.log(`Scrolling feed ${i + 1}/${config.actionCount}`);
+      await this.humanScroll(page, profileId, 2);
+      await this.randomInteract(page, config, profileId, 0.4);
+    }
+  }
+
+  static async taskFbAddFriendsGroup(page: Page, config: TaskConfig, profileId: string) {
+    let url = config.targetUrl;
+    if (!url) {
+      throw new Error('Vui lòng nhập Link Group Facebook (hoặc ID Group) vào ô Target URL!');
+    }
+    
+    // If it's just numbers (Group ID), construct the URL
+    if (/^\d+$/.test(url.trim())) {
+      url = `https://www.facebook.com/groups/${url.trim()}`;
+    } else if (!url.includes('facebook.com') && !url.includes('fb.com')) {
+      url = `https://www.facebook.com/groups/${url.trim()}`;
+    }
+
+    if (!url.includes('/members')) {
+      if (url.endsWith('/')) url += 'members';
+      else url += '/members';
+    }
+
+    console.log(`Navigating to ${url}...`);
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
+    await this.safeWait(page, 4000 + Math.random() * 2000, profileId);
+
+    let addedCount = 0;
+    let scrollAttempts = 0;
+
+    while (addedCount < config.actionCount && scrollAttempts < 20) {
+      const btnSelector = '[aria-label*="Thêm bạn bè"], [aria-label*="Add friend"], [aria-label*="Add Friend"], span';
+      const btns = await page.locator(btnSelector).all();
+
+      let clickedInThisPass = false;
+      for (const btn of btns) {
+        if (addedCount >= config.actionCount) break;
+
+        const isValid = await btn.evaluate(el => {
+          const rect = el.getBoundingClientRect();
+          if (rect.width === 0 || rect.height === 0 || rect.top < 0 || rect.bottom > (window.innerHeight || document.documentElement.clientHeight)) return false;
+          let aria = (el.getAttribute('aria-label') || '').toLowerCase().trim();
+          let text = ((el as HTMLElement).innerText || '').toLowerCase().trim();
+          return aria.includes('thêm bạn bè') || aria.includes('add friend') || text.includes('thêm bạn bè') || text.includes('add friend');
+        });
+
+        if (isValid) {
+          try {
+            await btn.click({ timeout: 2000 });
+            addedCount++;
+            clickedInThisPass = true;
+            console.log(`Sent friend request ${addedCount}/${config.actionCount}`);
+            await this.safeWait(page, 3000 + Math.random() * 5000, profileId);
+          } catch (e) {
+          }
+        }
+      }
+
+      if (!clickedInThisPass) {
+        await this.humanScroll(page, profileId, 2);
+        scrollAttempts++;
+      } else {
+        console.log(`Finished a batch. Resting 5-10s before next batch...`);
+        await this.safeWait(page, 5000 + Math.random() * 5000, profileId);
+        await this.humanScroll(page, profileId, 2);
+      }
+    }
+  }
+
+  static async taskFbInviteToGroup(page: Page, config: TaskConfig, profileId: string) {
+    let url = config.targetUrl;
+    if (!url) {
+      throw new Error('Vui lòng nhập Link Group Facebook (hoặc ID Group) vào ô Target URL!');
+    }
+    
+    // If it's just numbers (Group ID), construct the URL
+    if (/^\d+$/.test(url.trim())) {
+      url = `https://www.facebook.com/groups/${url.trim()}`;
+    } else if (!url.includes('facebook.com') && !url.includes('fb.com')) {
+      url = `https://www.facebook.com/groups/${url.trim()}`;
+    }
+
+    console.log(`Navigating to ${url}...`);
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
+    await this.safeWait(page, 4000 + Math.random() * 2000, profileId);
+
+    const opened = await page.evaluate(() => {
+      const inviteSelectors = [
+        'div[aria-label="Mời"]',
+        'div[aria-label="Invite"]',
+        'div[aria-label*="Mời tham gia"]',
+        'div[role="button"]',
+        'a',
+        'span'
+      ];
+      let allBtns = Array.from(document.querySelectorAll(inviteSelectors.join(', ')));
+      let inviteBtn = allBtns.find(el => {
+        let text = ((el as HTMLElement).innerText || '').toLowerCase();
+        let aria = (el.getAttribute('aria-label') || '').toLowerCase();
+        if ((text.includes('mời') || text.includes('invite') || aria.includes('mời') || aria.includes('invite')) && !text.includes('bạn bè trên facebook')) {
+          return el.getBoundingClientRect().width > 0;
+        }
+        return false;
+      });
+
+      if (inviteBtn) {
+        const target = inviteBtn.closest('[role="button"]') || inviteBtn;
+        (target as HTMLElement).click();
+        return true;
+      }
+      return false;
+    });
+
+    if (opened) {
+      console.log('Opened Invite dialog');
+      await this.safeWait(page, 3000, profileId);
+
+      await page.evaluate(() => {
+        let spans = Array.from(document.querySelectorAll('span'));
+        let subBtn = spans.find(span => {
+          let text = span.innerText?.toLowerCase() || '';
+          return text.includes('mời bạn bè trên facebook') || text.includes('invite facebook friends');
+        });
+        if (subBtn) {
+          const target = subBtn.closest('[role="button"]') || subBtn;
+          (target as HTMLElement).click();
+        }
+      });
+      await this.safeWait(page, 3000, profileId);
+
+      let invitedCount = 0;
+      let scrollAttempts = 0;
+
+      while (invitedCount < config.actionCount && scrollAttempts < 15) {
+        const checkboxes = await page.locator('input[type="checkbox"], div[role="checkbox"]').all();
+        let clickedInThisPass = false;
+
+        for (const cb of checkboxes) {
+          if (invitedCount >= config.actionCount) break;
+
+          const canCheck = await cb.evaluate(el => {
+            const rect = el.getBoundingClientRect();
+            if (rect.width === 0 || rect.height === 0 || rect.top < 0 || rect.bottom > (window.innerHeight || document.documentElement.clientHeight)) return false;
+            const ariaChecked = el.getAttribute('aria-checked');
+            if (ariaChecked === 'true') return false;
+            if (el.tagName.toLowerCase() === 'input' && (el as HTMLInputElement).checked) return false;
+            return true;
+          });
+
+          if (canCheck) {
+            try {
+              await cb.click({ timeout: 2000 });
+              invitedCount++;
+              clickedInThisPass = true;
+              console.log(`Selected friend ${invitedCount}/${config.actionCount}`);
+              await this.safeWait(page, 1000 + Math.random() * 1500, profileId);
+            } catch (e) { }
+          }
+        }
+
+        if (!clickedInThisPass) {
+          try {
+            await page.mouse.wheel(0, 500);
+          } catch (e) { }
+          await this.safeWait(page, 2000, profileId);
+          scrollAttempts++;
+        }
+      }
+
+      const sent = await page.evaluate(() => {
+        let spans = Array.from(document.querySelectorAll('div[role="button"] span'));
+        let sendBtn = spans.find(span => {
+          let txt = ((span as HTMLElement).innerText || '').toLowerCase().trim();
+          return txt.includes('gửi lời mời') || txt.includes('send invites') || txt === 'gửi' || txt === 'send';
+        });
+        if (sendBtn) {
+          const target = sendBtn.closest('[role="button"]') || sendBtn;
+          (target as HTMLElement).click();
+          return true;
+        }
+        return false;
+      });
+
+      if (sent) {
+        console.log(`Sent invites for batch of ${invitedCount}.`);
+      } else {
+        console.log('Could not find Send button, closing dialog via escape');
+        await page.keyboard.press('Escape');
+      }
+      await this.safeWait(page, 3000, profileId);
+
+    } else {
+      console.log('Could not find the Invite button on the group page');
+    }
+  }
+
+  static async runTask(profileId: string, config: TaskConfig) {
+    browserManager.clearStopFlag(profileId);
+    const userDataDir = path.join(os.homedir(), '.autopost', 'profiles', profileId);
+
+    console.log(`[AutomationEngine] Launching browser for profile ${profileId}`);
+
+    let browser = browserManager.getBrowser(profileId);
+    
+    if (browser) {
+      console.log(`[AutomationEngine] Browser already running in memory for ${profileId}. Reusing it.`);
+    } else {
+      const lockFile = path.join(userDataDir, 'SingletonLock');
+      if (fs.existsSync(lockFile)) {
+        console.error(`[AutomationEngine] Browser already running outside this process for ${profileId}`);
+        throw new Error('Browser already running outside this process. Please close it first.');
+      }
+
+      try {
+        browser = await chromium.launchPersistentContext(userDataDir, {
+          headless: false,
+          args: [
+            '--disable-notifications',
+            '--start-maximized',
+            '--disable-save-password-bubble',
+            '--disable-features=PasswordManager,CredentialManagementAPI'
+          ],
+          viewport: null,
+        });
+
+        browser.on('close', () => {
+          browserManager.removeBrowser(profileId);
+        });
+        browserManager.setBrowser(profileId, browser);
+      } catch (e: any) {
+        console.error(`[AutomationEngine] Failed to launch browser for ${profileId}. It might be already open!`);
+        throw new Error('Browser already running');
+      }
+    }
+
+    // Wait a moment for Chrome to restore previous tabs
+    await new Promise(r => setTimeout(r, 2000));
+    
+    const pages = browser.pages();
+    let page = pages.find(p => p.url().includes('facebook.com'));
+    
+    if (!page) {
+      page = pages[pages.length - 1];
+    }
+    
+    // Close ALL other tabs to avoid about:blank or any other clutter
+    for (const p of pages) {
+      if (p !== page) {
+        await p.close().catch(() => { });
+      }
+    }
+    
+    if (!page) {
+      page = await browser.newPage();
+    }
+
+    await page.bringToFront();
+
+    const screenshotPath = path.join(process.cwd(), 'public', 'screenshots', `${profileId}.jpg`);
+
+    const intervalId = setInterval(() => {
+      if (!page.isClosed()) {
+        page.screenshot({ path: screenshotPath, type: 'jpeg', quality: 40 }).catch(() => { });
+      }
+    }, 2000);
+
+    try {
+      switch (config.type) {
+        case 'fb_farm_reels':
+          await this.taskFbFarmReels(page, config, profileId);
+          break;
+        case 'fb_auto_interact':
+          await this.taskFbAutoInteract(page, config, profileId);
+          break;
+        case 'fb_add_friends_group':
+          await this.taskFbAddFriendsGroup(page, config, profileId);
+          break;
+        case 'fb_invite_to_group':
+          await this.taskFbInviteToGroup(page, config, profileId);
+          break;
+        default:
+          throw new Error(`Unknown task type: ${config.type}`);
+      }
+    } catch (error) {
+      console.error(`[AutomationEngine] Error running task ${config.type}:`, error);
+      throw error;
+    } finally {
+      // We do NOT close the browser here, nor do we clear the interval!
+      // This allows the browser to stay open 24/7 and the Live Dashboard to keep getting screenshots.
+      console.log(`[AutomationEngine] Task ${config.type} completed, leaving browser open 24/7.`);
+
+      // But we should clean up if the user manually closes the browser
+      browser.on('disconnected', () => {
+        clearInterval(intervalId);
+        if (fs.existsSync(screenshotPath)) {
+          try { fs.unlinkSync(screenshotPath); } catch (e) { }
+        }
+      });
+    }
+  }
+}

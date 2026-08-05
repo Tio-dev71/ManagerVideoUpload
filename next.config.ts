@@ -10,7 +10,7 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ['lucide-react', 'date-fns', 'framer-motion'],
   },
   // External packages that shouldn't be bundled
-  serverExternalPackages: ['bullmq', 'ioredis'],
+  serverExternalPackages: ['bullmq', 'ioredis', '@ffmpeg-installer/ffmpeg', 'fluent-ffmpeg', 'playwright-extra', 'puppeteer-extra-plugin-stealth'],
 };
 
 export default nextConfig;
