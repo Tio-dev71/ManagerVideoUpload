@@ -105,5 +105,5 @@ export const auth = async (...args: any[]) => {
       expires: '2099-01-01T00:00:00.000Z',
     };
   }
-  return nextAuthResult.auth(...args);
+  return (nextAuthResult.auth as any)(...args);
 };

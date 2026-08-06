@@ -24,7 +24,7 @@ export const browserManager = {
     global.activeBrowsers.set(profileId, browser);
     
     // Auto-remove when disconnected
-    browser.on('disconnected', () => {
+    browser.on('close', () => {
       global.activeBrowsers.delete(profileId);
     });
   },

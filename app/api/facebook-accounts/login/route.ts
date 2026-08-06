@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: 'Trình duyệt bị ngắt kết nối đột ngột. Hãy thử lại!' }, { status: 500 });
     }
 
-    let page = pages.find(p => p.url().includes('facebook.com'));
+    let page = pages.find((p: any) => p.url().includes('facebook.com'));
 
     if (!page) {
       page = pages[pages.length - 1];
@@ -157,7 +157,7 @@ export async function POST(req: NextRequest) {
       }
 
       console.log('[FB Login API] 2FA required. Generating token...');
-      const token = TOTP.generate(account.twoFactorCode.replace(/\s+/g, '').toUpperCase()).otp;
+      const token = (TOTP.generate(account.twoFactorCode.replace(/\s+/g, '').toUpperCase()) as any).otp;
 
       const codeInput = page.locator('#approvals_code');
       if (await codeInput.count() > 0) {

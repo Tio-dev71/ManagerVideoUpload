@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
+// @ts-ignore
 import ffmpeg from 'fluent-ffmpeg';
 import ffmpegInstaller from '@ffmpeg-installer/ffmpeg';
 
@@ -54,7 +55,7 @@ export async function addWatermark(videoUrl: string, text: string = 'Topmedia'):
         }
         resolve(outputVideoPath);
       })
-      .on('error', (err) => {
+      .on('error', (err: any) => {
         console.error(`[Watermark] Error applying watermark:`, err);
         // Clean up partial files
         if (fs.existsSync(rawVideoPath)) fs.unlinkSync(rawVideoPath);

@@ -485,7 +485,7 @@ export class AutomationEngine {
       console.log(`[AutomationEngine] Task ${config.type} completed, leaving browser open 24/7.`);
 
       // But we should clean up if the user manually closes the browser
-      browser.on('disconnected', () => {
+      browser.on('close', () => {
         clearInterval(intervalId);
         if (fs.existsSync(screenshotPath)) {
           try { fs.unlinkSync(screenshotPath); } catch (e) { }
