@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
     // Update DB
     await prisma.facebookAccount.update({
       where: { id },
-      data: { status: statusText }
+      data: { status: statusText as any }
     });
 
     return NextResponse.json({ success: true, isLive, status: statusText });
