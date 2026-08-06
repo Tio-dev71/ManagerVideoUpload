@@ -28,36 +28,11 @@ export async function POST(req: NextRequest) {
 
     console.log(`[FB Login API] Starting login for UID: ${account.uid}`);
 
-    // Check if we already have it in memory
-    browser = browserManager.getBrowser(account.profileId);
-    if (browser) {
-      console.log('[FB Login API] Browser is already running in memory. Reusing it.');
-    } else {
-      const lockFile = path.join(userDataDir, 'SingletonLock');
-      if (fs.existsSync(lockFile)) {
-        return NextResponse.json({ success: false, error: 'Trình duyệt của tài khoản này đang được mở ở một nơi khác. Hãy tắt nó trước!' }, { status: 400 });
-      }
-
-      try {
-        browser = await chromium.launchPersistentContext(userDataDir, {
-          headless: false,
-          args: [
-            '--disable-notifications',
-            '--start-maximized',
-            '--disable-save-password-bubble',
-            '--disable-features=PasswordManager,CredentialManagementAPI'
-          ],
-          viewport: null,
-        });
-
-        browser.on('close', () => {
-          browserManager.removeBrowser(account.profileId);
-        });
-        browserManager.setBrowser(account.profileId, browser);
-      } catch (launchError: any) {
-        console.error('[FB Login API] Launch error:', launchError.message);
-        return NextResponse.json({ success: false, error: 'Trình duyệt của tài khoản này đang được mở (có thể đang chạy Auto). Hãy kiểm tra Live Dashboard hoặc tắt nó trước!' }, { status: 400 });
-      }
+    try {
+      browser = await browserManager.launchBrowser(account.profileId, account.proxy);
+    } catch (launchError: any) {
+      console.error('[FB Login API] Launch error:', launchError.message);
+      return NextResponse.json({ success: false, error: launchError.message || 'Trình duyệt đang mở ở nơi khác!' }, { status: 400 });
     }
 
     // Wait a moment for Chrome to restore previous tabs

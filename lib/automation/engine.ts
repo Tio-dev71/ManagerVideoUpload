@@ -413,41 +413,19 @@ export class AutomationEngine {
 
   static async runTask(profileId: string, config: TaskConfig) {
     browserManager.clearStopFlag(profileId);
-    const userDataDir = path.join(os.homedir(), '.autopost', 'profiles', profileId);
+    
+    // Fetch account to get proxy
+    const account = await prisma.facebookAccount.findFirst({ where: { profileId } });
+    const proxyStr = account?.proxy;
 
     console.log(`[AutomationEngine] Launching browser for profile ${profileId}`);
 
-    let browser = browserManager.getBrowser(profileId);
-    
-    if (browser) {
-      console.log(`[AutomationEngine] Browser already running in memory for ${profileId}. Reusing it.`);
-    } else {
-      const lockFile = path.join(userDataDir, 'SingletonLock');
-      if (fs.existsSync(lockFile)) {
-        console.error(`[AutomationEngine] Browser already running outside this process for ${profileId}`);
-        throw new Error('Browser already running outside this process. Please close it first.');
-      }
-
-      try {
-        browser = await chromium.launchPersistentContext(userDataDir, {
-          headless: false,
-          args: [
-            '--disable-notifications',
-            '--start-maximized',
-            '--disable-save-password-bubble',
-            '--disable-features=PasswordManager,CredentialManagementAPI'
-          ],
-          viewport: null,
-        });
-
-        browser.on('close', () => {
-          browserManager.removeBrowser(profileId);
-        });
-        browserManager.setBrowser(profileId, browser);
-      } catch (e: any) {
-        console.error(`[AutomationEngine] Failed to launch browser for ${profileId}. It might be already open!`);
-        throw new Error('Browser already running');
-      }
+    let browser;
+    try {
+      browser = await browserManager.launchBrowser(profileId, proxyStr);
+    } catch (e: any) {
+      console.error(`[AutomationEngine] Failed to launch browser for ${profileId}. Error: ${e.message}`);
+      throw new Error(e.message || 'Browser already running');
     }
 
     // Wait a moment for Chrome to restore previous tabs

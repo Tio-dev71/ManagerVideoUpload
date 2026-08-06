@@ -13,7 +13,7 @@ export const GET = (req: any, ctx: any) => {
       expires: '2099-01-01T00:00:00.000Z'
     });
   }
-  return handlers.GET(req, ctx);
+  return (handlers as any).GET(req, ctx);
 };
 
 export const POST = handlers.POST;

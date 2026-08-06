@@ -1,18 +1,20 @@
 import { chromium } from 'playwright';
 import path from 'path';
 import os from 'os';
+import { prisma } from '@/lib/db';
+import { browserManager } from '@/lib/automation/browserManager';
 
 export async function postToFacebookGroup(groupUrl: string, caption: string, videoPath: string, profileId: string = 'chrome-profile') {
   const userDataDir = path.join(os.homedir(), '.autopost', 'profiles', profileId);
 
+  // Fetch account to get proxy
+  const account = await prisma.facebookAccount.findFirst({ where: { profileId } });
+  const proxyStr = account?.proxy;
+
   console.log(`[AutoPost] Starting Facebook automation...`);
   console.log(`[AutoPost] Launching Chromium with profile: ${userDataDir}`);
   
-  const browser = await chromium.launchPersistentContext(userDataDir, {
-    headless: false,
-    args: ['--disable-notifications', '--start-maximized'],
-    viewport: null,
-  });
+  const browser = await browserManager.launchBrowser(profileId, proxyStr);
 
   const page = await browser.newPage();
 
