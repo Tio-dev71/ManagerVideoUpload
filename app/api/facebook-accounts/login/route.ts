@@ -9,7 +9,7 @@ import { TOTP } from 'totp-generator';
 import { browserManager } from '@/lib/automation/browserManager';
 
 export async function POST(req: NextRequest) {
-  let browser;
+  let browser: any;
   try {
     const session = await auth();
     if (!session?.user) {
