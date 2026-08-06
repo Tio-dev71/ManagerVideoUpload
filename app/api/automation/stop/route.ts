@@ -19,8 +19,9 @@ export async function POST(req: NextRequest) {
     }
 
     // Stop the task for all profiles
-    if (task.profileIds && task.profileIds.length > 0) {
-      for (const accountId of task.profileIds) {
+    const profileIds = (task.profileIds as string[]) || [];
+    if (profileIds.length > 0) {
+      for (const accountId of profileIds) {
         const account = await prisma.facebookAccount.findUnique({ where: { id: accountId } });
         if (account && account.profileId) {
           // Set the stop flag
