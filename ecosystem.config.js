@@ -2,7 +2,7 @@ module.exports = {
   apps: [
     {
       name: "Topify",
-      script: "npm.cmd",
+      script: "./node_modules/next/dist/bin/next",
       args: "start",
       env: {
         NODE_ENV: "production",
