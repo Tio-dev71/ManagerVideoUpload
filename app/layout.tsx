@@ -5,7 +5,7 @@ import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/theme-provider";
 
 export const metadata: Metadata = {
-  title: "AutoReel Lite — Auto-post Videos to Social Media",
+  title: "Topify — Auto-post Videos to Social Media",
   description:
     "Schedule and auto-post short videos to Facebook Reels, Instagram Reels, and YouTube Shorts. Simple, beautiful, powerful.",
 };

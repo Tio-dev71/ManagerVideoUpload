@@ -93,11 +93,11 @@ export function Sidebar() {
         <div className={`flex items-center h-16 px-4 border-b border-[var(--color-sidebar-border)] dark:border-neutral-800 ${collapsed ? 'justify-center' : 'justify-between'}`}>
           <Link href="/dashboard" className="flex items-center gap-2.5 min-w-0">
             <div className="flex-shrink-0 w-9 h-9 flex items-center justify-center">
-              <Image src="/tiodevlogo.png" alt="AutoReel Logo" width={36} height={36} className="rounded-xl object-cover" />
+              <Image src="/tiodevlogo.png" alt="Topify Logo" width={36} height={36} className="rounded-xl object-cover" />
             </div>
             {!collapsed && (
               <span className="text-[15px] font-semibold truncate dark:text-white">
-                AutoReel
+                Topify
               </span>
             )}
           </Link>

@@ -70,10 +70,10 @@ function LoginForm() {
         {/* Logo */}
         <div className="text-center mb-10">
           <div className="inline-flex items-center justify-center w-16 h-16 mb-5">
-            <Image src="/tiodevlogo.png" alt="AutoReel Logo" width={64} height={64} className="rounded-2xl shadow-lg object-cover" />
+            <Image src="/tiodevlogo.png" alt="Topify Logo" width={64} height={64} className="rounded-2xl shadow-lg object-cover" />
           </div>
           <h1 className="text-[28px] font-semibold tracking-tight text-[var(--color-foreground)]">
-            AutoReel Lite
+            Topify
           </h1>
           <p className="mt-2 text-[var(--color-muted-foreground)] text-[15px] leading-relaxed">
             Auto-post videos to Reels & Shorts

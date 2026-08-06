@@ -144,7 +144,7 @@ export default function TeamPage() {
       <div>
         <h1 className="text-[28px] font-semibold tracking-tight">Team</h1>
         <p className="text-[var(--color-muted-foreground)] mt-1">
-          Manage who can access AutoReel Lite
+          Manage who can access Topify
         </p>
       </div>
 
