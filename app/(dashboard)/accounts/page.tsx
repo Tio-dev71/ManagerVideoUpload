@@ -49,6 +49,9 @@ export default function AccountsPage() {
         setRawInput('');
         setShowAddModal(false);
         fetchAccounts();
+      } else {
+        const errorText = await res.text();
+        alert('Failed to import: ' + errorText);
       }
     } catch (e) {
       console.error(e);
