@@ -50,7 +50,7 @@ function LoginForm() {
       if (result?.error) {
         // Since we already confirmed the email is authorized,
         // any error here is an SMTP / email delivery issue
-        setError('Failed to send magic link email. Please check SMTP configuration (EMAIL_SERVER in .env).');
+        setError();
       } else {
         setSent(true);
       }

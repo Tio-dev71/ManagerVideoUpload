@@ -99,8 +99,8 @@ model AllowedEmail {
   id          String   @id @default(cuid())
   email       String   @unique
   role        Role     @default(STAFF)
-  invitedBy   User     @relation(fields: [invitedById], references: [id])
-  invitedById String
+  invitedBy   User?    @relation(fields: [invitedById], references: [id])
+  invitedById String?
   
   workspaceId String?
   workspace   Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)

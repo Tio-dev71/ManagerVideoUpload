@@ -56,7 +56,7 @@ const nextAuthResult = NextAuth({
               email: userEmail,
               role: 'SUPER_ADMIN',
               workspaceId: workspace.id,
-              invitedById: user.id,
+              // invitedById: user.id, // Omit to avoid FK constraint on first login
             }
           });
         }
