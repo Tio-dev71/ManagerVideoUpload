@@ -183,23 +183,23 @@ export default function AccountsPage() {
                           <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mr-2"></div>
                         ) : (
                           <>
-                            <button 
+                            <button
                               onClick={() => handleCheckLive(acc.id)}
-                              className="p-2 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 rounded-lg transition-colors" 
+                              className="p-2 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 rounded-lg transition-colors"
                               title="Check Live Status"
                             >
                               <Shield className="w-4 h-4" />
                             </button>
-                            <button 
+                            <button
                               onClick={() => handleTestLogin(acc.id)}
-                              className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-lg transition-colors" 
+                              className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-lg transition-colors"
                               title="Test Login"
                             >
                               <Play className="w-4 h-4" />
                             </button>
-                            <button 
+                            <button
                               onClick={() => handleDelete(acc.id)}
-                              className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors" 
+                              className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors"
                               title="Delete"
                             >
                               <Trash2 className="w-4 h-4" />
@@ -228,7 +228,7 @@ export default function AccountsPage() {
             </div>
             <div className="p-6">
               <p className="text-sm text-neutral-500 mb-3">
-                Paste your accounts below. 1 account per line.<br/>
+                Paste your accounts below. 1 account per line.<br />
                 Format: <code className="bg-neutral-100 dark:bg-neutral-800 px-1 py-0.5 rounded">UID|Pass|2FA</code>
               </p>
               <textarea
