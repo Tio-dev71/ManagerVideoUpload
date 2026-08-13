@@ -68,13 +68,16 @@ const nextAuthResult = NextAuth({
 
       // Update user role and workspace to match allowed email
       if (user.id) {
-        await prisma.user.update({
-          where: { id: user.id },
-          data: {
-            role: allowed.role,
-            workspaceId: allowed.workspaceId,
-          },
-        });
+        const existingUser = await prisma.user.findUnique({ where: { id: user.id } });
+        if (existingUser) {
+          await prisma.user.update({
+            where: { id: user.id },
+            data: {
+              role: allowed.role,
+              workspaceId: allowed.workspaceId,
+            },
+          });
+        }
       }
 
       return true;
