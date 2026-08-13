@@ -101,27 +101,6 @@ export class AutomationEngine {
         }
         return { clicked: false, postText: '' };
       });
-        function isVisible(el: Element) {
-          const rect = el.getBoundingClientRect();
-          return rect.top >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight);
-        }
-        
-        let allBtns = Array.from(document.querySelectorAll('div[role="button"], a, span'));
-        let commentBtn = allBtns.find(el => {
-          if (!isVisible(el)) return false;
-          let text = (el as HTMLElement).innerText?.toLowerCase() || '';
-          let aria = el.getAttribute('aria-label')?.toLowerCase() || '';
-          return aria.includes('bình luận') || aria.includes('comment') || aria.includes('viết bình luận') ||
-                 text === 'bình luận' || text === 'comment';
-        });
-
-        if (commentBtn) {
-          const target = commentBtn.closest('[role="button"]') || commentBtn;
-          (target as HTMLElement).click();
-          return true;
-        }
-        return false;
-      });
 
       if (clicked) {
         await this.safeWait(page, 3000, profileId);
