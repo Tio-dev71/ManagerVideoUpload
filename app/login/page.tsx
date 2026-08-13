@@ -5,15 +5,13 @@ import { signIn } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 import Image from 'next/image';
-import { Play, Loader2, CheckCircle2, ArrowRight, Zap } from 'lucide-react';
+import { Play, Loader2, ArrowRight, Zap } from 'lucide-react';
 
 function LoginForm() {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
-  const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
   const searchParams = useSearchParams();
-  const isVerify = searchParams.get('verify') === 'true';
   const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
   const authError = searchParams.get('error');
 
@@ -27,43 +25,25 @@ function LoginForm() {
     try {
       const normalizedEmail = email.trim().toLowerCase();
 
-      // Step 1: Check if email is in allowed list BEFORE calling signIn
-      const checkRes = await fetch('/api/team/check', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: normalizedEmail }),
-      });
-      const checkData = await checkRes.json();
-
-      if (!checkData.allowed) {
-        setError('This email is not authorized. Ask your admin to add you.');
-        return;
-      }
-
-      // Step 2: Email IS authorized, now attempt signIn (sends magic link)
-      const result = await signIn('email', {
+      // Attempt signIn via Credentials
+      const result = await signIn('credentials', {
         email: normalizedEmail,
-        redirect: false,
+        redirect: true,
         callbackUrl,
       });
 
       if (result?.error) {
-        // Since we already confirmed the email is authorized,
-        // any error here is an SMTP / email delivery issue
-        setError('Lỗi hệ thống: ' + result.error + '. Vui lòng xem PM2 logs (có thể do lỗi kết nối Database).');
-      } else {
-        setSent(true);
+        setError('Không thể đăng nhập. Vui lòng kiểm tra lại email hoặc liên hệ Admin.');
+        setLoading(false); // Only stop loading if there's an error (redirect will navigate away)
       }
     } catch {
       setError('Something went wrong. Please try again.');
-    } finally {
       setLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[var(--color-background)] px-4">
-      {/* Background subtle gradient */}
       <div className="fixed inset-0 bg-gradient-to-br from-blue-50/50 via-transparent to-purple-50/30 pointer-events-none" />
 
       <div className="relative w-full max-w-[420px] animate-fade-in">
@@ -82,32 +62,10 @@ function LoginForm() {
 
         {/* Card */}
         <div className="card-apple p-8">
-          {isVerify || sent ? (
-            /* Success / Verify state */
-            <div className="text-center py-4">
-              <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-emerald-50 mb-5">
-                <CheckCircle2 className="w-7 h-7 text-emerald-500" />
-              </div>
-              <h2 className="text-xl font-semibold mb-2">Check your email</h2>
-              <p className="text-[var(--color-muted-foreground)] text-[15px] leading-relaxed">
-                We sent a magic link to{' '}
-                <span className="font-medium text-[var(--color-foreground)]">
-                  {email || 'your email'}
-                </span>
-                . Click the link to sign in.
-              </p>
-              <div className="mt-6 p-3 rounded-xl bg-amber-50 border border-amber-100">
-                <p className="text-[13px] text-amber-700">
-                  <strong>Dev mode:</strong> Check your terminal console for the magic link.
-                </p>
-              </div>
-            </div>
-          ) : (
-            /* Login form */
             <form onSubmit={handleSubmit}>
               <h2 className="text-xl font-semibold mb-1">Sign in</h2>
               <p className="text-[var(--color-muted-foreground)] text-sm mb-6">
-                Enter your email to receive a magic link
+                Enter your authorized email to access Dashboard
               </p>
 
               {(error || authError) && (
@@ -149,7 +107,7 @@ function LoginForm() {
                   {loading ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      Sending link...
+                      Signing in...
                     </>
                   ) : (
                     <>
@@ -160,7 +118,6 @@ function LoginForm() {
                 </button>
               </div>
             </form>
-          )}
         </div>
 
         {/* Footer */}

@@ -1,94 +1,97 @@
 import NextAuth from 'next-auth';
 import { PrismaAdapter } from '@auth/prisma-adapter';
-import EmailProvider from 'next-auth/providers/email';
+import CredentialsProvider from 'next-auth/providers/credentials';
 import prisma from '@/lib/db';
 
 const nextAuthResult = NextAuth({
   adapter: PrismaAdapter(prisma),
   providers: [
-    EmailProvider({
-      server: process.env.EMAIL_SERVER || 'smtp://localhost:2525',
-      from: process.env.EMAIL_FROM || 'noreply@example.com',
-      async sendVerificationRequest({ identifier: email, url }) {
-        console.log(`\n\n=== CHÚ Ý: ĐÃ BỎ QUA SMTP ===`);
-        console.log(`Đường link đăng nhập: \n${url}\n`);
-        try {
-          const fs = require('fs');
-          const path = require('path');
-          // Write to the root of ManagerVideoUpload
-          fs.writeFileSync(path.join(process.cwd(), 'magic-link.txt'), `Đường link đăng nhập mới nhất của bạn (copy dán vào trình duyệt):\n\n${url}\n`);
-        } catch(e) {}
+    CredentialsProvider({
+      name: "Email",
+      credentials: {
+        email: { label: "Email", type: "email", placeholder: "admin@example.com" }
+      },
+      async authorize(credentials) {
+        if (!credentials?.email) return null;
+        
+        const userEmail = (credentials.email as string).toLowerCase().trim();
+        const adminEmail = process.env.ADMIN_EMAIL?.toLowerCase().replace(/['"]/g, '').trim();
+
+        // Check if email is in the allowed list
+        let allowed = await prisma.allowedEmail.findUnique({
+          where: { email: userEmail },
+        });
+
+        // Auto-seed admin if user is the designated admin
+        if (userEmail === adminEmail) {
+          if (!allowed) {
+            const workspace = await prisma.workspace.upsert({
+              where: { id: 'default-workspace' },
+              update: {},
+              create: { id: 'default-workspace', name: 'Default Workspace' },
+            });
+
+            allowed = await prisma.allowedEmail.create({
+              data: {
+                email: userEmail,
+                role: 'SUPER_ADMIN',
+                workspaceId: workspace.id,
+              }
+            });
+          }
+        }
+
+        if (!allowed) {
+          return null;
+        }
+
+        // Check if user exists in DB
+        let user = await prisma.user.findUnique({
+          where: { email: userEmail }
+        });
+
+        if (!user) {
+           user = await prisma.user.create({
+             data: {
+               email: userEmail,
+               role: allowed.role,
+               workspaceId: allowed.workspaceId,
+             }
+           });
+        } else {
+           user = await prisma.user.update({
+             where: { id: user.id },
+             data: {
+               role: allowed.role,
+               workspaceId: allowed.workspaceId,
+             }
+           });
+        }
+
+        return user;
       }
     }),
   ],
   pages: {
     signIn: '/login',
-    verifyRequest: '/login?verify=true',
     error: '/login',
   },
   callbacks: {
-    async signIn({ user }) {
-      if (!user.email) return false;
-
-      const adminEmail = process.env.ADMIN_EMAIL?.toLowerCase().replace(/['"]/g, '').trim();
-      const userEmail = user.email.toLowerCase().trim();
-
-      // Check if email is in the allowed list
-      let allowed = await prisma.allowedEmail.findUnique({
-        where: { email: userEmail },
-      });
-
-      // Auto-seed admin if user is the designated admin
-      if (userEmail === adminEmail) {
-        if (!user.id) {
-          return true; // Allow sending magic link without seeding yet
-        }
-
-        if (!allowed) {
-          const workspace = await prisma.workspace.upsert({
-            where: { id: 'default-workspace' },
-            update: {},
-            create: { id: 'default-workspace', name: 'Default Workspace' },
-          });
-
-          allowed = await prisma.allowedEmail.create({
-            data: {
-              email: userEmail,
-              role: 'SUPER_ADMIN',
-              workspaceId: workspace.id,
-              // invitedById: user.id, // Omit to avoid FK constraint on first login
-            }
-          });
-        }
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.role = user.role;
+        token.workspaceId = user.workspaceId;
       }
-
-      if (!allowed) {
-        return false;
-      }
-
-      // Update user role and workspace to match allowed email
-      if (user.id) {
-        const existingUser = await prisma.user.findUnique({ where: { id: user.id } });
-        if (existingUser) {
-          await prisma.user.update({
-            where: { id: user.id },
-            data: {
-              role: allowed.role,
-              workspaceId: allowed.workspaceId,
-            },
-          });
-        }
-      }
-
-      return true;
+      return token;
     },
-    async session({ session, user }) {
-      if (session.user) {
+    async session({ session, token }) {
+      if (session.user && token.id) {
         const dbUser = await prisma.user.findUnique({
-          where: { id: user.id },
+          where: { id: token.id as string },
           select: { id: true, role: true, workspaceId: true },
         });
-        session.user.id = user.id;
+        session.user.id = token.id as string;
         session.user.role = dbUser?.role ?? 'STAFF';
         (session.user as any).workspaceId = dbUser?.workspaceId ?? null;
       }
@@ -96,7 +99,7 @@ const nextAuthResult = NextAuth({
     },
   },
   session: {
-    strategy: 'database',
+    strategy: 'jwt',
   },
   trustHost: true,
 });
