@@ -80,8 +80,8 @@ const nextAuthResult = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.role = user.role;
-        token.workspaceId = user.workspaceId;
+        token.role = (user as any).role;
+        token.workspaceId = (user as any).workspaceId;
       }
       return token;
     },
