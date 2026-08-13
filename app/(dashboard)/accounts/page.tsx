@@ -19,6 +19,10 @@ export default function AccountsPage() {
   const [rawInput, setRawInput] = useState('');
   const [adding, setAdding] = useState(false);
   const [processingId, setProcessingId] = useState<string | null>(null);
+  
+  // Multi-select state
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [isRunningMultiple, setIsRunningMultiple] = useState(false);
 
   useEffect(() => {
     fetchAccounts();
@@ -64,6 +68,8 @@ export default function AccountsPage() {
     if (!confirm('Are you sure you want to delete this account?')) return;
     try {
       await fetch(`/api/facebook-accounts?id=${id}`, { method: 'DELETE' });
+      // Remove from selected
+      setSelectedIds(prev => prev.filter(selectedId => selectedId !== id));
       fetchAccounts();
     } catch (e) {
       console.error(e);
@@ -98,13 +104,44 @@ export default function AccountsPage() {
         fetchAccounts();
       } else {
         const data = await res.json();
-        alert('Login failed: ' + data.error);
+        console.error('Login failed:', data.error);
+        // We log to console instead of alert so it doesn't block the Run All loop.
+        // If they want to see the error, they can look at the browser which is left open now.
       }
     } catch (e) {
       console.error(e);
-      alert('Error connecting to login service.');
     } finally {
       setProcessingId(null);
+    }
+  };
+
+  const handleRunSelected = async () => {
+    if (selectedIds.length === 0) return;
+    setIsRunningMultiple(true);
+
+    for (const id of selectedIds) {
+      await handleTestLogin(id);
+      // Optional: Add a small delay between launches to prevent CPU spikes
+      await new Promise(r => setTimeout(r, 2000)); 
+    }
+
+    setIsRunningMultiple(false);
+    alert('Đã chạy xong danh sách tài khoản được chọn!');
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.length === accounts.length && accounts.length > 0) {
+      setSelectedIds([]); // Deselect all
+    } else {
+      setSelectedIds(accounts.map(acc => acc.id)); // Select all
+    }
+  };
+
+  const toggleSelectAccount = (id: string) => {
+    if (selectedIds.includes(id)) {
+      setSelectedIds(prev => prev.filter(selectedId => selectedId !== id));
+    } else {
+      setSelectedIds(prev => [...prev, id]);
     }
   };
 
@@ -120,13 +157,28 @@ export default function AccountsPage() {
             Manage your profiles for automated marketing and posting.
           </p>
         </div>
-        <button
-          onClick={() => setShowAddModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          Add Accounts
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleRunSelected}
+            disabled={selectedIds.length === 0 || isRunningMultiple}
+            className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-lg font-medium transition-colors"
+          >
+            {isRunningMultiple ? (
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            ) : (
+              <Play className="w-4 h-4 fill-current" />
+            )}
+            Chạy tất cả đã chọn
+          </button>
+          
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            Add Accounts
+          </button>
+        </div>
       </div>
 
       {loading ? (
@@ -138,6 +190,14 @@ export default function AccountsPage() {
           <table className="w-full text-left text-sm">
             <thead className="bg-neutral-50 dark:bg-neutral-950 border-b border-neutral-200 dark:border-neutral-800">
               <tr>
+                <th className="px-6 py-4 w-12">
+                  <input 
+                    type="checkbox"
+                    className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                    checked={selectedIds.length === accounts.length && accounts.length > 0}
+                    onChange={toggleSelectAll}
+                  />
+                </th>
                 <th className="px-6 py-4 font-medium text-neutral-500 dark:text-neutral-400">Name</th>
                 <th className="px-6 py-4 font-medium text-neutral-500 dark:text-neutral-400">UID</th>
                 <th className="px-6 py-4 font-medium text-neutral-500 dark:text-neutral-400">Status</th>
@@ -148,13 +208,21 @@ export default function AccountsPage() {
             <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
               {accounts.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-neutral-500">
+                  <td colSpan={6} className="px-6 py-12 text-center text-neutral-500">
                     No accounts found. Add some accounts to get started.
                   </td>
                 </tr>
               ) : (
                 accounts.map((acc) => (
                   <tr key={acc.id} className="hover:bg-neutral-50 dark:hover:bg-neutral-950/50 transition-colors">
+                    <td className="px-6 py-4">
+                      <input 
+                        type="checkbox"
+                        className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                        checked={selectedIds.includes(acc.id)}
+                        onChange={() => toggleSelectAccount(acc.id)}
+                      />
+                    </td>
                     <td className="px-6 py-4 font-medium dark:text-neutral-200">{acc.name}</td>
                     <td className="px-6 py-4 text-neutral-600 dark:text-neutral-400 font-mono">{acc.uid || 'N/A'}</td>
                     <td className="px-6 py-4">

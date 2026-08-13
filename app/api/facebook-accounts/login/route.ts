@@ -138,7 +138,7 @@ export async function POST(req: NextRequest) {
 
     if (loginError) {
       console.log(`[FB Login API] Login failed - Invalid credentials`);
-      await browser.close();
+      // Do not close browser
       return NextResponse.json({ success: false, error: 'Invalid credentials or account disabled' }, { status: 400 });
     }
 
@@ -152,7 +152,7 @@ export async function POST(req: NextRequest) {
     if (isTwoFactor) {
       if (!account.twoFactorCode) {
         console.log('[FB Login API] 2FA required but no secret provided.');
-        await browser.close();
+        // Do not close browser
         return NextResponse.json({ success: false, error: '2FA required but no secret provided' }, { status: 400 });
       }
 
@@ -201,9 +201,8 @@ export async function POST(req: NextRequest) {
 
   } catch (error: any) {
     console.error('[FB Login API] Error:', error);
-    if (browser) {
-      try { await browser.close(); } catch (e) { }
-    }
-    return NextResponse.json({ error: 'Internal Server Error', details: error.message }, { status: 500 });
+    // DO NOT CLOSE THE BROWSER. Let the user see what went wrong and manually login if needed.
+    // We still return 500 so the frontend stops spinning, but the browser stays open.
+    return NextResponse.json({ error: 'Quá trình tự động đăng nhập gặp lỗi (Trình duyệt vẫn đang mở).', details: error.message }, { status: 500 });
   }
 }
