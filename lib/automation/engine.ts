@@ -9,6 +9,7 @@ export interface TaskConfig {
   targetUrl?: string;
   actionCount: number;
   comments?: string[];
+  useAiComment?: boolean;
   type: string;
 }
 
@@ -66,11 +67,40 @@ export class AutomationEngine {
         }
       });
       await this.safeWait(page, 2000, profileId);
-    } else if (config.comments && config.comments.length > 0) {
+    } else if ((config.comments && config.comments.length > 0) || config.useAiComment) {
       console.log('Commenting on a post/reel');
-      const comment = config.comments[Math.floor(Math.random() * config.comments.length)];
+      
+      const { clicked, postText } = await page.evaluate(() => {
+        function isVisible(el: Element) {
+          const rect = el.getBoundingClientRect();
+          return rect.top >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight);
+        }
+        
+        let allBtns = Array.from(document.querySelectorAll('div[role="button"], a, span'));
+        let commentBtn = allBtns.find(el => {
+          if (!isVisible(el)) return false;
+          let text = (el as HTMLElement).innerText?.toLowerCase() || '';
+          let aria = el.getAttribute('aria-label')?.toLowerCase() || '';
+          return aria.includes('bình luận') || aria.includes('comment') || aria.includes('viết bình luận') ||
+                 text === 'bình luận' || text === 'comment';
+        });
 
-      const clicked = await page.evaluate(() => {
+        let text = '';
+        if (commentBtn) {
+          try {
+            const container = commentBtn.closest('div[data-pagelet^="FeedUnit_"], div[role="article"]');
+            if (container) {
+              const textEl = container.querySelector('div[data-ad-preview="message"], div[dir="auto"]');
+              if (textEl) text = (textEl as HTMLElement).innerText;
+            }
+          } catch(e) {}
+          
+          const target = commentBtn.closest('[role="button"]') || commentBtn;
+          (target as HTMLElement).click();
+          return { clicked: true, postText: text };
+        }
+        return { clicked: false, postText: '' };
+      });
         function isVisible(el: Element) {
           const rect = el.getBoundingClientRect();
           return rect.top >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight);
@@ -96,12 +126,51 @@ export class AutomationEngine {
       if (clicked) {
         await this.safeWait(page, 3000, profileId);
 
+        let finalComment = (config.comments && config.comments.length > 0) 
+            ? config.comments[Math.floor(Math.random() * config.comments.length)]
+            : 'Hay quá ạ!';
+            
+        try {
+          let apiKey = process.env.GEMINI_API_KEY;
+          if (!apiKey) {
+             const setting = await prisma.systemSetting.findUnique({ where: { key: 'GEMINI_API_KEY' } });
+             if (setting) apiKey = setting.value;
+          }
+          
+          if (config.useAiComment && apiKey && postText && postText.trim().length > 10) {
+            console.log('Generating AI comment for: ' + postText.substring(0, 30).replace(/\n/g, ' ') + '...');
+            
+            const prompt = `You are a normal Facebook user. Write a short, natural, friendly comment in Vietnamese for this post: "${postText}". Only return the comment text. Do not use quotes or hashtags.`;
+            
+            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: { temperature: 0.7, maxOutputTokens: 60 }
+              })
+            });
+            
+            if (res.ok) {
+              const data = await res.json();
+              if (data.candidates && data.candidates[0].content.parts[0].text) {
+                finalComment = data.candidates[0].content.parts[0].text.trim().replace(/^["']|["']$/g, '');
+                console.log('AI Comment generated: ' + finalComment);
+              }
+            } else {
+              console.log('AI API error. Using fallback.');
+            }
+          }
+        } catch (e) {
+          console.log('AI Comment failed, using fallback.', e);
+        }
+
         await page.evaluate(() => {
           const box = document.querySelector('form[action*="/comment/"] textarea, form div[contenteditable="true"], div[aria-label="Viết bình luận"], div[aria-label="Write a comment"]') as HTMLElement;
           if (box) box.focus();
         });
 
-        await page.keyboard.type(comment, { delay: 50 });
+        await page.keyboard.type(finalComment, { delay: 50 });
         await this.safeWait(page, 500, profileId);
         await page.keyboard.press('Enter');
 
@@ -127,7 +196,7 @@ export class AutomationEngine {
               profileId,
               actionType: 'COMMENT',
               link: postLink,
-              message: comment
+              message: finalComment
             }
           });
         } catch (e) {

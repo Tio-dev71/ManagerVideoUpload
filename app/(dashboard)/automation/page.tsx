@@ -32,6 +32,7 @@ export default function AutomationScriptsPage() {
   const [targetUrl, setTargetUrl] = useState('');
   const [actionCount, setActionCount] = useState(5);
   const [commentsStr, setCommentsStr] = useState('');
+  const [useAiComment, setUseAiComment] = useState(false);
   const [selectedAccounts, setSelectedAccounts] = useState<Set<string>>(new Set());
 
   useEffect(() => {
@@ -81,6 +82,7 @@ export default function AutomationScriptsPage() {
     const config = {
       targetUrl: targetUrl.trim() || undefined,
       actionCount: Number(actionCount) || 5,
+      useAiComment,
       comments: commentsStr ? commentsStr.split('\n').filter(c => c.trim()) : undefined
     };
 
@@ -101,6 +103,7 @@ export default function AutomationScriptsPage() {
         setTaskName('');
         setTargetUrl('');
         setCommentsStr('');
+        setUseAiComment(false);
         setSelectedAccounts(new Set());
         fetchTasks();
       } else {
@@ -337,16 +340,33 @@ export default function AutomationScriptsPage() {
               </div>
 
               {(taskType === 'fb_auto_interact' || taskType === 'fb_farm_reels') && (
-                <div>
-                  <label className="block text-xs font-semibold mb-2 text-neutral-500 dark:text-neutral-400 tracking-wider uppercase flex items-center gap-2">
-                    <MessageCircle className="w-3.5 h-3.5" /> Custom Comments (One per line)
+                <div className="space-y-4">
+                  <label className="flex items-center gap-3 cursor-pointer p-4 border border-blue-100 dark:border-blue-900/50 rounded-xl bg-blue-50/50 dark:bg-blue-900/10 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
+                    <input 
+                      type="checkbox" 
+                      checked={useAiComment} 
+                      onChange={e => setUseAiComment(e.target.checked)} 
+                      className="w-5 h-5 text-blue-600 rounded border-blue-300 focus:ring-blue-500"
+                    />
+                    <div className="flex flex-col">
+                      <span className="text-sm font-bold text-blue-700 dark:text-blue-400">Tự động bình luận thông minh bằng AI (Gemini)</span>
+                      <span className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">Sử dụng AI đọc bài viết và tự sinh bình luận tự nhiên theo ngữ cảnh (Cần cấu hình GEMINI_API_KEY trong file .env)</span>
+                    </div>
                   </label>
-                  <textarea
-                    value={commentsStr}
-                    onChange={e => setCommentsStr(e.target.value)}
-                    placeholder="Thật tuyệt vời!&#10;Hay quá bạn ơi&#10;Quá đỉnh"
-                    className="w-full h-24 p-4 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none dark:text-neutral-200"
-                  />
+
+                  {!useAiComment && (
+                    <div>
+                      <label className="block text-xs font-semibold mb-2 text-neutral-500 dark:text-neutral-400 tracking-wider uppercase flex items-center gap-2">
+                        <MessageCircle className="w-3.5 h-3.5" /> Hoặc Bình Luận Theo Mẫu Nhập Sẵn (Mỗi câu 1 dòng)
+                      </label>
+                      <textarea
+                        value={commentsStr}
+                        onChange={e => setCommentsStr(e.target.value)}
+                        placeholder="Thật tuyệt vời!&#10;Hay quá bạn ơi&#10;Quá đỉnh"
+                        className="w-full h-24 p-4 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none dark:text-neutral-200"
+                      />
+                    </div>
+                  )}
                 </div>
               )}
 
