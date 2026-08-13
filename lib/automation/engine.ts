@@ -88,18 +88,29 @@ export class AutomationEngine {
         let text = '';
         if (commentBtn) {
           try {
-            const container = commentBtn.closest('div[data-pagelet^="FeedUnit_"], div[role="article"]');
-            if (container) {
-              const textEls = Array.from(container.querySelectorAll('div[data-ad-preview="message"], div[dir="auto"]'));
-              let longestText = '';
-              for (const el of textEls) {
-                const txt = (el as HTMLElement).innerText || '';
-                // Avoid picking up comment button texts, share button texts, etc.
-                if (txt.length > longestText.length && txt.length > 15 && !['Thích', 'Bình luận', 'Chia sẻ', 'Like', 'Comment', 'Share'].includes(txt)) {
-                  longestText = txt;
-                }
+            let container = commentBtn.closest('div[role="article"], div[data-pagelet^="FeedUnit"], div[data-pagelet^="GroupFeed"], div[aria-posinset]');
+            if (!container) {
+              container = commentBtn;
+              for(let i=0; i<8; i++) {
+                if(container.parentElement) container = container.parentElement;
               }
-              text = longestText;
+            }
+
+            if (container) {
+              const messageBlock = container.querySelector('div[data-ad-preview="message"]');
+              if (messageBlock) {
+                text = (messageBlock as HTMLElement).innerText;
+              } else {
+                const textEls = Array.from(container.querySelectorAll('div[dir="auto"], span[dir="auto"]'));
+                let longestText = '';
+                for (const el of textEls) {
+                  const txt = (el as HTMLElement).innerText || '';
+                  if (txt.length > longestText.length && txt.length > 15 && !['Thích', 'Bình luận', 'Chia sẻ', 'Like', 'Comment', 'Share'].includes(txt)) {
+                    longestText = txt;
+                  }
+                }
+                text = longestText;
+              }
             }
           } catch(e) {}
           
