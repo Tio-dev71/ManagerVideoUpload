@@ -90,8 +90,16 @@ export class AutomationEngine {
           try {
             const container = commentBtn.closest('div[data-pagelet^="FeedUnit_"], div[role="article"]');
             if (container) {
-              const textEl = container.querySelector('div[data-ad-preview="message"], div[dir="auto"]');
-              if (textEl) text = (textEl as HTMLElement).innerText;
+              const textEls = Array.from(container.querySelectorAll('div[data-ad-preview="message"], div[dir="auto"]'));
+              let longestText = '';
+              for (const el of textEls) {
+                const txt = (el as HTMLElement).innerText || '';
+                // Avoid picking up comment button texts, share button texts, etc.
+                if (txt.length > longestText.length && txt.length > 15 && !['Thích', 'Bình luận', 'Chia sẻ', 'Like', 'Comment', 'Share'].includes(txt)) {
+                  longestText = txt;
+                }
+              }
+              text = longestText;
             }
           } catch(e) {}
           
@@ -116,6 +124,10 @@ export class AutomationEngine {
              if (setting) apiKey = setting.value;
           }
           
+          console.log(`[AI DEBUG] useAiComment: ${config.useAiComment}, apiKey exists: ${!!apiKey}, postText length: ${postText ? postText.length : 0}`);
+          if (config.useAiComment && !apiKey) console.log('[AI DEBUG] Missing GEMINI_API_KEY in .env or settings');
+          if (config.useAiComment && (!postText || postText.trim().length <= 10)) console.log('[AI DEBUG] postText is too short or empty: ' + postText);
+
           if (config.useAiComment && apiKey && postText && postText.trim().length > 10) {
             console.log('Generating AI comment for: ' + postText.substring(0, 30).replace(/\n/g, ' ') + '...');
             
