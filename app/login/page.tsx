@@ -50,7 +50,7 @@ function LoginForm() {
       if (result?.error) {
         // Since we already confirmed the email is authorized,
         // any error here is an SMTP / email delivery issue
-        setError();
+        setError('Lỗi hệ thống: ' + result.error + '. Vui lòng xem PM2 logs (có thể do lỗi kết nối Database).');
       } else {
         setSent(true);
       }
