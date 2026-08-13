@@ -9,6 +9,16 @@ const nextAuthResult = NextAuth({
     EmailProvider({
       server: process.env.EMAIL_SERVER || 'smtp://localhost:2525',
       from: process.env.EMAIL_FROM || 'noreply@example.com',
+      async sendVerificationRequest({ identifier: email, url }) {
+        console.log(`\n\n=== CHÚ Ý: ĐÃ BỎ QUA SMTP ===`);
+        console.log(`Đường link đăng nhập: \n${url}\n`);
+        try {
+          const fs = require('fs');
+          const path = require('path');
+          // Write to the root of ManagerVideoUpload
+          fs.writeFileSync(path.join(process.cwd(), 'magic-link.txt'), `Đường link đăng nhập mới nhất của bạn (copy dán vào trình duyệt):\n\n${url}\n`);
+        } catch(e) {}
+      }
     }),
   ],
   pages: {
