@@ -28,13 +28,15 @@ function LoginForm() {
       // Attempt signIn via Credentials
       const result = await signIn('credentials', {
         email: normalizedEmail,
-        redirect: true,
+        redirect: false,
         callbackUrl,
       });
 
       if (result?.error) {
         setError('Không thể đăng nhập. Vui lòng kiểm tra lại email hoặc liên hệ Admin.');
         setLoading(false); // Only stop loading if there's an error (redirect will navigate away)
+      } else if (result?.ok) {
+        window.location.href = callbackUrl; // Manually redirect on success
       }
     } catch {
       setError('Something went wrong. Please try again.');
