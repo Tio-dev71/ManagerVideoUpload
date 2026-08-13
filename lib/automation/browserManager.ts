@@ -60,25 +60,15 @@ export const browserManager = {
       throw new Error('Trình duyệt của tài khoản này đang được mở ở một tiến trình khác. Hãy tắt nó trước!');
     }
 
-    // Tính toán vị trí để xếp các cửa sổ cạnh nhau (tiling)
-    const activeCount = global.activeBrowsers.size;
-    const width = 450;
-    const height = 800;
-    const maxCols = 4; // Xếp tối đa 4 cửa sổ trên 1 hàng (4 * 450 = 1800px, vừa màn Full HD)
-    const posX = (activeCount % maxCols) * width;
-    // Nếu sang hàng 2, đẩy xuống 1 chút để dễ nhìn
-    const posY = Math.floor(activeCount / maxCols) * 50; 
-
     const options: any = {
       headless: false,
       args: [
         '--disable-notifications',
         '--disable-save-password-bubble',
         '--disable-features=PasswordManager,CredentialManagementAPI',
-        `--window-size=${width},${height}`,
-        `--window-position=${posX},${posY}`
+        '--start-maximized'
       ],
-      viewport: { width, height },
+      viewport: null, // Let Playwright use the window size
     };
 
     // Apply Proxy
