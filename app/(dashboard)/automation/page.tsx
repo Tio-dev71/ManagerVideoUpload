@@ -350,7 +350,7 @@ export default function AutomationScriptsPage() {
                     />
                     <div className="flex flex-col">
                       <span className="text-sm font-bold text-blue-700 dark:text-blue-400">Tự động bình luận thông minh bằng AI (Gemini)</span>
-                      <span className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">Sử dụng AI đọc bài viết và tự sinh bình luận tự nhiên theo ngữ cảnh (Cần cấu hình GEMINI_API_KEY trong file .env)</span>
+                      <span className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">Sử dụng AI đọc bài viết và tự sinh bình luận tự nhiên theo ngữ cảnh (Cần cấu hình DEEPSEEK_API_KEY hoặc GEMINI_API_KEY trong DB)</span>
                     </div>
                   </label>
 
