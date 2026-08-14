@@ -134,9 +134,9 @@ export class AutomationEngine {
           let deepseekBaseUrl = process.env.DEEPSEEK_BASE_URL || 'https://api.deepseek.com/chat/completions';
           try {
              const setting = await prisma.systemSetting.findUnique({ where: { key: 'GEMINI_API_KEY' } });
-             if (setting) apiKey = setting.value;
+             if (setting && setting.value) apiKey = setting.value;
              const dsSetting = await prisma.systemSetting.findUnique({ where: { key: 'DEEPSEEK_API_KEY' } });
-             if (dsSetting) deepseekKey = dsSetting.value;
+             if (dsSetting && dsSetting.value) deepseekKey = dsSetting.value;
           } catch(e) {
              // Ignore db error
           }
