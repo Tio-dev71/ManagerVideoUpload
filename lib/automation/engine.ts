@@ -205,6 +205,7 @@ export class AutomationEngine {
               } catch(e) {
                 console.log('[AI DEBUG] Failed to fetch models list');
               }
+            } // end else
             } // end if (!finalComment && apiKey)
             } catch (err) {
               console.log('AI API Exception:', err);
