@@ -130,19 +130,54 @@ export class AutomationEngine {
             
         try {
           let apiKey = process.env.GEMINI_API_KEY;
-          if (!apiKey) {
+          let deepseekKey = process.env.DEEPSEEK_API_KEY;
+          try {
              const setting = await prisma.systemSetting.findUnique({ where: { key: 'GEMINI_API_KEY' } });
              if (setting) apiKey = setting.value;
+             const dsSetting = await prisma.systemSetting.findUnique({ where: { key: 'DEEPSEEK_API_KEY' } });
+             if (dsSetting) deepseekKey = dsSetting.value;
+          } catch(e) {
+             // Ignore db error
           }
           
           console.log(`[AI DEBUG] useAiComment: ${config.useAiComment}, apiKey exists: ${!!apiKey}, postText length: ${postText ? postText.length : 0}`);
-          if (config.useAiComment && !apiKey) console.log('[AI DEBUG] Missing GEMINI_API_KEY in .env or settings');
+          if (config.useAiComment && !apiKey && !deepseekKey) console.log('[AI DEBUG] Missing GEMINI_API_KEY or DEEPSEEK_API_KEY in .env or settings');
           if (config.useAiComment && (!postText || postText.trim().length <= 10)) console.log('[AI DEBUG] postText is too short or empty: ' + postText);
 
-          if (config.useAiComment && apiKey && postText && postText.trim().length > 10) {
+          if (config.useAiComment && (apiKey || deepseekKey) && postText && postText.trim().length > 10) {
             console.log('Generating AI comment for: ' + postText.substring(0, 30).replace(/\n/g, ' ') + '...');
             
             const prompt = `You are a normal Facebook user. Write a short, natural, friendly comment in Vietnamese for this post: "${postText}". Only return the comment text. Do not use quotes or hashtags.`;
+            
+            try {
+              if (deepseekKey) {
+                const dsRes = await fetch('https://api.deepseek.com/chat/completions', {
+                  method: 'POST',
+                  headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${deepseekKey}`
+                  },
+                  body: JSON.stringify({
+                    model: 'deepseek-chat',
+                    messages: [{ role: 'user', content: prompt }],
+                    temperature: 0.7,
+                    max_tokens: 60
+                  })
+                });
+                
+                if (dsRes.ok) {
+                  const data = await dsRes.json();
+                  if (data.choices && data.choices[0] && data.choices[0].message) {
+                    finalComment = data.choices[0].message.content.trim().replace(/^["']|["']$/g, '');
+                    console.log('DeepSeek AI Comment generated: ' + finalComment);
+                  }
+                } else {
+                  console.log('DeepSeek API error:', await dsRes.text());
+                }
+              }
+              
+              if (!finalComment && apiKey) {
+                // Fallback to Gemini if DeepSeek fails or not configured
             
             const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`, {
               method: 'POST',
@@ -170,6 +205,9 @@ export class AutomationEngine {
               } catch(e) {
                 console.log('[AI DEBUG] Failed to fetch models list');
               }
+            } // end if (!finalComment && apiKey)
+            } catch (err) {
+              console.log('AI API Exception:', err);
             }
           }
         } catch (e) {
