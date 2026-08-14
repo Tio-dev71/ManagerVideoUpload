@@ -144,7 +144,7 @@ export class AutomationEngine {
             
             const prompt = `You are a normal Facebook user. Write a short, natural, friendly comment in Vietnamese for this post: "${postText}". Only return the comment text. Do not use quotes or hashtags.`;
             
-            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`, {
+            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
@@ -162,6 +162,14 @@ export class AutomationEngine {
             } else {
               const errText = await res.text();
               console.log('AI API error. Status: ' + res.status + ' Response: ' + errText);
+              // Fetch available models to debug
+              try {
+                const modelsRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+                const modelsData = await modelsRes.json();
+                console.log('[AI DEBUG] Available models for this API Key:', modelsData.models ? modelsData.models.map(m => m.name).join(', ') : modelsData);
+              } catch(e) {
+                console.log('[AI DEBUG] Failed to fetch models list');
+              }
             }
           }
         } catch (e) {
