@@ -166,7 +166,7 @@ export class AutomationEngine {
               try {
                 const modelsRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
                 const modelsData = await modelsRes.json();
-                console.log('[AI DEBUG] Available models for this API Key:', modelsData.models ? modelsData.models.map(m => m.name).join(', ') : modelsData);
+                console.log('[AI DEBUG] Available models for this API Key:', modelsData.models ? modelsData.models.map((m: any) => m.name).join(', ') : modelsData);
               } catch(e) {
                 console.log('[AI DEBUG] Failed to fetch models list');
               }
