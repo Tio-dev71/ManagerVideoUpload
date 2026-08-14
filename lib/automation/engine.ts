@@ -131,6 +131,7 @@ export class AutomationEngine {
         try {
           let apiKey = process.env.GEMINI_API_KEY;
           let deepseekKey = process.env.DEEPSEEK_API_KEY;
+          let deepseekBaseUrl = process.env.DEEPSEEK_BASE_URL || 'https://api.deepseek.com/chat/completions';
           try {
              const setting = await prisma.systemSetting.findUnique({ where: { key: 'GEMINI_API_KEY' } });
              if (setting) apiKey = setting.value;
@@ -151,7 +152,7 @@ export class AutomationEngine {
             
             try {
               if (deepseekKey) {
-                const dsRes = await fetch('https://api.deepseek.com/chat/completions', {
+                const dsRes = await fetch(deepseekBaseUrl, {
                   method: 'POST',
                   headers: { 
                     'Content-Type': 'application/json',
