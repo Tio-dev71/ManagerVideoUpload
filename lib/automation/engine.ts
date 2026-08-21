@@ -531,6 +531,162 @@ export class AutomationEngine {
     }
   }
 
+  static async taskFbBuffPost(page: Page, config: TaskConfig, profileId: string) {
+    if (!config.targetUrl) throw new Error('Target URL is required for buff post task');
+    console.log(`[AutomationEngine] Buffing post: ${config.targetUrl}`);
+    await page.goto(config.targetUrl, { waitUntil: 'domcontentloaded' });
+    await this.safeWait(page, 3000 + Math.random() * 2000, profileId);
+
+    await this.humanScroll(page, profileId, 1);
+
+    console.log('Liking post...');
+    await page.evaluate(() => {
+      function isVisible(el: Element) {
+        const rect = el.getBoundingClientRect();
+        return rect.top >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight);
+      }
+      const likes = Array.from(document.querySelectorAll('div[aria-label="Thích"], div[aria-label="Like"], div[aria-label="Bày tỏ cảm xúc"], div[aria-label="Thích bài viết"]')).filter(isVisible) as HTMLElement[];
+      if (likes.length > 0) {
+        likes[0].click();
+      }
+    });
+
+    await this.safeWait(page, 3000, profileId);
+
+    // Call randomInteract but force comment by setting chance to 1. 
+    // Wait, randomInteract handles AI comment internally. Let's just run randomInteract multiple times to guarantee a comment if needed, or we copy the comment part.
+    // Instead of copying 100 lines of AI logic, let's just trigger comment block directly.
+    // Actually, I can just copy the comment block.
+    console.log('Commenting on post...');
+    
+    // Borrow logic from randomInteract (which I see is lines 70-240)
+    // To keep it simple, I'll extract just the clicking and typing part.
+    const { clicked, postText } = await page.evaluate(() => {
+      function isVisible(el: Element) {
+        const rect = el.getBoundingClientRect();
+        return rect.top >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight);
+      }
+      
+      let allBtns = Array.from(document.querySelectorAll('div[role="button"], a, span'));
+      let commentBtn = allBtns.find(el => {
+        if (!isVisible(el)) return false;
+        let text = (el as HTMLElement).innerText?.toLowerCase() || '';
+        let aria = el.getAttribute('aria-label')?.toLowerCase() || '';
+        return aria.includes('bình luận') || aria.includes('comment') || aria.includes('viết bình luận') ||
+               text === 'bình luận' || text === 'comment';
+      });
+
+      let text = '';
+      if (commentBtn) {
+        try {
+          let container = commentBtn.closest('div[role="article"], div[data-pagelet^="FeedUnit"], div[data-pagelet^="GroupFeed"], div[aria-posinset]');
+          if (!container) {
+            container = commentBtn;
+            for(let i=0; i<8; i++) {
+              if(container.parentElement) container = container.parentElement;
+            }
+          }
+
+          if (container) {
+            const messageBlock = container.querySelector('div[data-ad-preview="message"]');
+            if (messageBlock) {
+              text = (messageBlock as HTMLElement).innerText;
+            } else {
+              const textEls = Array.from(container.querySelectorAll('div[dir="auto"], span[dir="auto"]'));
+              let longestText = '';
+              for (const el of textEls) {
+                const txt = (el as HTMLElement).innerText || '';
+                if (txt.length > longestText.length && txt.length > 15 && !['Thích', 'Bình luận', 'Chia sẻ', 'Like', 'Comment', 'Share'].includes(txt)) {
+                  longestText = txt;
+                }
+              }
+              text = longestText;
+            }
+          }
+        } catch(e) {}
+        
+        const target = commentBtn.closest('[role="button"]') || commentBtn;
+        (target as HTMLElement).click();
+        return { clicked: true, postText: text };
+      }
+      return { clicked: false, postText: '' };
+    });
+
+    if (clicked) {
+      await this.safeWait(page, 3000, profileId);
+
+      let finalComment = (config.comments && config.comments.length > 0) 
+          ? config.comments[Math.floor(Math.random() * config.comments.length)]
+          : 'Hay quá ạ!';
+          
+      try {
+        let apiKey = process.env.GEMINI_API_KEY;
+        let deepseekKey = process.env.DEEPSEEK_API_KEY;
+        let deepseekBaseUrl = process.env.DEEPSEEK_BASE_URL || 'https://api.deepseek.com/chat/completions';
+        
+        try {
+           const setting = await prisma.systemSetting.findUnique({ where: { key: 'GEMINI_API_KEY' } });
+           if (setting && setting.value) apiKey = setting.value;
+           const dsSetting = await prisma.systemSetting.findUnique({ where: { key: 'DEEPSEEK_API_KEY' } });
+           if (dsSetting && dsSetting.value) deepseekKey = dsSetting.value;
+        } catch(e) {}
+
+        if (config.useAiComment && (apiKey || deepseekKey) && postText && postText.trim().length > 10) {
+          const prompt = `You are a normal Facebook user. Write a short, natural, friendly comment in Vietnamese for this post: "${postText}". Only return the comment text. Do not use quotes or hashtags.`;
+          
+          if (deepseekKey) {
+            const dsRes = await fetch(deepseekBaseUrl, {
+              method: 'POST',
+              headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${deepseekKey}`
+              },
+              body: JSON.stringify({
+                model: 'deepseek-chat',
+                messages: [{ role: 'user', content: prompt }],
+                temperature: 0.7,
+                max_tokens: 60
+              })
+            });
+            if (dsRes.ok) {
+              const data = await dsRes.json();
+              if (data.choices && data.choices[0] && data.choices[0].message) {
+                finalComment = data.choices[0].message.content.trim().replace(/^["']|["']$/g, '');
+              }
+            }
+          }
+          
+          if (!finalComment && apiKey) {
+            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: { temperature: 0.7, maxOutputTokens: 60 }
+              })
+            });
+            if (res.ok) {
+              const data = await res.json();
+              if (data.candidates && data.candidates[0].content.parts[0].text) {
+                finalComment = data.candidates[0].content.parts[0].text.trim().replace(/^["']|["']$/g, '');
+              }
+            }
+          }
+        }
+      } catch (e) {
+        console.error('AI Comment generation error:', e);
+      }
+
+      console.log('Sending comment: ' + finalComment);
+      await page.keyboard.type(finalComment, { delay: 30 + Math.random() * 50 });
+      await this.safeWait(page, 1000, profileId);
+      await page.keyboard.press('Enter');
+      await this.safeWait(page, 2000, profileId);
+    } else {
+      console.log('Could not find Comment button for buffing.');
+    }
+  }
+
   static async runTask(profileId: string, config: TaskConfig) {
     browserManager.clearStopFlag(profileId);
     
@@ -583,6 +739,9 @@ export class AutomationEngine {
       switch (config.type) {
         case 'fb_farm_reels':
           await this.taskFbFarmReels(page, config, profileId);
+          break;
+        case 'fb_buff_post':
+          await this.taskFbBuffPost(page, config, profileId);
           break;
         case 'fb_auto_interact':
           await this.taskFbAutoInteract(page, config, profileId);

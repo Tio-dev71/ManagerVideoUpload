@@ -1,7 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, Shield, AlertCircle, CheckCircle2, Play, Users } from 'lucide-react';
+import { Plus, Trash2, Shield, AlertCircle, CheckCircle2, Play, Users, Key } from 'lucide-react';
+import { toast } from 'sonner';
+import totp from 'totp-generator';
 
 interface FbAccount {
   id: string;
@@ -9,6 +11,7 @@ interface FbAccount {
   uid: string | null;
   status: 'LIVE' | 'CHECKPOINT' | 'DEAD';
   profileId: string;
+  twoFactorCode?: string | null;
   createdAt: string;
 }
 
@@ -145,6 +148,22 @@ export default function AccountsPage() {
     }
   };
 
+  const handleGet2FA = (account: FbAccount) => {
+    if (!account.twoFactorCode) {
+      toast.error('Không tìm thấy mã 2FA secret cho tài khoản này.');
+      return;
+    }
+    
+    try {
+      const code = totp(account.twoFactorCode.replace(/\s+/g, ''));
+      navigator.clipboard.writeText(code);
+      toast.success(`Đã copy mã 2FA: ${code}`);
+    } catch (error) {
+      console.error(error);
+      toast.error('Lỗi khi tạo mã 2FA, kiểm tra lại secret key.');
+    }
+  };
+
   return (
     <div className="p-8 max-w-7xl mx-auto">
       <div className="flex items-center justify-between mb-8">
@@ -258,6 +277,15 @@ export default function AccountsPage() {
                             >
                               <Shield className="w-4 h-4" />
                             </button>
+                            {acc.twoFactorCode && (
+                              <button
+                                onClick={() => handleGet2FA(acc)}
+                                className="p-2 text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-lg transition-colors"
+                                title="Get 2FA Code"
+                              >
+                                <Key className="w-4 h-4" />
+                              </button>
+                            )}
                             <button
                               onClick={() => handleTestLogin(acc.id)}
                               className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-lg transition-colors"

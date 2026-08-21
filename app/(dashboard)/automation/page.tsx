@@ -175,6 +175,7 @@ export default function AutomationScriptsPage() {
   const formatTaskType = (type: string) => {
     switch (type) {
       case 'fb_auto_interact': return 'Auto Interact (News Feed)';
+      case 'fb_buff_post': return 'Buff Bài Viết';
       case 'fb_farm_reels': return 'Farm Reels (Fanpage / Feed)';
       case 'fb_add_friends_group': return 'Add Friends';
       case 'fb_invite_to_group': return 'Invite Group';
@@ -307,6 +308,7 @@ export default function AutomationScriptsPage() {
                   className="w-full px-4 py-2.5 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none dark:text-neutral-200"
                 >
                   <option value="fb_auto_interact">Auto Interact (News Feed)</option>
+                  <option value="fb_buff_post">Buff Bài Viết (Like & Comment 1 Link)</option>
                   <option value="fb_farm_reels">Farm Reels (Fanpage / Feed)</option>
                   <option value="fb_add_friends_group">Auto Kết Bạn (Thành viên nhóm)</option>
                   <option value="fb_invite_to_group">Auto Mời Bạn Bè (Vào nhóm mình)</option>
@@ -316,7 +318,7 @@ export default function AutomationScriptsPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="col-span-2">
                   <label className="block text-xs font-semibold mb-2 text-neutral-500 dark:text-neutral-400 tracking-wider uppercase flex items-center gap-2">
-                    <LinkIcon className="w-3.5 h-3.5" /> Target URL (Fanpage, Group... Leave empty for generic feed)
+                    <LinkIcon className="w-3.5 h-3.5" /> {taskType === 'fb_buff_post' ? 'Link Bài Viết (Post URL)' : 'Target URL (Fanpage, Group... Leave empty for generic feed)'}
                   </label>
                   <input
                     type="text"
@@ -339,7 +341,7 @@ export default function AutomationScriptsPage() {
                 </div>
               </div>
 
-              {(taskType === 'fb_auto_interact' || taskType === 'fb_farm_reels') && (
+              {(taskType === 'fb_auto_interact' || taskType === 'fb_farm_reels' || taskType === 'fb_buff_post') && (
                 <div className="space-y-4">
                   <label className="flex items-center gap-3 cursor-pointer p-4 border border-blue-100 dark:border-blue-900/50 rounded-xl bg-blue-50/50 dark:bg-blue-900/10 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
                     <input 
