@@ -148,14 +148,14 @@ export default function AccountsPage() {
     }
   };
 
-  const handleGet2FA = (account: FbAccount) => {
+  const handleGet2FA = async (account: FbAccount) => {
     if (!account.twoFactorCode) {
       toast.error('Không tìm thấy mã 2FA secret cho tài khoản này.');
       return;
     }
     
     try {
-      const { otp } = TOTP.generate(account.twoFactorCode.replace(/\s+/g, ''));
+      const { otp } = await TOTP.generate(account.twoFactorCode.replace(/\s+/g, ''));
       navigator.clipboard.writeText(otp);
       toast.success(`Đã copy mã 2FA: ${otp}`);
     } catch (error) {
