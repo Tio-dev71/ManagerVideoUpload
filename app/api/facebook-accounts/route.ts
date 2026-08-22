@@ -57,6 +57,7 @@ export async function POST(req: NextRequest) {
             cookie,
             profileId,
             status: 'LIVE',
+            proxy: 'http://127.0.0.1:9999',
           },
         });
         addedAccounts.push(account);
