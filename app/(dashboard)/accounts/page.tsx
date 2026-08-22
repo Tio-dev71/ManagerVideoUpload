@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Trash2, Shield, AlertCircle, CheckCircle2, Play, Users, Key } from 'lucide-react';
 import { toast } from 'sonner';
-import totp from 'totp-generator';
+import { TOTP } from 'totp-generator';
 
 interface FbAccount {
   id: string;
@@ -155,9 +155,9 @@ export default function AccountsPage() {
     }
     
     try {
-      const code = totp(account.twoFactorCode.replace(/\s+/g, ''));
-      navigator.clipboard.writeText(code);
-      toast.success(`Đã copy mã 2FA: ${code}`);
+      const { otp } = TOTP.generate(account.twoFactorCode.replace(/\s+/g, ''));
+      navigator.clipboard.writeText(otp);
+      toast.success(`Đã copy mã 2FA: ${otp}`);
     } catch (error) {
       console.error(error);
       toast.error('Lỗi khi tạo mã 2FA, kiểm tra lại secret key.');
