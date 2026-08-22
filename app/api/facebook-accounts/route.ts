@@ -74,7 +74,6 @@ export async function POST(req: NextRequest) {
             profileId,
             proxy: proxyStr,
             status: 'LIVE',
-            proxy: 'http://127.0.0.1:9999',
           },
         });
         
