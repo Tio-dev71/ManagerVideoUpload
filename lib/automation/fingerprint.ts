@@ -1,3 +1,36 @@
+import * as fs from 'fs';
+import * as path from 'path';
+import * as os from 'os';
+
+export function getOrGenerateFingerprint(profileId: string) {
+  const userDataDir = path.join(os.homedir(), '.autopost', 'profiles', profileId);
+  const fingerprintPath = path.join(userDataDir, 'fingerprint.json');
+
+  if (fs.existsSync(fingerprintPath)) {
+    try {
+      const data = fs.readFileSync(fingerprintPath, 'utf8');
+      return JSON.parse(data);
+    } catch (err) {
+      console.error(`[Fingerprint] Failed to read existing fingerprint for ${profileId}`, err);
+    }
+  }
+
+  // Generate new one if not exists or failed to read
+  const fingerprint = getRandomFingerprint();
+  
+  try {
+    if (!fs.existsSync(userDataDir)) {
+      fs.mkdirSync(userDataDir, { recursive: true });
+    }
+    fs.writeFileSync(fingerprintPath, JSON.stringify(fingerprint, null, 2), 'utf8');
+    console.log(`[Fingerprint] Generated and saved new fingerprint for ${profileId}`);
+  } catch (err) {
+    console.error(`[Fingerprint] Failed to save fingerprint for ${profileId}`, err);
+  }
+
+  return fingerprint;
+}
+
 export function getRandomFingerprint() {
   const userAgents = [
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36',

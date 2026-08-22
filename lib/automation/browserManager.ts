@@ -2,7 +2,7 @@ import { BrowserContext, chromium } from 'playwright';
 import path from 'path';
 import os from 'os';
 import fs from 'fs';
-import { getRandomFingerprint, parseProxy } from './fingerprint';
+import { getOrGenerateFingerprint, parseProxy } from './fingerprint';
 
 declare global {
   var activeBrowsers: Map<string, BrowserContext>;
@@ -81,7 +81,7 @@ export const browserManager = {
     }
 
     // Apply Random Fingerprint
-    const fingerprint = getRandomFingerprint();
+    const fingerprint = getOrGenerateFingerprint(profileId);
     options.userAgent = fingerprint.userAgent;
     options.locale = fingerprint.locale;
     options.timezoneId = fingerprint.timezoneId;

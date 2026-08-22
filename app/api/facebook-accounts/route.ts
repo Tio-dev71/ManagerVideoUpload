@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { auth } from '@/lib/auth';
+import { getOrGenerateFingerprint } from '@/lib/automation/fingerprint';
 
 export async function GET(req: NextRequest) {
   try {
@@ -37,6 +38,11 @@ export async function POST(req: NextRequest) {
     const lines = rawAccounts.split('\n').filter((l: string) => l.trim() !== '');
     const addedAccounts = [];
 
+    // Fetch all active proxies to assign randomly
+    const activeProxies = await prisma.proxy.findMany({
+      where: { status: 'ACTIVE' }
+    });
+
     for (const line of lines) {
       const parts = line.split('|');
       const uid = parts[0]?.trim();
@@ -48,6 +54,16 @@ export async function POST(req: NextRequest) {
         const name = `Clone ${uid.substring(0, 5)}...`;
         const profileId = `profile_${uid}_${Date.now()}`;
         
+        let proxyStr: string | null = null;
+        if (activeProxies.length > 0) {
+          const proxy = activeProxies[Math.floor(Math.random() * activeProxies.length)];
+          if (proxy.username && proxy.password) {
+            proxyStr = `${proxy.protocol}://${proxy.username}:${proxy.password}@${proxy.host}:${proxy.port}`;
+          } else {
+            proxyStr = `${proxy.protocol}://${proxy.host}:${proxy.port}`;
+          }
+        }
+        
         const account = await prisma.facebookAccount.create({
           data: {
             name,
@@ -56,10 +72,15 @@ export async function POST(req: NextRequest) {
             twoFactorCode,
             cookie,
             profileId,
+            proxy: proxyStr,
             status: 'LIVE',
             proxy: 'http://127.0.0.1:9999',
           },
         });
+        
+        // Auto-generate and save the fingerprint for this profile
+        getOrGenerateFingerprint(profileId);
+        
         addedAccounts.push(account);
       }
     }

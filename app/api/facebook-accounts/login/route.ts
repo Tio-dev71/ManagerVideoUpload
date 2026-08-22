@@ -157,7 +157,7 @@ export async function POST(req: NextRequest) {
       }
 
       console.log('[FB Login API] 2FA required. Generating token...');
-      const token = (TOTP.generate(account.twoFactorCode.replace(/\s+/g, '').toUpperCase()) as any).otp;
+      const { otp: token } = await TOTP.generate(account.twoFactorCode.replace(/\s+/g, '').toUpperCase());
 
       const codeInput = page.locator('#approvals_code');
       if (await codeInput.count() > 0) {

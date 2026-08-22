@@ -325,7 +325,7 @@ export default function AccountsPage() {
             <div className="p-6">
               <p className="text-sm text-neutral-500 mb-3">
                 Paste your accounts below. 1 account per line.<br />
-                Format: <code className="bg-neutral-100 dark:bg-neutral-800 px-1 py-0.5 rounded">UID|Pass|2FA</code>
+                Format: <code className="bg-neutral-100 dark:bg-neutral-800 px-1 py-0.5 rounded">UID|Pass|2FA|Email</code>
               </p>
               <textarea
                 value={rawInput}
