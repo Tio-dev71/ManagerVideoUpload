@@ -4,8 +4,10 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { ArrowRight, ChevronRight, Home, BarChart3, PieChart, Lightbulb, FileText, Bell, Search, Users } from 'lucide-react';
 import Image from 'next/image';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 export default function AnalyticsHero() {
+  const { t } = useLanguage();
   return (
     <div className="relative overflow-hidden bg-white pt-24 pb-20 lg:pt-28 lg:pb-28">
       {/* Background Gradients */}
@@ -18,11 +20,11 @@ export default function AnalyticsHero() {
         <div className="flex items-center gap-2 text-sm text-gray-500 mb-10 font-medium">
           <Link href="/" className="hover:text-[#5B3DF5] transition-colors flex items-center gap-1.5">
             <Home className="w-4 h-4" />
-            Trang chủ
+            {t('breadcrumb.home')}
           </Link>
           <ChevronRight className="w-4 h-4 text-gray-300" />
           <Link href="/products" className="hover:text-[#5B3DF5] transition-colors">
-            Sản phẩm
+            {t('breadcrumb.products')}
           </Link>
           <ChevronRight className="w-4 h-4 text-gray-300" />
           <span className="text-gray-900 font-bold">Topify Analytics</span>
@@ -38,7 +40,7 @@ export default function AnalyticsHero() {
               className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-[#5B3DF5] text-xs font-bold tracking-wide uppercase mb-6 shadow-sm"
             >
               <BarChart3 className="w-3.5 h-3.5" />
-              TOPIFY ANALYTICS
+              {t('analytics.hero.tag')}
             </motion.div>
 
             <motion.h1
@@ -55,10 +57,8 @@ export default function AnalyticsHero() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
               className="text-[22px] md:text-2xl font-bold text-gray-800 mb-6 leading-snug"
-            >
-              Phân tích dữ liệu thông minh<br />
-              Ra quyết định chính xác – Tăng trưởng bền vững
-            </motion.div>
+              dangerouslySetInnerHTML={{ __html: t('analytics.hero.title') }}
+            />
 
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -66,7 +66,7 @@ export default function AnalyticsHero() {
               transition={{ duration: 0.5, delay: 0.3 }}
               className="text-[17px] text-gray-600 mb-10 max-w-xl leading-relaxed"
             >
-              Topify Analytics tổng hợp và phân tích dữ liệu từ mọi kênh marketing, bán hàng và vận hành. Biểu đồ trực quan, báo cáo tự động giúp bạn nắm bắt hiệu suất, phát hiện cơ hội và tối ưu hiệu quả nhanh chóng.
+              {t('analytics.hero.desc')}
             </motion.p>
 
             {/* 4 Feature Points */}
@@ -80,29 +80,29 @@ export default function AnalyticsHero() {
                 <div className="w-10 h-10 rounded-xl bg-blue-100/50 flex items-center justify-center text-[#5B3DF5] mb-3">
                   <BarChart3 className="w-5 h-5" />
                 </div>
-                <h4 className="text-[15px] font-bold text-gray-900 mb-1">Dữ liệu tập trung</h4>
-                <p className="text-[13px] text-gray-600 leading-relaxed">Kết nối mọi kênh, thống nhất dữ liệu trên một nền tảng.</p>
+                <h4 className="text-[15px] font-bold text-gray-900 mb-1">{t('analytics.hero.f1.title')}</h4>
+                <p className="text-[13px] text-gray-600 leading-relaxed">{t('analytics.hero.f1.desc')}</p>
               </div>
               <div>
                 <div className="w-10 h-10 rounded-xl bg-blue-100/50 flex items-center justify-center text-[#5B3DF5] mb-3">
                   <PieChart className="w-5 h-5" />
                 </div>
-                <h4 className="text-[15px] font-bold text-gray-900 mb-1">Phân tích chuyên sâu</h4>
-                <p className="text-[13px] text-gray-600 leading-relaxed">Phân tích đa chiều, biểu đồ trực quan, dễ hiểu.</p>
+                <h4 className="text-[15px] font-bold text-gray-900 mb-1">{t('analytics.hero.f2.title')}</h4>
+                <p className="text-[13px] text-gray-600 leading-relaxed">{t('analytics.hero.f2.desc')}</p>
               </div>
               <div>
                 <div className="w-10 h-10 rounded-xl bg-blue-100/50 flex items-center justify-center text-[#5B3DF5] mb-3">
                   <Lightbulb className="w-5 h-5" />
                 </div>
-                <h4 className="text-[15px] font-bold text-gray-900 mb-1">Insight thông minh</h4>
-                <p className="text-[13px] text-gray-600 leading-relaxed">AI gợi ý cơ hội, cảnh báo bất thường, dự đoán xu hướng.</p>
+                <h4 className="text-[15px] font-bold text-gray-900 mb-1">{t('analytics.hero.f3.title')}</h4>
+                <p className="text-[13px] text-gray-600 leading-relaxed">{t('analytics.hero.f3.desc')}</p>
               </div>
               <div>
                 <div className="w-10 h-10 rounded-xl bg-blue-100/50 flex items-center justify-center text-[#5B3DF5] mb-3">
                   <FileText className="w-5 h-5" />
                 </div>
-                <h4 className="text-[15px] font-bold text-gray-900 mb-1">Báo cáo tự động</h4>
-                <p className="text-[13px] text-gray-600 leading-relaxed">Báo cáo theo lịch, tự động gửi đến bạn và đội nhóm.</p>
+                <h4 className="text-[15px] font-bold text-gray-900 mb-1">{t('analytics.hero.f4.title')}</h4>
+                <p className="text-[13px] text-gray-600 leading-relaxed">{t('analytics.hero.f4.desc')}</p>
               </div>
             </motion.div>
 
@@ -117,7 +117,7 @@ export default function AnalyticsHero() {
                 href="/login"
                 className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3.5 text-[15px] font-semibold text-white bg-[#5B3DF5] rounded-xl hover:bg-[#4F2FE0] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
               >
-                Dùng thử miễn phí
+                {t('analytics.hero.btn_free')}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Link>
               <button
@@ -126,7 +126,7 @@ export default function AnalyticsHero() {
                 <div className="w-6 h-6 rounded-full flex items-center justify-center mr-2 border-2 border-[#5B3DF5] group-hover:scale-110 transition-transform">
                   <svg className="w-2.5 h-2.5 ml-0.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" /></svg>
                 </div>
-                Xem demo
+                {t('analytics.hero.btn_demo')}
               </button>
             </motion.div>
           </div>
@@ -155,17 +155,17 @@ export default function AnalyticsHero() {
                 </div>
                 <div className="px-3 flex flex-col gap-1">
                   {[
-                    { n: 'Tổng quan', i: <BarChart3 className="w-4 h-4" />, act: true },
-                    { n: 'Báo cáo', i: <FileText className="w-4 h-4" /> },
-                    { n: 'Kênh', i: <PieChart className="w-4 h-4" /> },
-                    { n: 'Chiến dịch', i: <Lightbulb className="w-4 h-4" /> },
-                    { n: 'Nội dung', i: <FileText className="w-4 h-4" /> },
-                    { n: 'Khách hàng', i: <Users className="w-4 h-4" /> },
-                    { n: 'Doanh thu', i: <BarChart3 className="w-4 h-4" /> },
-                    { n: 'Phiếu bán hàng', i: <FileText className="w-4 h-4" /> },
-                    { n: 'So sánh', i: <PieChart className="w-4 h-4" /> },
-                    { n: 'Cảnh báo', i: <Bell className="w-4 h-4" /> },
-                    { n: 'Cài đặt', i: <FileText className="w-4 h-4" /> },
+                    { n: t('analytics.mockup.menu.overview'), i: <BarChart3 className="w-4 h-4" />, act: true },
+                    { n: t('analytics.mockup.menu.reports'), i: <FileText className="w-4 h-4" /> },
+                    { n: t('analytics.mockup.menu.channels'), i: <PieChart className="w-4 h-4" /> },
+                    { n: t('analytics.mockup.menu.campaigns'), i: <Lightbulb className="w-4 h-4" /> },
+                    { n: t('analytics.mockup.menu.content'), i: <FileText className="w-4 h-4" /> },
+                    { n: t('analytics.mockup.menu.customers'), i: <Users className="w-4 h-4" /> },
+                    { n: t('analytics.mockup.menu.revenue'), i: <BarChart3 className="w-4 h-4" /> },
+                    { n: t('analytics.mockup.menu.orders'), i: <FileText className="w-4 h-4" /> },
+                    { n: t('analytics.mockup.menu.compare'), i: <PieChart className="w-4 h-4" /> },
+                    { n: t('analytics.mockup.menu.alerts'), i: <Bell className="w-4 h-4" /> },
+                    { n: t('analytics.mockup.menu.settings'), i: <FileText className="w-4 h-4" /> },
                   ].map((it, idx) => (
                     <div key={idx} className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm ${it.act ? 'bg-white text-[#5B3DF5] font-bold shadow-sm' : 'text-gray-600 font-medium'}`}>
                       {it.i} {it.n}
@@ -178,7 +178,7 @@ export default function AnalyticsHero() {
               <div className="flex-1 bg-white p-8 flex flex-col overflow-hidden">
                 {/* Header */}
                 <div className="flex justify-between items-center mb-8">
-                  <h2 className="text-2xl font-bold text-gray-900">Tổng quan</h2>
+                  <h2 className="text-2xl font-bold text-gray-900">{t('analytics.mockup.menu.overview')}</h2>
                   <div className="flex items-center gap-4">
                     <div className="px-4 py-2 bg-gray-50 rounded-lg text-sm text-gray-600 font-medium border border-gray-100">
                       01/05/2024 - 31/05/2024
@@ -196,10 +196,10 @@ export default function AnalyticsHero() {
                 {/* 4 Stats Cards */}
                 <div className="grid grid-cols-4 gap-4 mb-6">
                   {[
-                    { n: 'Doanh thu', v: '2.45B', d: '+18.6%', c: 'text-green-500' },
-                    { n: 'Lượt truy cập', v: '356.8K', d: '+12.3%', c: 'text-green-500' },
-                    { n: 'Đơn hàng', v: '3.152', d: '+15.2%', c: 'text-green-500' },
-                    { n: 'Tỷ lệ chuyển đổi', v: '2.85%', d: '+8.7%', c: 'text-green-500' },
+                    { n: t('analytics.mockup.stats.revenue'), v: '2.45B', d: '+18.6%', c: 'text-green-500' },
+                    { n: t('analytics.mockup.stats.visits'), v: '356.8K', d: '+12.3%', c: 'text-green-500' },
+                    { n: t('analytics.mockup.stats.orders'), v: '3.152', d: '+15.2%', c: 'text-green-500' },
+                    { n: t('analytics.mockup.stats.conversion'), v: '2.85%', d: '+8.7%', c: 'text-green-500' },
                   ].map((st, i) => (
                     <div key={i} className="bg-white border border-gray-100 rounded-xl p-5 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
                       <div className="text-sm font-semibold text-gray-500 mb-3">{st.n}</div>
@@ -219,7 +219,7 @@ export default function AnalyticsHero() {
                   <div className="flex flex-col gap-6">
                     {/* Donut Chart */}
                     <div className="bg-white border border-gray-100 rounded-xl p-6 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex-1">
-                      <div className="text-sm font-bold text-gray-900 mb-6">Hiệu suất theo kênh</div>
+                      <div className="text-sm font-bold text-gray-900 mb-6">{t('analytics.mockup.chart1.title')}</div>
                       <div className="flex items-center gap-8">
                         {/* Donut svg */}
                         <div className="w-[180px] h-[180px] relative">
@@ -231,7 +231,7 @@ export default function AnalyticsHero() {
                           </svg>
                           <div className="absolute inset-0 flex flex-col items-center justify-center">
                             <span className="text-2xl font-bold text-gray-900">356.8K</span>
-                            <span className="text-[11px] font-semibold text-gray-500">Lượt truy cập</span>
+                            <span className="text-[11px] font-semibold text-gray-500">{t('analytics.mockup.chart1.subtitle')}</span>
                           </div>
                         </div>
                         {/* Legend */}
@@ -242,7 +242,7 @@ export default function AnalyticsHero() {
                             { l: 'Google', c: 'bg-blue-500', p: '18.7%' },
                             { l: 'Zalo', c: 'bg-cyan-500', p: '8.4%' },
                             { l: 'Email', c: 'bg-purple-500', p: '4.1%' },
-                            { l: 'Khác', c: 'bg-gray-300', p: '3.0%' }
+                            { l: t('analytics.mockup.chart1.other'), c: 'bg-gray-300', p: '3.0%' }
                           ].map((lg, i) => (
                             <div key={i} className="flex items-center justify-between text-xs">
                               <div className="flex items-center gap-2">
@@ -259,11 +259,11 @@ export default function AnalyticsHero() {
                     {/* Bar Chart */}
                     <div className="bg-white border border-gray-100 rounded-xl p-6 shadow-[0_2px_10px_rgba(0,0,0,0.02)] h-[240px] flex flex-col">
                       <div className="flex justify-between items-center mb-6">
-                        <div className="text-sm font-bold text-gray-900">Hiệu suất nội dung</div>
+                        <div className="text-sm font-bold text-gray-900">{t('analytics.mockup.chart2.title')}</div>
                         <div className="flex gap-4 text-[10px] font-bold text-gray-500">
-                          <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-[#5B3DF5]"></div> Lượt xem</div>
-                          <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-blue-400"></div> Tương tác</div>
-                          <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-teal-400"></div> Chuyển đổi</div>
+                          <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-[#5B3DF5]"></div> {t('analytics.mockup.chart2.legend.views')}</div>
+                          <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-blue-400"></div> {t('analytics.mockup.chart2.legend.engagement')}</div>
+                          <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-teal-400"></div> {t('analytics.mockup.chart2.legend.conversion')}</div>
                         </div>
                       </div>
                       <div className="flex-1 flex items-end justify-between px-2 gap-4 pb-6 border-b border-gray-100 relative">
@@ -283,7 +283,7 @@ export default function AnalyticsHero() {
                         ))}
                       </div>
                       <div className="flex justify-between px-2 pt-3 text-[10px] font-bold text-gray-500 ml-10">
-                        <span>Bài viết 1</span><span>Bài viết 2</span><span>Bài viết 3</span><span>Bài viết 4</span><span>Bài viết 5</span>
+                        <span>{t('analytics.mockup.chart2.x.post1')}</span><span>{t('analytics.mockup.chart2.x.post2')}</span><span>{t('analytics.mockup.chart2.x.post3')}</span><span>{t('analytics.mockup.chart2.x.post4')}</span><span>{t('analytics.mockup.chart2.x.post5')}</span>
                       </div>
                     </div>
                   </div>
@@ -292,7 +292,7 @@ export default function AnalyticsHero() {
                   <div className="flex flex-col gap-6">
                     {/* Line Chart */}
                     <div className="bg-white border border-gray-100 rounded-xl p-6 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex-1 flex flex-col">
-                      <div className="text-sm font-bold text-gray-900 mb-6">Xu hướng truy cập</div>
+                      <div className="text-sm font-bold text-gray-900 mb-6">{t('analytics.mockup.chart3.title')}</div>
                       <div className="flex-1 relative w-full h-full pb-6 pl-8">
                         {/* Y axis */}
                         <div className="absolute left-0 top-0 bottom-6 flex flex-col justify-between text-[10px] font-bold text-gray-400 pb-1">
@@ -328,7 +328,7 @@ export default function AnalyticsHero() {
 
                     {/* Donut Chart 2 */}
                     <div className="bg-white border border-gray-100 rounded-xl p-6 shadow-[0_2px_10px_rgba(0,0,0,0.02)] h-[200px]">
-                      <div className="text-sm font-bold text-gray-900 mb-6">Thiết bị truy cập</div>
+                      <div className="text-sm font-bold text-gray-900 mb-6">{t('analytics.mockup.chart4.title')}</div>
                       <div className="flex items-center gap-8 h-full pb-4">
                         <div className="w-[120px] h-[120px] relative">
                           <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90">

@@ -4,8 +4,10 @@ import { ArrowRight, CheckCircle2, Play, Users } from 'lucide-react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 export default function WorkCta() {
+  const { t } = useLanguage();
   return (
     <div className="bg-white py-16 pb-24">
       <div className="max-w-[1350px] mx-auto px-4 sm:px-6 lg:px-8">
@@ -25,9 +27,9 @@ export default function WorkCta() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 className="text-3xl md:text-4xl font-bold text-white mb-8 leading-tight"
+                dangerouslySetInnerHTML={{ __html: t('work.cta.title') }}
               >
-                Quản trị công việc thông minh<br className="hidden md:block"/>
-                Hiệu suất đội nhóm bứt phá cùng Topify Work!
+                
               </motion.h2>
 
               <motion.div 
@@ -39,13 +41,13 @@ export default function WorkCta() {
               >
                 <button className="inline-flex items-center justify-center px-8 py-3.5 text-[15px] font-bold text-blue-700 bg-white rounded-xl hover:bg-gray-50 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
                   <Play className="w-4 h-4 mr-2" />
-                  Xem demo sản phẩm
+                  {t('work.cta.btn_demo')}
                 </button>
                 <Link
                   href="/login"
                   className="inline-flex items-center justify-center px-8 py-3.5 text-[15px] font-bold text-white bg-[#102999] rounded-xl hover:bg-[#0c1f73] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
                 >
-                  Dùng thử miễn phí
+                  {t('work.cta.btn_free')}
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Link>
               </motion.div>
@@ -58,9 +60,9 @@ export default function WorkCta() {
                 className="flex flex-wrap items-center gap-x-8 gap-y-4"
               >
                 {[
-                  'Dùng thử miễn phí 7 ngày',
-                  'Không cần thẻ tín dụng',
-                  'Hỗ trợ 24/7'
+                  '{t('work.cta.btn_free')} 7 ngày',
+                  t('work.cta.check2'),
+                  t('work.cta.check3')
                 ].map((text, idx) => (
                   <div key={idx} className="flex items-center gap-2 text-blue-100 text-[14px] font-medium">
                     <CheckCircle2 className="w-4 h-4 text-blue-300" />
@@ -80,7 +82,7 @@ export default function WorkCta() {
             >
               {/* This is a placeholder for the 3D assets in the design */}
               <div className="absolute inset-0 flex items-center justify-center">
-                 <Image src="/topi1.png" alt="Mascot" width={224} height={224} className="w-full h-auto object-contain drop-shadow-2xl relative z-10 animate-bounce" style={{ animationDuration: '4s' }} />
+                 <Image src="/topi1.png" alt="Mascot" width={384} height={384} className="w-72 h-72 md:w-80 md:h-80 lg:w-96 lg:h-96 object-contain drop-shadow-2xl relative z-10 animate-bounce" style={{ animationDuration: '4s' }} />
               </div>
             </motion.div>
             

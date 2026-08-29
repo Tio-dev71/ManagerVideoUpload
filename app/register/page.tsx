@@ -2,48 +2,79 @@
 
 import { useState, Suspense } from 'react';
 import { signIn } from 'next-auth/react';
-import { useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Loader2, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 
-function LoginForm() {
+function RegisterForm() {
   const { t } = useLanguage();
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   
-  const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
-  const errorParam = searchParams.get('error');
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim() || !password.trim()) return;
+    
+    if (password !== confirmPassword) {
+      toast.error('Mật khẩu xác nhận không khớp.');
+      return;
+    }
+
+    if (password.length < 6) {
+      toast.error('Mật khẩu phải có ít nhất 6 ký tự.');
+      return;
+    }
 
     setLoading(true);
 
     try {
-      const normalizedEmail = email.trim().toLowerCase();
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: fullName,
+          email: email,
+          password: password,
+        }),
+      });
 
+      const data = await response.json();
+
+      if (!response.ok) {
+        toast.error(data.error || 'Lỗi đăng ký.');
+        setLoading(false);
+        return;
+      }
+
+      toast.success('Đăng ký thành công! Đang đăng nhập...');
+      
+      // Auto login after register
       const result = await signIn('credentials', {
-        email: normalizedEmail,
+        email: email.trim().toLowerCase(),
         password,
         redirect: false,
-        callbackUrl,
       });
 
       if (result?.error) {
-        toast.error('Email hoặc mật khẩu không đúng.');
-        setLoading(false);
+        toast.error('Lỗi khi đăng nhập tự động. Vui lòng đăng nhập thủ công.');
+        router.push('/login');
       } else if (result?.ok) {
-        toast.success('Đăng nhập thành công!');
-        window.location.href = callbackUrl;
+        window.location.href = '/dashboard';
       }
-    } catch {
+
+    } catch (error) {
       toast.error('Đã xảy ra lỗi. Vui lòng thử lại.');
       setLoading(false);
     }
@@ -52,7 +83,7 @@ function LoginForm() {
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
     try {
-      await signIn('google', { callbackUrl });
+      await signIn('google', { callbackUrl: '/dashboard' });
     } catch (error) {
       toast.error('Không thể đăng nhập bằng Google.');
       setGoogleLoading(false);
@@ -60,7 +91,7 @@ function LoginForm() {
   };
 
   return (
-    <div className="w-full max-w-md space-y-8 animate-fade-in">
+    <div className="w-full max-w-md space-y-8 animate-fade-in z-10">
       <div className="flex flex-col items-center text-center">
         <Link href="/" className="inline-flex items-center justify-center mb-5 group">
           <Image 
@@ -73,29 +104,37 @@ function LoginForm() {
           />
         </Link>
         <h2 className="text-3xl font-extrabold tracking-tight text-[var(--color-foreground)]">
-          {t('auth.login.title')}
+          {t('auth.register.title')}
         </h2>
         <p className="mt-2 text-sm text-[var(--color-muted-foreground)]">
-          {t('auth.login.or')}{" "}
-          <Link href="/register" className="font-medium text-[var(--color-primary)] hover:text-[var(--color-primary-hover)] transition-colors">
-            {t('auth.login.register_link')}
+          {t('auth.register.or')}{" "}
+          <Link href="/login" className="font-medium text-[var(--color-primary)] hover:text-[var(--color-primary-hover)] transition-colors">
+            {t('auth.register.login_link')}
           </Link>
         </p>
       </div>
 
       <div className="card-apple p-8">
         <form onSubmit={handleSubmit} className="space-y-4">
-          {errorParam && (
-            <div className="rounded-lg bg-[var(--color-error-soft)] p-3 text-sm font-medium text-[var(--color-error)] text-center">
-              {errorParam === 'AccessDenied'
-                ? t('auth.login.error_access')
-                : t('auth.login.error_auth')}
-            </div>
-          )}
+          <div className="space-y-2">
+            <label htmlFor="fullName" className="block text-sm font-medium text-[var(--color-foreground)]">
+              {t('auth.register.name')}
+            </label>
+            <input
+              id="fullName"
+              type="text"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              placeholder="Ví dụ: Nguyễn Văn A"
+              className="input-apple"
+              required
+              disabled={loading || googleLoading}
+            />
+          </div>
 
           <div className="space-y-2">
             <label htmlFor="email" className="block text-sm font-medium text-[var(--color-foreground)]">
-              {t('auth.login.email')}
+              {t('auth.register.email')}
             </label>
             <input
               id="email"
@@ -110,19 +149,29 @@ function LoginForm() {
           </div>
 
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <label htmlFor="password" className="block text-sm font-medium text-[var(--color-foreground)]">
-                {t('auth.login.password')}
-              </label>
-              {/* <Link href="/forgot-password" className="text-xs font-medium text-[var(--color-primary)] hover:text-[var(--color-primary-hover)]">
-                Quên mật khẩu?
-              </Link> */}
-            </div>
+            <label htmlFor="password" className="block text-sm font-medium text-[var(--color-foreground)]">
+              {t('auth.register.password')} ({t('auth.register.password_placeholder')})
+            </label>
             <input
               id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              required
+              className="input-apple"
+              disabled={loading || googleLoading}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-[var(--color-foreground)]">
+              Xác nhận mật khẩu
+            </label>
+            <input
+              id="confirmPassword"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
               required
               className="input-apple"
               disabled={loading || googleLoading}
@@ -137,10 +186,10 @@ function LoginForm() {
             {loading ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                {t('auth.login.submitting')}
+                {t('auth.register.submitting')}
               </>
             ) : (
-              t('auth.login.submit')
+              t('auth.register.submit')
             )}
           </button>
         </form>
@@ -150,7 +199,7 @@ function LoginForm() {
             <span className="w-full border-t border-[var(--color-border)]" />
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-[var(--color-card)] px-2 text-[var(--color-muted-foreground)]">{t('auth.login.or_continue')}</span>
+            <span className="bg-[var(--color-card)] px-2 text-[var(--color-muted-foreground)]">{t('auth.register.or_continue')}</span>
           </div>
         </div>
 
@@ -173,7 +222,7 @@ function LoginForm() {
 
         <div className="mt-6 flex justify-center border-t border-[var(--color-border)] pt-4">
           <Link href="/" className="flex items-center gap-2 text-sm text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)] transition-colors">
-            <ArrowLeft className="w-4 h-4" /> {t('auth.login.back_home')}
+            <ArrowLeft className="w-4 h-4" /> {t('auth.register.back_home')}
           </Link>
         </div>
       </div>
@@ -181,7 +230,7 @@ function LoginForm() {
   );
 }
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const { t } = useLanguage();
   return (
     <div className="min-h-screen flex items-center justify-center bg-[var(--color-background)] px-4 py-12">
@@ -189,10 +238,10 @@ export default function LoginPage() {
       <Suspense fallback={
         <div className="flex flex-col items-center justify-center space-y-4 z-10">
           <Loader2 className="w-8 h-8 animate-spin text-[var(--color-primary)]" />
-          <p className="text-sm text-[var(--color-muted-foreground)]">{t('auth.login.loading')}</p>
+          <p className="text-sm text-[var(--color-muted-foreground)]">{t('auth.register.loading')}</p>
         </div>
       }>
-        <LoginForm />
+        <RegisterForm />
       </Suspense>
     </div>
   );

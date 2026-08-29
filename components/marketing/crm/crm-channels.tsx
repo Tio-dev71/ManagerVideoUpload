@@ -1,15 +1,17 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { Globe, MoreHorizontal } from 'lucide-react';
 
 export default function CrmChannels() {
+  const { t } = useLanguage();
   return (
     <div className="py-20 bg-gray-50 border-y border-gray-100">
       <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
-            Quản lý hội thoại từ mọi kênh bán hàng
+            {t('crm.channels.title')}
           </h2>
         </div>
 
@@ -22,7 +24,7 @@ export default function CrmChannels() {
             </div>
             <div>
               <div className="font-bold text-gray-900 text-sm">Facebook</div>
-              <div className="text-xs text-gray-500 mt-1">Messenger & Comments</div>
+              <div className="text-xs text-gray-500 mt-1">{t('crm.channels.f1')}</div>
             </div>
           </div>
 
@@ -33,7 +35,7 @@ export default function CrmChannels() {
             </div>
             <div>
               <div className="font-bold text-gray-900 text-sm">Instagram</div>
-              <div className="text-xs text-gray-500 mt-1">Direct Message & Comments</div>
+              <div className="text-xs text-gray-500 mt-1">{t('crm.channels.f2')}</div>
             </div>
           </div>
 
@@ -44,7 +46,7 @@ export default function CrmChannels() {
             </div>
             <div>
               <div className="font-bold text-gray-900 text-sm">TikTok</div>
-              <div className="text-xs text-gray-500 mt-1">Inbox & Comments</div>
+              <div className="text-xs text-gray-500 mt-1">{t('crm.channels.f3')}</div>
             </div>
           </div>
 
@@ -55,7 +57,7 @@ export default function CrmChannels() {
             </div>
             <div>
               <div className="font-bold text-gray-900 text-sm">Zalo</div>
-              <div className="text-xs text-gray-500 mt-1">Official Account & Messages</div>
+              <div className="text-xs text-gray-500 mt-1">{t('crm.channels.f4')}</div>
             </div>
           </div>
 
@@ -66,7 +68,7 @@ export default function CrmChannels() {
             </div>
             <div>
               <div className="font-bold text-gray-900 text-sm">Website</div>
-              <div className="text-xs text-gray-500 mt-1">Live chat & Form liên hệ</div>
+              <div className="text-xs text-gray-500 mt-1">{t('crm.channels.f5')}</div>
             </div>
           </div>
 
@@ -76,7 +78,7 @@ export default function CrmChannels() {
               <MoreHorizontal className="w-6 h-6" />
             </div>
             <div className="flex-1 flex items-center mt-1">
-              <div className="text-xs text-gray-500">Và nhiều kênh khác</div>
+              <div className="text-xs text-gray-500">{t('crm.channels.f6')}</div>
             </div>
           </div>
 

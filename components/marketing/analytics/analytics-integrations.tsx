@@ -3,11 +3,12 @@
 import { motion } from 'framer-motion';
 import { Mail, Globe, MoreHorizontal } from 'lucide-react';
 import Image from 'next/image';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 const integrations = [
   {
     name: 'Facebook',
-    desc: 'Page, Group, Ads',
+    descKey: 'analytics.integrations.item1.desc',
     icon: <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white">
       <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
         <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
@@ -16,7 +17,7 @@ const integrations = [
   },
   {
     name: 'TikTok',
-    desc: 'Ads & Organic',
+    descKey: 'analytics.integrations.item2.desc',
     icon: <div className="w-10 h-10 rounded-full bg-black flex items-center justify-center text-white">
       {/* SVG for TikTok */}
       <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -26,14 +27,14 @@ const integrations = [
   },
   {
     name: 'Google Analytics 4',
-    desc: 'Website & App',
+    descKey: 'analytics.integrations.item3.desc',
     icon: <div className="w-10 h-10 rounded-full bg-[#F9AB00] flex items-center justify-center text-white">
       <Globe className="w-5 h-5" />
     </div>,
   },
   {
     name: 'YouTube',
-    desc: 'Channel & Video',
+    descKey: 'analytics.integrations.item4.desc',
     icon: <div className="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center text-white">
       <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
         <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33 2.78 2.78 0 0 0 1.94 2c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.33 29 29 0 0 0-.46-5.33z" />
@@ -43,29 +44,30 @@ const integrations = [
   },
   {
     name: 'Zalo OA',
-    desc: 'Official Account',
+    descKey: 'analytics.integrations.item5.desc',
     icon: <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-xs">Zalo</div>,
   },
   {
     name: 'Email Marketing',
-    desc: 'Campaigns',
+    descKey: 'analytics.integrations.item6.desc',
     icon: <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600"><Mail className="w-5 h-5" /></div>,
   },
   {
-    name: 'Khác',
-    desc: 'API, CRM, POS...',
+    nameKey: 'analytics.integrations.item7.name',
+    descKey: 'analytics.integrations.item7.desc',
     icon: <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500"><MoreHorizontal className="w-5 h-5" /></div>,
   },
 ];
 
 export default function AnalyticsIntegrations() {
+  const { t } = useLanguage();
   return (
     <div className="bg-gray-50/50 py-24 relative overflow-hidden border-y border-gray-100">
       <div className="max-w-[1350px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">
-            Dữ liệu toàn diện – Phân tích đa chiều
+            {t('analytics.integrations.title')}
           </h2>
         </div>
 
@@ -81,8 +83,8 @@ export default function AnalyticsIntegrations() {
             >
               {item.icon}
               <div>
-                <div className="font-bold text-gray-900 text-[15px] leading-tight mb-1">{item.name}</div>
-                <div className="text-xs text-gray-500 font-medium">{item.desc}</div>
+                <div className="font-bold text-gray-900 text-[15px] leading-tight mb-1">{item.nameKey ? t(item.nameKey) : item.name}</div>
+                <div className="text-xs text-gray-500 font-medium">{t(item.descKey)}</div>
               </div>
             </motion.div>
           ))}

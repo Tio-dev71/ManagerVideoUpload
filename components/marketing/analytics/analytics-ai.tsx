@@ -3,15 +3,17 @@
 import { motion } from 'framer-motion';
 import { Sparkles, BellRing, TrendingUp, Lightbulb } from 'lucide-react';
 import Image from 'next/image';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 export default function AnalyticsAi() {
+  const { t } = useLanguage();
   return (
     <div className="bg-gray-50/30 py-24 relative overflow-hidden">
       <div className="max-w-[1350px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">
-            AI & Insight – Biến dữ liệu thành hành động
+            {t('analytics.ai.title')}
           </h2>
         </div>
 
@@ -31,8 +33,8 @@ export default function AnalyticsAi() {
                 <Sparkles className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-gray-900 mb-1">AI Insight thông minh</h3>
-                <p className="text-sm text-gray-600 leading-relaxed">Tự động phân tích và gợi ý cơ hội tăng trưởng.</p>
+                <h3 className="text-base font-bold text-gray-900 mb-1">{t('analytics.ai.f1.title')}</h3>
+                <p className="text-sm text-gray-600 leading-relaxed">{t('analytics.ai.f1.desc')}</p>
               </div>
             </motion.div>
 
@@ -47,8 +49,8 @@ export default function AnalyticsAi() {
                 <BellRing className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-gray-900 mb-1">Cảnh báo bất thường</h3>
-                <p className="text-sm text-gray-600 leading-relaxed">Phát hiện sớm vấn đề, giúp bạn xử lý kịp thời.</p>
+                <h3 className="text-base font-bold text-gray-900 mb-1">{t('analytics.ai.f2.title')}</h3>
+                <p className="text-sm text-gray-600 leading-relaxed">{t('analytics.ai.f2.desc')}</p>
               </div>
             </motion.div>
 
@@ -63,8 +65,8 @@ export default function AnalyticsAi() {
                 <TrendingUp className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-gray-900 mb-1">Dự báo xu hướng</h3>
-                <p className="text-sm text-gray-600 leading-relaxed">Dự đoán kết quả giúp bạn lập kế hoạch chính xác.</p>
+                <h3 className="text-base font-bold text-gray-900 mb-1">{t('analytics.ai.f3.title')}</h3>
+                <p className="text-sm text-gray-600 leading-relaxed">{t('analytics.ai.f3.desc')}</p>
               </div>
             </motion.div>
 
@@ -79,8 +81,8 @@ export default function AnalyticsAi() {
                 <Lightbulb className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-gray-900 mb-1">Gợi ý tối ưu</h3>
-                <p className="text-sm text-gray-600 leading-relaxed">Đề xuất tối ưu ngân sách, chiến dịch & nội dung.</p>
+                <h3 className="text-base font-bold text-gray-900 mb-1">{t('analytics.ai.f4.title')}</h3>
+                <p className="text-sm text-gray-600 leading-relaxed">{t('analytics.ai.f4.desc')}</p>
               </div>
             </motion.div>
 

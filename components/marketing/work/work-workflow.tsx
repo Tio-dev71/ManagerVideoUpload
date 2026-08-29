@@ -3,38 +3,40 @@
 import { motion } from 'framer-motion';
 import { Plus, Users, ListTodo, Check, BarChart2, ArrowRight } from 'lucide-react';
 import Image from 'next/image';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 export default function WorkWorkflow() {
+  const { t } = useLanguage();
   const steps = [
     {
       icon: <Plus className="w-6 h-6" />,
       color: 'bg-blue-600 text-white',
-      title: '1. Tạo công việc',
-      desc: 'Xác định công việc và yêu cầu'
+      title: t('work.workflow.s1.title'),
+      desc: t('work.workflow.s1.desc')
     },
     {
       icon: <Users className="w-6 h-6" />,
       color: 'bg-purple-600 text-white',
-      title: '2. Giao việc',
-      desc: 'Phân công người thực hiện và thời hạn'
+      title: t('work.workflow.s2.title'),
+      desc: t('work.workflow.s2.desc')
     },
     {
       icon: <ListTodo className="w-6 h-6" />,
       color: 'bg-orange-400 text-white',
-      title: '3. Thực hiện',
-      desc: 'Theo dõi tiến độ real-time'
+      title: t('work.workflow.s3.title'),
+      desc: t('work.workflow.s3.desc')
     },
     {
       icon: <Check className="w-6 h-6" />,
       color: 'bg-green-500 text-white',
-      title: '4. Hoàn thành',
-      desc: 'Nghiệm thu và đánh giá kết quả'
+      title: t('work.workflow.s4.title'),
+      desc: t('work.workflow.s4.desc')
     },
     {
       icon: <BarChart2 className="w-6 h-6" />,
       color: 'bg-blue-500 text-white',
-      title: '5. Báo cáo',
-      desc: 'Phân tích, báo cáo và cải tiến liên tục'
+      title: t('work.workflow.s5.title'),
+      desc: t('work.workflow.s5.desc')
     }
   ];
 
@@ -95,14 +97,14 @@ export default function WorkWorkflow() {
               initial={{ opacity: 0, scale: 0.8 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              className="relative w-48 h-48 animate-bounce" style={{ animationDuration: '3s' }}
+              className="relative w-64 h-64 animate-bounce" style={{ animationDuration: '3s' }}
             >
               {/* Speech Bubble */}
-              <div className="absolute -top-12 -left-16 bg-blue-50 text-blue-700 text-sm font-bold py-3 px-5 rounded-2xl rounded-br-none shadow-lg border border-blue-100 w-48 text-center z-20">
-                Hiệu suất tốt hơn mỗi ngày!
+              <div className="absolute -top-12 -left-20 bg-blue-50 text-blue-700 text-sm font-bold py-3 px-5 rounded-2xl rounded-br-none shadow-lg border border-blue-100 w-48 text-center z-20">
+                {t('work.workflow.bubble')}
               </div>
               
-              <Image src="/topi2.png" alt="Mascot" width={192} height={192} className="w-full h-auto object-contain drop-shadow-2xl relative z-10" />
+              <Image src="/topi2.png" alt="Mascot" width={256} height={256} className="w-full h-auto object-contain drop-shadow-2xl relative z-10" />
               <div className="absolute -bottom-4 right-4 w-20 h-24 bg-white rounded-xl shadow-lg border border-gray-100 flex flex-col p-2 z-20 rotate-[-10deg]">
                 <div className="w-full h-2 bg-blue-100 rounded mb-2"></div>
                 <div className="flex-1 w-full flex items-end gap-1">

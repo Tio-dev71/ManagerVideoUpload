@@ -4,8 +4,10 @@ import { ArrowRight, CheckCircle2, MessageCircle, Mail } from 'lucide-react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 export default function CrmCta() {
+  const { t } = useLanguage();
   return (
     <div className="bg-white py-16 pb-24">
       <div className="max-w-[1350px] mx-auto px-4 sm:px-6 lg:px-8">
@@ -25,9 +27,9 @@ export default function CrmCta() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 className="text-3xl md:text-4xl font-bold text-white mb-8 leading-tight"
+                dangerouslySetInnerHTML={{ __html: t('crm.cta.title') }}
               >
-                Chăm sóc khách hàng tốt hơn –<br className="hidden md:block"/>
-                Doanh thu tăng trưởng bền vững cùng Topify CRM!
+                
               </motion.h2>
 
               <motion.div 
@@ -38,13 +40,13 @@ export default function CrmCta() {
                 className="flex flex-col sm:flex-row gap-4 mb-10"
               >
                 <button className="inline-flex items-center justify-center px-8 py-3.5 text-[15px] font-bold text-[#5B3DF5] bg-white rounded-xl hover:bg-gray-50 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
-                  Xem demo sản phẩm
+                  {t('crm.cta.btn_demo')}
                 </button>
                 <Link
                   href="/login"
                   className="inline-flex items-center justify-center px-8 py-3.5 text-[15px] font-bold text-white bg-[#37239C] rounded-xl hover:bg-[#2C1C7D] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
                 >
-                  Dùng thử miễn phí
+                  {t('crm.cta.btn_free')}
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Link>
               </motion.div>
@@ -57,9 +59,9 @@ export default function CrmCta() {
                 className="flex flex-wrap items-center gap-x-8 gap-y-4"
               >
                 {[
-                  'Dùng thử miễn phí 7 ngày',
-                  'Không cần thẻ tín dụng',
-                  'Hỗ trợ 24/7'
+                  '{t('crm.cta.btn_free')} 7 ngày',
+                  t('crm.cta.check2'),
+                  t('crm.cta.check3')
                 ].map((text, idx) => (
                   <div key={idx} className="flex items-center gap-2 text-blue-100 text-[14px] font-medium">
                     <CheckCircle2 className="w-4 h-4 text-green-300" />
@@ -79,7 +81,7 @@ export default function CrmCta() {
             >
               {/* This is a placeholder for the 3D assets in the design */}
               <div className="absolute inset-0 flex items-center justify-center">
-                 <Image src="/topi1.png" alt="Mascot" width={224} height={224} className="w-full h-auto object-contain drop-shadow-2xl relative z-10 animate-bounce" style={{ animationDuration: '4s' }} />
+                 <Image src="/topi1.png" alt="Mascot" width={384} height={384} className="w-72 h-72 md:w-80 md:h-80 lg:w-96 lg:h-96 object-contain drop-shadow-2xl relative z-10 animate-bounce" style={{ animationDuration: '4s' }} />
               </div>
             </motion.div>
             

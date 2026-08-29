@@ -1,39 +1,41 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { MessageCircle, Bot, Tags, UserCheck, Headset, ArrowRight } from 'lucide-react';
 
 export default function CrmWorkflow() {
+  const { t } = useLanguage();
   const steps = [
     {
       icon: <MessageCircle className="w-6 h-6" />,
       color: 'bg-purple-100 text-purple-600',
-      title: 'Khách hàng tương tác',
-      desc: 'Nhắn tin, bình luận hoặc điền form'
+      title: t('crm.workflow.s1.title'),
+      desc: t('crm.workflow.s1.desc')
     },
     {
       icon: <Bot className="w-6 h-6" />,
       color: 'bg-teal-100 text-teal-600',
-      title: 'Bot tự động phản hồi',
-      desc: 'Trả lời ngay lập tức theo kịch bản'
+      title: t('crm.workflow.s2.title'),
+      desc: t('crm.workflow.s2.desc')
     },
     {
       icon: <Tags className="w-6 h-6" />,
       color: 'bg-orange-100 text-orange-600',
-      title: 'Thu thập & phân loại',
-      desc: 'Lưu thông tin, gắn tag, phân loại lead'
+      title: t('crm.workflow.s3.title'),
+      desc: t('crm.workflow.s3.desc')
     },
     {
       icon: <UserCheck className="w-6 h-6" />,
       color: 'bg-blue-100 text-blue-600',
-      title: 'Phân phối nhân viên',
-      desc: 'Giao cho nhân viên phù hợp theo quy tắc'
+      title: t('crm.workflow.s4.title'),
+      desc: t('crm.workflow.s4.desc')
     },
     {
       icon: <Headset className="w-6 h-6" />,
       color: 'bg-pink-100 text-pink-600',
-      title: 'Chăm sóc & chốt đơn',
-      desc: 'Theo dõi, chăm sóc và chốt đơn hiệu quả'
+      title: t('crm.workflow.s5.title'),
+      desc: t('crm.workflow.s5.desc')
     }
   ];
 
@@ -47,7 +49,7 @@ export default function CrmWorkflow() {
             viewport={{ once: true }}
             className="text-2xl md:text-3xl font-bold text-gray-900"
           >
-            Tự động hóa quy trình – Tiết kiệm thời gian
+            {t('crm.workflow.title')}
           </motion.h2>
         </div>
 

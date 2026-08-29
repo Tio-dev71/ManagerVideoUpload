@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 const platforms = [
   {
@@ -70,6 +71,7 @@ const platforms = [
 ];
 
 export default function PlatformsSection() {
+  const { t } = useLanguage();
   return (
     <div id="platforms" className="bg-white py-24 relative overflow-hidden border-t border-gray-100">
       <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -78,10 +80,10 @@ export default function PlatformsSection() {
         <div className="text-center max-w-3xl mx-auto mb-16 flex flex-col items-center">
           <div className="inline-flex items-center justify-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-[#5B3DF5] text-xs font-bold tracking-wide uppercase mb-6">
             <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" /></svg>
-            NỀN TẢNG HỖ TRỢ
+            {t('platforms.badge')}
           </div>
           <h3 className="text-3xl md:text-4xl lg:text-[40px] font-bold text-gray-900 mb-6 leading-[1.2]">
-            Kết nối tất cả <span className="text-[#5B3DF5]">nền tảng</span> bạn đang sử dụng
+            {t('platforms.title1')} <span className="text-[#5B3DF5]">{t('platforms.title2')}</span> {t('platforms.title3')}
           </h3>
         </div>
 
@@ -114,8 +116,8 @@ export default function PlatformsSection() {
             <div className="w-10 h-10 rounded-full bg-white text-[#5B3DF5] flex items-center justify-center mb-3 shadow-sm font-bold text-lg">
               ...
             </div>
-            <h4 className="font-bold text-[#5B3DF5] text-sm mb-1">Xem thêm</h4>
-            <p className="text-[11px] text-blue-600/70 leading-tight">+10 nền tảng khác</p>
+            <h4 className="font-bold text-[#5B3DF5] text-sm mb-1">{t('platforms.see_more')}</h4>
+            <p className="text-[11px] text-blue-600/70 leading-tight">{t('platforms.more_desc')}</p>
           </motion.div>
         </div>
       </div>

@@ -1,11 +1,14 @@
 'use client';
 
+import { useLanguage } from '@/lib/i18n/LanguageContext';
+
 export default function WorkPartners() {
+  const { t } = useLanguage();
   return (
     <div className="py-12 bg-white border-t border-gray-100">
       <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <p className="text-sm font-bold text-gray-900 mb-8">
-          Hơn 10.000+ doanh nghiệp đã tin tưởng và sử dụng Topify
+          {t('work.partners.title')}
         </p>
 
         <div className="flex flex-wrap justify-center items-center gap-10 md:gap-16 opacity-60 grayscale hover:grayscale-0 transition-all duration-500 cursor-pointer">

@@ -3,42 +3,44 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, ClipboardList, Columns, Calendar, Users, Target, BarChart3 } from 'lucide-react';
 import Link from 'next/link';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 export default function WorkFeatures() {
+  const { t } = useLanguage();
   const features = [
     {
-      title: 'Quản lý công việc',
-      desc: 'Tạo, giao, theo dõi và quản lý công việc chi tiết.',
+      title: t('work.features.f1.title'),
+      desc: t('work.features.f1.desc'),
       icon: <ClipboardList className="w-6 h-6" />,
       color: 'bg-blue-50 text-blue-600',
     },
     {
-      title: 'Dự án & Kanban',
-      desc: 'Quản lý dự án linh hoạt với bảng Kanban trực quan.',
+      title: t('work.features.f2.title'),
+      desc: t('work.features.f2.desc'),
       icon: <Columns className="w-6 h-6" />,
       color: 'bg-purple-50 text-purple-600',
     },
     {
-      title: 'Lịch & Deadline',
-      desc: 'Lên lịch, nhắc việc và quản lý deadline thông minh.',
+      title: t('work.features.f3.title'),
+      desc: t('work.features.f3.desc'),
       icon: <Calendar className="w-6 h-6" />,
       color: 'bg-pink-50 text-pink-600',
     },
     {
-      title: 'Đội nhóm & Phân quyền',
-      desc: 'Quản lý thành viên, vai trò và phân quyền rõ ràng.',
+      title: t('work.features.f4.title'),
+      desc: t('work.features.f4.desc'),
       icon: <Users className="w-6 h-6" />,
       color: 'bg-teal-50 text-teal-600',
     },
     {
-      title: 'Mục tiêu (OKR/KPI)',
-      desc: 'Đặt mục tiêu, theo dõi và đánh giá kết quả minh bạch.',
+      title: t('work.features.f5.title'),
+      desc: t('work.features.f5.desc'),
       icon: <Target className="w-6 h-6" />,
       color: 'bg-blue-50 text-blue-600',
     },
     {
-      title: 'Báo cáo & Hiệu suất',
-      desc: 'Báo cáo trực quan, đo lường hiệu suất toàn diện.',
+      title: t('work.features.f6.title'),
+      desc: t('work.features.f6.desc'),
       icon: <BarChart3 className="w-6 h-6" />,
       color: 'bg-indigo-50 text-indigo-600',
     },
@@ -76,7 +78,7 @@ export default function WorkFeatures() {
                 {ft.desc}
               </p>
               <Link href="#" className="inline-flex items-center text-[13px] font-bold text-blue-600 hover:text-blue-700">
-                Tìm hiểu thêm <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                {t('work.features.btn_learn_more')} <ArrowRight className="w-3.5 h-3.5 ml-1" />
               </Link>
             </motion.div>
           ))}

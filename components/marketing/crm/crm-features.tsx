@@ -3,42 +3,44 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, MessageSquare, Users, Filter, Bot, Zap, Network } from 'lucide-react';
 import Link from 'next/link';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 export default function CrmFeatures() {
+  const { t } = useLanguage();
   const features = [
     {
-      title: 'Hộp thư đa kênh',
-      desc: 'Tập trung tất cả tin nhắn, bình luận về một nơi. Không bỏ sót khách hàng.',
+      title: t('crm.features.f1.title'),
+      desc: t('crm.features.f1.desc'),
       icon: <MessageSquare className="w-6 h-6" />,
       color: 'bg-purple-50 text-purple-600',
     },
     {
-      title: 'Quản lý khách hàng',
-      desc: 'Lưu trữ thông tin chi tiết, phân loại, gắn tag và theo dõi lịch sử tương tác.',
+      title: t('crm.features.f2.title'),
+      desc: t('crm.features.f2.desc'),
       icon: <Users className="w-6 h-6" />,
       color: 'bg-teal-50 text-teal-600',
     },
     {
-      title: 'Cơ hội & Pipeline',
-      desc: 'Quản lý lead và cơ hội bán hàng theo từng giai đoạn. Theo dõi doanh thu.',
+      title: t('crm.features.f3.title'),
+      desc: t('crm.features.f3.desc'),
       icon: <Filter className="w-6 h-6" />,
       color: 'bg-orange-50 text-orange-600',
     },
     {
-      title: 'Chatbot AI',
-      desc: 'Chatbot thông minh 24/7, trả lời tự động, chăm sóc và tạo lead hiệu quả.',
+      title: t('crm.features.f4.title'),
+      desc: t('crm.features.f4.desc'),
       icon: <Bot className="w-6 h-6" />,
       color: 'bg-blue-50 text-blue-600',
     },
     {
-      title: 'Bot bình luận',
-      desc: 'Tự động trả lời bình luận theo kịch bản, lọc lead và thu hút khách hàng tiềm năng.',
+      title: t('crm.features.f5.title'),
+      desc: t('crm.features.f5.desc'),
       icon: <Zap className="w-6 h-6 fill-pink-600/20" />,
       color: 'bg-pink-50 text-pink-600',
     },
     {
-      title: 'Tự động hóa',
-      desc: 'Trigger, kịch bản tự động giúp tiết kiệm thời gian và tăng hiệu suất đội ngũ.',
+      title: t('crm.features.f6.title'),
+      desc: t('crm.features.f6.desc'),
       icon: <Network className="w-6 h-6" />,
       color: 'bg-indigo-50 text-indigo-600',
     },
@@ -76,7 +78,7 @@ export default function CrmFeatures() {
                 {ft.desc}
               </p>
               <Link href="#" className="inline-flex items-center text-[13px] font-bold text-[#5B3DF5] hover:text-[#4F2FE0]">
-                Tìm hiểu thêm <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                {t('crm.features.btn_learn_more')} <ArrowRight className="w-3.5 h-3.5 ml-1" />
               </Link>
             </motion.div>
           ))}

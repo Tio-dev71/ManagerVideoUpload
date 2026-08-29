@@ -3,8 +3,10 @@
 import { ArrowRight, Play, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 export default function AnalyticsCta() {
+  const { t } = useLanguage();
   return (
     <div className="bg-white py-16 pb-8">
       <div className="max-w-[1350px] mx-auto px-4 sm:px-6 lg:px-8">
@@ -19,25 +21,25 @@ export default function AnalyticsCta() {
             {/* Left Content */}
             <div className="max-w-2xl text-center lg:text-left">
               <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
-                Phân tích dữ liệu thông minh
+                {t('analytics.cta.title1')}
               </h2>
               <h3 className="text-3xl md:text-4xl font-bold text-white mb-10 leading-tight">
-                Tăng trưởng doanh nghiệp cùng Topify Analytics!
+                {t('analytics.cta.title2')}
               </h3>
 
               {/* Checkmarks */}
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-6 mb-10 text-white/90 font-medium text-sm md:text-base">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-5 h-5 text-blue-300" />
-                  Kết nối dễ dàng
+                  {t('analytics.cta.check1')}
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-5 h-5 text-blue-300" />
-                  Báo cáo tự động
+                  {t('analytics.cta.check2')}
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-5 h-5 text-blue-300" />
-                  Dễ dùng & trực quan
+                  {t('analytics.cta.check3')}
                 </div>
               </div>
 
@@ -45,13 +47,13 @@ export default function AnalyticsCta() {
               <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
                 <button className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3.5 text-[15px] font-bold text-blue-900 bg-white rounded-xl hover:bg-gray-50 transition-all shadow-lg hover:-translate-y-0.5 group">
                   <Play className="w-4 h-4 mr-2 text-blue-600 group-hover:text-blue-700 transition-colors" fill="currentColor" />
-                  Xem demo sản phẩm
+                  {t('analytics.cta.btn_demo')}
                 </button>
                 <Link
                   href="/login"
                   className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3.5 text-[15px] font-bold text-white bg-black/20 hover:bg-black/30 backdrop-blur border border-white/10 rounded-xl transition-all shadow-lg hover:-translate-y-0.5"
                 >
-                  Dùng thử miễn phí
+                  {t('analytics.cta.btn_free')}
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Link>
               </div>

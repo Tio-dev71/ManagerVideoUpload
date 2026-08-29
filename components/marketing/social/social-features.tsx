@@ -3,14 +3,16 @@
 import { motion } from 'framer-motion';
 import { LayoutGrid, Calendar, Folder, BarChart2, Users, Check, Star, Plus, Search, ChevronDown, Globe, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 export default function SocialFeatures() {
+  const { t } = useLanguage();
   const tabs = [
-    { name: 'Quản lý đa kênh', icon: <LayoutGrid className="w-4 h-4" />, active: true },
-    { name: 'Đăng bài & Lên lịch', icon: <Calendar className="w-4 h-4" /> },
-    { name: 'Kho nội dung', icon: <Folder className="w-4 h-4" /> },
-    { name: 'Phân tích hiệu quả', icon: <BarChart2 className="w-4 h-4" /> },
-    { name: 'Đội nhóm & Phê duyệt', icon: <Users className="w-4 h-4" /> },
+    { name: t('social.features.tab1'), icon: <LayoutGrid className="w-4 h-4" />, active: true },
+    { name: t('social.features.tab2'), icon: <Calendar className="w-4 h-4" /> },
+    { name: t('social.features.tab3'), icon: <Folder className="w-4 h-4" /> },
+    { name: t('social.features.tab4'), icon: <BarChart2 className="w-4 h-4" /> },
+    { name: t('social.features.tab5'), icon: <Users className="w-4 h-4" /> },
   ];
 
   return (
@@ -24,9 +26,8 @@ export default function SocialFeatures() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight"
-          >
-            <span className="text-[#5B3DF5]">Quản lý toàn diện</span> – Đăng bài thông minh – Tăng trưởng bền vững
-          </motion.h2>
+            dangerouslySetInnerHTML={{ __html: t('social.features.title') }}
+          />
         </div>
 
         {/* Tabs */}
@@ -52,15 +53,15 @@ export default function SocialFeatures() {
           {/* Left: Text & Features */}
           <div className="max-w-xl">
             <h3 className="text-3xl font-bold text-gray-900 mb-8 leading-tight">
-              Quản lý tất cả kênh mạng xã hội trên một nền tảng duy nhất
+              {t('social.features.subtitle')}
             </h3>
             
             <div className="space-y-6 mb-10">
               {[
-                { title: 'Kết nối và quản lý không giới hạn kênh:', desc: 'Facebook, TikTok, Instagram, YouTube, Zalo,...' },
-                { title: 'Nhóm kênh linh hoạt, dễ dàng phân loại', desc: 'theo dự án, chiến dịch hoặc khách hàng.' },
-                { title: 'Cập nhật trạng thái kênh theo thời gian thực,', desc: 'cảnh báo khi kênh gặp sự cố.' },
-                { title: 'Hỗ trợ Proxy & Token an toàn,', desc: 'bảo mật tuyệt đối.' },
+                { title: t('social.features.p1.title'), desc: t('social.features.p1.desc') },
+                { title: t('social.features.p2.title'), desc: t('social.features.p2.desc') },
+                { title: t('social.features.p3.title'), desc: t('social.features.p3.desc') },
+                { title: t('social.features.p4.title'), desc: t('social.features.p4.desc') },
               ].map((item, i) => (
                 <div key={i} className="flex gap-4">
                   <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center shrink-0 mt-0.5">
@@ -80,7 +81,7 @@ export default function SocialFeatures() {
                 <Star className="w-5 h-5 text-white fill-white" />
               </div>
               <p className="text-[15px] font-medium text-[#5B3DF5] leading-relaxed">
-                Tiết kiệm đến 80% thời gian quản lý nhiều tài khoản & kênh rời rạc.
+                {t('social.features.highlight')}
               </p>
             </div>
           </div>
@@ -119,30 +120,30 @@ export default function SocialFeatures() {
               {/* Main Content */}
               <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-center mb-6">
-                  <h4 className="text-lg font-bold text-gray-900">Kênh của bạn</h4>
+                  <h4 className="text-lg font-bold text-gray-900">{t('social.mockup.features.channels')}</h4>
                   <button className="bg-[#5B3DF5] text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-md">
-                    <Plus className="w-3.5 h-3.5" /> Kết nối kênh
+                    <Plus className="w-3.5 h-3.5" /> {t('social.mockup.features.btn_connect')}
                   </button>
                 </div>
                 
                 <div className="flex gap-4 mb-6">
                   <div className="relative flex-1">
                     <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                    <input type="text" placeholder="Tìm kiếm kênh..." className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none" />
+                    <input type="text" placeholder={t('social.mockup.features.search_placeholder')} className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none" />
                   </div>
                   <div className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm flex items-center gap-2 cursor-pointer text-gray-600 font-medium">
-                    Tất cả kênh <ChevronDown className="w-4 h-4" />
+                    {t('social.mockup.features.filter_all')} <ChevronDown className="w-4 h-4" />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Channel Cards */}
                   {[
-                    { n: 'Topify Official', t: 'Facebook Page', f: '32.5K người theo dõi', bg: 'bg-blue-500', i: 'f' },
-                    { n: 'Topify Shop', t: 'TikTok Account', f: '76.1K người theo dõi', bg: 'bg-black', i: 't' },
-                    { n: 'Topify Vietnam', t: 'Instagram Business', f: '12.3K người theo dõi', bg: 'bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-500', i: 'i' },
-                    { n: 'Topify Channel', t: 'YouTube Channel', f: '45.2K người đăng ký', bg: 'bg-red-600', i: '▶' },
-                    { n: 'Topify Zalo OA', t: 'Zalo Official Account', f: '18.7K người quan tâm', bg: 'bg-blue-500', i: 'Z' },
+                    { n: 'Topify Official', t: 'Facebook Page', f: `32.5K ${t('social.mockup.features.followers')}`, bg: 'bg-blue-500', i: 'f' },
+                    { n: 'Topify Shop', t: 'TikTok Account', f: `76.1K ${t('social.mockup.features.followers')}`, bg: 'bg-black', i: 't' },
+                    { n: 'Topify Vietnam', t: 'Instagram Business', f: `12.3K ${t('social.mockup.features.followers')}`, bg: 'bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-500', i: 'i' },
+                    { n: 'Topify Channel', t: 'YouTube Channel', f: `45.2K ${t('social.mockup.features.subscribers')}`, bg: 'bg-red-600', i: '▶' },
+                    { n: 'Topify Zalo OA', t: 'Zalo Official Account', f: `18.7K ${t('social.mockup.features.interested')}`, bg: 'bg-blue-500', i: 'Z' },
                     { n: 'Topify Website', t: 'Website/Blog', f: '--', bg: 'bg-gray-800', i: 'W' },
                   ].map((ch, idx) => (
                     <div key={idx} className="border border-gray-100 rounded-xl p-4 bg-white shadow-sm hover:shadow-md transition-shadow relative group">
@@ -160,7 +161,7 @@ export default function SocialFeatures() {
                       </div>
                       <div className="text-[11px] text-gray-500 mb-3">{ch.f}</div>
                       <div className="inline-flex px-2 py-1 bg-green-50 text-green-600 text-[10px] font-bold rounded">
-                        Đang hoạt động
+                        {t('social.mockup.features.status_active')}
                       </div>
                     </div>
                   ))}
@@ -176,12 +177,12 @@ export default function SocialFeatures() {
             <div className="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 mb-6 group-hover:scale-110 transition-transform">
               <Calendar className="w-6 h-6" />
             </div>
-            <h4 className="text-[17px] font-bold text-gray-900 mb-3">Lên lịch & Đăng bài tự động</h4>
+            <h4 className="text-[17px] font-bold text-gray-900 mb-3">{t('social.features.c1.title')}</h4>
             <p className="text-[14px] text-gray-600 mb-6 leading-relaxed">
-              Lên lịch đăng bài theo ngày, tuần, tháng. Tự động đăng đúng thời điểm vàng, giúp tối ưu hiệu quả.
+              {t('social.features.c1.desc')}
             </p>
             <Link href="#" className="inline-flex items-center text-[13px] font-bold text-[#5B3DF5] hover:text-[#4F2FE0]">
-              Tìm hiểu thêm <ArrowRight className="w-3.5 h-3.5 ml-1" />
+              {t('social.features.btn_learn_more')} <ArrowRight className="w-3.5 h-3.5 ml-1" />
             </Link>
           </div>
 
@@ -189,12 +190,12 @@ export default function SocialFeatures() {
             <div className="w-12 h-12 rounded-xl bg-teal-50 flex items-center justify-center text-teal-600 mb-6 group-hover:scale-110 transition-transform">
               <Folder className="w-6 h-6 fill-teal-600/20" />
             </div>
-            <h4 className="text-[17px] font-bold text-gray-900 mb-3">Kho nội dung thông minh</h4>
+            <h4 className="text-[17px] font-bold text-gray-900 mb-3">{t('social.features.c2.title')}</h4>
             <p className="text-[14px] text-gray-600 mb-6 leading-relaxed">
-              Lưu trữ, phân loại và tái sử dụng nội dung dễ dàng. Hỗ trợ tìm kiếm nhanh, tag, đảm bảo đồng bộ đội nhóm.
+              {t('social.features.c2.desc')}
             </p>
             <Link href="#" className="inline-flex items-center text-[13px] font-bold text-[#5B3DF5] hover:text-[#4F2FE0]">
-              Tìm hiểu thêm <ArrowRight className="w-3.5 h-3.5 ml-1" />
+              {t('social.features.btn_learn_more')} <ArrowRight className="w-3.5 h-3.5 ml-1" />
             </Link>
           </div>
 
@@ -202,12 +203,12 @@ export default function SocialFeatures() {
             <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 mb-6 group-hover:scale-110 transition-transform">
               <BarChart2 className="w-6 h-6" />
             </div>
-            <h4 className="text-[17px] font-bold text-gray-900 mb-3">Phân tích & Báo cáo chi tiết</h4>
+            <h4 className="text-[17px] font-bold text-gray-900 mb-3">{t('social.features.c3.title')}</h4>
             <p className="text-[14px] text-gray-600 mb-6 leading-relaxed">
-              Theo dõi hiệu quả theo thời gian thực. Báo cáo trực quan, dễ hiểu giúp bạn đưa ra quyết định nhanh chóng.
+              {t('social.features.c3.desc')}
             </p>
             <Link href="#" className="inline-flex items-center text-[13px] font-bold text-[#5B3DF5] hover:text-[#4F2FE0]">
-              Tìm hiểu thêm <ArrowRight className="w-3.5 h-3.5 ml-1" />
+              {t('social.features.btn_learn_more')} <ArrowRight className="w-3.5 h-3.5 ml-1" />
             </Link>
           </div>
 
@@ -215,12 +216,12 @@ export default function SocialFeatures() {
             <div className="w-12 h-12 rounded-xl bg-pink-50 flex items-center justify-center text-pink-600 mb-6 group-hover:scale-110 transition-transform">
               <Users className="w-6 h-6" />
             </div>
-            <h4 className="text-[17px] font-bold text-gray-900 mb-3">Đội nhóm & Phê duyệt</h4>
+            <h4 className="text-[17px] font-bold text-gray-900 mb-3">{t('social.features.c4.title')}</h4>
             <p className="text-[14px] text-gray-600 mb-6 leading-relaxed">
-              Phân quyền rõ ràng, giao việc & duyệt nội dung trước khi đăng. Quản lý tiến độ dễ dàng, minh bạch.
+              {t('social.features.c4.desc')}
             </p>
             <Link href="#" className="inline-flex items-center text-[13px] font-bold text-[#5B3DF5] hover:text-[#4F2FE0]">
-              Tìm hiểu thêm <ArrowRight className="w-3.5 h-3.5 ml-1" />
+              {t('social.features.btn_learn_more')} <ArrowRight className="w-3.5 h-3.5 ml-1" />
             </Link>
           </div>
         </div>

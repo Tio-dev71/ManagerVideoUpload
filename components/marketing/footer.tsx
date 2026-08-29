@@ -1,24 +1,27 @@
+'use client';
+
 import Link from 'next/link';
+import Image from 'next/image';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 export default function Footer() {
+  const { t } = useLanguage();
+  const currentYear = new Date().getFullYear();
   return (
     <footer className="bg-white border-t border-gray-100 pt-16 pb-8">
       <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-8 mb-12">
           <div className="col-span-1 md:col-span-2">
             <Link href="/" className="flex items-center gap-2 mb-6">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-blue-500 flex items-center justify-center">
-                <span className="text-white font-bold text-lg leading-none">t</span>
-              </div>
-              <span className="text-2xl font-bold text-gray-900 tracking-tight">Topify</span>
+              <Image src="/Topify-logo.png" alt="Topify Logo" width={200} height={56} className="h-12 w-auto object-contain" />
             </Link>
             <p className="text-gray-600 text-sm leading-relaxed max-w-xs">
-              Topify giúp bạn quản lý, đăng bài, tương tác và đo lường hiệu quả trên tất cả nền tảng mạng xã hội từ một nơi duy nhất.
+              {t('footer.desc')}
             </p>
           </div>
           
           <div>
-            <h4 className="text-gray-900 font-semibold mb-6">Sản phẩm</h4>
+            <h4 className="text-gray-900 font-semibold mb-6">{t('footer.products')}</h4>
             <ul className="space-y-4 text-sm text-gray-600">
               <li><Link href="/products/analytics" className="hover:text-blue-600 transition-colors">Topify Analytics</Link></li>
               <li><Link href="/products/social" className="hover:text-blue-600 transition-colors">Topify Social</Link></li>
@@ -28,29 +31,29 @@ export default function Footer() {
           </div>
           
           <div>
-            <h4 className="text-gray-900 font-semibold mb-6">Tài nguyên</h4>
+            <h4 className="text-gray-900 font-semibold mb-6">{t('footer.resources')}</h4>
             <ul className="space-y-4 text-sm text-gray-600">
-              <li><Link href="#" className="hover:text-blue-600 transition-colors">Blog</Link></li>
-              <li><Link href="#" className="hover:text-blue-600 transition-colors">Trung tâm trợ giúp</Link></li>
-              <li><Link href="#" className="hover:text-blue-600 transition-colors">Cộng đồng</Link></li>
-              <li><Link href="#" className="hover:text-blue-600 transition-colors">Webinar</Link></li>
+              <li><Link href="#" className="hover:text-blue-600 transition-colors">{t('footer.blog')}</Link></li>
+              <li><Link href="#" className="hover:text-blue-600 transition-colors">{t('footer.help')}</Link></li>
+              <li><Link href="#" className="hover:text-blue-600 transition-colors">{t('footer.community')}</Link></li>
+              <li><Link href="#" className="hover:text-blue-600 transition-colors">{t('footer.webinar')}</Link></li>
             </ul>
           </div>
           
           <div>
-            <h4 className="text-gray-900 font-semibold mb-6">Công ty</h4>
+            <h4 className="text-gray-900 font-semibold mb-6">{t('footer.company')}</h4>
             <ul className="space-y-4 text-sm text-gray-600">
-              <li><Link href="#" className="hover:text-blue-600 transition-colors">Về chúng tôi</Link></li>
-              <li><Link href="#" className="hover:text-blue-600 transition-colors">Tuyển dụng</Link></li>
-              <li><Link href="#" className="hover:text-blue-600 transition-colors">Bảo mật</Link></li>
-              <li><Link href="#" className="hover:text-blue-600 transition-colors">Điều khoản</Link></li>
+              <li><Link href="#" className="hover:text-blue-600 transition-colors">{t('footer.about')}</Link></li>
+              <li><Link href="#" className="hover:text-blue-600 transition-colors">{t('footer.careers')}</Link></li>
+              <li><Link href="#" className="hover:text-blue-600 transition-colors">{t('footer.security')}</Link></li>
+              <li><Link href="#" className="hover:text-blue-600 transition-colors">{t('footer.terms')}</Link></li>
             </ul>
           </div>
         </div>
         
         <div className="pt-8 border-t border-gray-100 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-gray-500 text-sm">
-            © {new Date().getFullYear()} Topify. Nền tảng số 1 cho doanh nghiệp.
+            {t('footer.copyright').replace('{year}', currentYear.toString())}
           </p>
           <div className="flex items-center gap-6">
             <a href="#" className="text-gray-400 hover:text-blue-600 transition-colors">

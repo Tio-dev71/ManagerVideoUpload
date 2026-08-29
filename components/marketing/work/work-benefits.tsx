@@ -1,44 +1,46 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { Shield, Target, Zap, TrendingUp, Heart, Lock } from 'lucide-react';
 
 export default function WorkBenefits() {
+  const { t } = useLanguage();
   const benefits = [
     {
       icon: <Shield className="w-8 h-8 text-blue-600" />,
-      title: 'Tăng hiệu suất',
-      desc: 'Quy trình rõ ràng, giảm thời gian phối hợp.',
+      title: t('work.benefits.f1.title'),
+      desc: t('work.benefits.f1.desc'),
       color: 'bg-blue-50'
     },
     {
       icon: <Target className="w-8 h-8 text-purple-600" />,
-      title: 'Minh bạch & Rõ ràng',
-      desc: 'Ai làm gì, khi nào, tiến độ thế nào – đều rõ ràng.',
+      title: t('work.benefits.f2.title'),
+      desc: t('work.benefits.f2.desc'),
       color: 'bg-purple-50'
     },
     {
       icon: <Zap className="w-8 h-8 text-orange-500 fill-orange-500" />,
-      title: 'Tiết kiệm thời gian',
-      desc: 'Tự động hóa và nhắc việc giúp tiết kiệm đến 60% thời gian.',
+      title: t('work.benefits.f3.title'),
+      desc: t('work.benefits.f3.desc'),
       color: 'bg-orange-50'
     },
     {
       icon: <TrendingUp className="w-8 h-8 text-blue-600" />,
-      title: 'Ra quyết định nhanh',
-      desc: 'Báo cáo trực quan, dữ liệu real-time hỗ trợ quyết định chính xác.',
+      title: t('work.benefits.f4.title'),
+      desc: t('work.benefits.f4.desc'),
       color: 'bg-blue-50'
     },
     {
       icon: <Heart className="w-8 h-8 text-pink-500 fill-pink-500" />,
-      title: 'Gắn kết đội nhóm',
-      desc: 'Cộng tác dễ dàng, tăng sự gắn kết và tinh thần trách nhiệm.',
+      title: t('work.benefits.f5.title'),
+      desc: t('work.benefits.f5.desc'),
       color: 'bg-pink-50'
     },
     {
       icon: <Lock className="w-8 h-8 text-indigo-600 fill-indigo-600/20" />,
-      title: 'An toàn dữ liệu',
-      desc: 'Bảo mật tuyệt đối với hệ thống nhiều lớp bảo vệ.',
+      title: t('work.benefits.f6.title'),
+      desc: t('work.benefits.f6.desc'),
       color: 'bg-indigo-50'
     }
   ];

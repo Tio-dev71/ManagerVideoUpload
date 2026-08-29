@@ -3,8 +3,10 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 export default function HeroSection() {
+  const { t } = useLanguage();
   return (
     <div className="relative overflow-hidden bg-white pt-32 pb-20 lg:pt-40 lg:pb-28">
       {/* Subtle Background Gradients */}
@@ -22,7 +24,7 @@ export default function HeroSection() {
               className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-[#5B3DF5] text-xs font-bold tracking-wide uppercase mb-8 shadow-sm"
             >
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
-              Nền tảng số 1 cho doanh nghiệp
+              {t('hero.badge')}
             </motion.div>
 
             <motion.h1
@@ -31,9 +33,9 @@ export default function HeroSection() {
               transition={{ duration: 0.5, delay: 0.1 }}
               className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight mb-6 leading-[1.15]"
             >
-              Quản trị nội dung &<br className="hidden md:block" /> Chăm sóc khách hàng<br className="hidden md:block" />{' '}
+              {t('hero.title1')}<br className="hidden md:block" /> {t('hero.title2')}<br className="hidden md:block" />{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#5B3DF5] to-[#3B82F6]">
-                đa kênh
+                {t('hero.title3')}
               </span>
             </motion.h1>
 
@@ -43,7 +45,7 @@ export default function HeroSection() {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="text-lg text-gray-600 mb-10 max-w-lg leading-relaxed"
             >
-              Topify giúp bạn quản lý, đăng bài, tương tác và đo lường hiệu quả trên tất cả nền tảng mạng xã hội từ một nơi duy nhất.
+              {t('hero.desc')}
             </motion.p>
 
             <motion.div
@@ -56,7 +58,7 @@ export default function HeroSection() {
                 href="/login"
                 className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 text-[15px] font-semibold text-white bg-[#5B3DF5] rounded-xl hover:bg-[#4F2FE0] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
               >
-                Dùng thử miễn phí
+                {t('hero.cta_primary')}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Link>
               <button
@@ -66,8 +68,8 @@ export default function HeroSection() {
                   <svg className="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" /></svg>
                 </div>
                 <div className="text-left">
-                  <div className="text-[#5B3DF5] font-bold">Xem demo</div>
-                  <div className="text-xs text-gray-500 font-normal">2 phút giới thiệu</div>
+                  <div className="text-[#5B3DF5] font-bold">{t('hero.cta_secondary')}</div>
+                  <div className="text-xs text-gray-500 font-normal">{t('hero.cta_secondary_desc')}</div>
                 </div>
               </button>
             </motion.div>
@@ -83,8 +85,8 @@ export default function HeroSection() {
                   <CheckCircle2 className="w-3.5 h-3.5 text-[#5B3DF5]" />
                 </div>
                 <div>
-                  <div className="font-semibold text-gray-900">Không cần thẻ tín dụng</div>
-                  <div className="text-xs text-gray-500 font-normal mt-0.5">Dùng thử 7 ngày miễn phí</div>
+                  <div className="font-semibold text-gray-900">{t('hero.feature1_title')}</div>
+                  <div className="text-xs text-gray-500 font-normal mt-0.5">{t('hero.feature1_desc')}</div>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -92,8 +94,8 @@ export default function HeroSection() {
                   <CheckCircle2 className="w-3.5 h-3.5 text-[#5B3DF5]" />
                 </div>
                 <div>
-                  <div className="font-semibold text-gray-900">Thiết lập nhanh chóng</div>
-                  <div className="text-xs text-gray-500 font-normal mt-0.5">Chỉ 5 phút để bắt đầu</div>
+                  <div className="font-semibold text-gray-900">{t('hero.feature2_title')}</div>
+                  <div className="text-xs text-gray-500 font-normal mt-0.5">{t('hero.feature2_desc')}</div>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -101,8 +103,8 @@ export default function HeroSection() {
                   <CheckCircle2 className="w-3.5 h-3.5 text-[#5B3DF5]" />
                 </div>
                 <div>
-                  <div className="font-semibold text-gray-900">Hỗ trợ 24/7</div>
-                  <div className="text-xs text-gray-500 font-normal mt-0.5">Đội ngũ luôn sẵn sàng</div>
+                  <div className="font-semibold text-gray-900">{t('hero.feature3_title')}</div>
+                  <div className="text-xs text-gray-500 font-normal mt-0.5">{t('hero.feature3_desc')}</div>
                 </div>
               </div>
             </motion.div>
@@ -135,9 +137,9 @@ export default function HeroSection() {
                       <div className="w-4 h-4 rounded bg-[#5B3DF5]/20 flex items-center justify-center">
                         <div className="w-2 h-2 bg-[#5B3DF5] rounded-sm"></div>
                       </div>
-                      <span className="text-[13px] font-semibold">Tổng quan</span>
+                      <span className="text-[13px] font-semibold">{t('hero.mockup.overview')}</span>
                     </div>
-                    {['Kênh', 'Bài viết', 'Lịch nội dung', 'Hộp thư', 'Khách hàng', 'Công việc', 'Báo cáo', 'Tự động hóa', 'Cài đặt'].map((item, i) => (
+                    {[t('hero.mockup.channel'), t('hero.mockup.post'), t('hero.mockup.calendar'), t('hero.mockup.inbox'), t('hero.mockup.customer'), t('hero.mockup.work'), t('hero.mockup.report'), t('hero.mockup.automation'), t('hero.mockup.setting')].map((item, i) => (
                       <div key={i} className="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded-lg text-gray-500">
                         <div className="w-4 h-4 rounded bg-gray-200"></div>
                         <span className="text-[13px] font-medium">{item}</span>
@@ -151,8 +153,8 @@ export default function HeroSection() {
                       <div className="w-full h-full bg-gradient-to-br from-indigo-400 to-blue-400"></div>
                     </div>
                     <div>
-                      <div className="text-[13px] font-bold text-gray-900 leading-tight">Nguyễn Văn A</div>
-                      <div className="text-[11px] text-gray-500">Admin</div>
+                      <div className="text-[13px] font-bold text-gray-900 leading-tight">{t('hero.mockup.user')}</div>
+                      <div className="text-[11px] text-gray-500">{t('hero.mockup.role')}</div>
                     </div>
                   </div>
                 </div>
@@ -161,7 +163,7 @@ export default function HeroSection() {
                 <div className="flex-1 p-6 flex flex-col gap-5 overflow-hidden bg-[#FAFAFA]">
                   {/* Header */}
                   <div className="flex items-center justify-between">
-                    <h2 className="text-lg font-bold text-gray-900">Tổng quan</h2>
+                    <h2 className="text-lg font-bold text-gray-900">{t('hero.mockup.overview')}</h2>
                     <div className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-medium text-gray-600 flex items-center gap-2">
                       01/05/2024 - 07/05/2024
                       <svg className="w-3 h-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
@@ -171,10 +173,10 @@ export default function HeroSection() {
                   {/* Top Stats */}
                   <div className="grid grid-cols-4 gap-4">
                     {[
-                      { label: 'Tổng bài đăng', val: '128', change: '+12.5%', color: 'text-emerald-500' },
-                      { label: 'Tổng tương tác', val: '24.5K', change: '+18.7%', color: 'text-emerald-500' },
-                      { label: 'Lượt tiếp cận', val: '410.3K', change: '+26.4%', color: 'text-emerald-500' },
-                      { label: 'Tin nhắn mới', val: '356', change: '-5.2%', color: 'text-rose-500' },
+                      { label: t('hero.mockup.stat1'), val: '128', change: '+12.5%', color: 'text-emerald-500' },
+                      { label: t('hero.mockup.stat2'), val: '24.5K', change: '+18.7%', color: 'text-emerald-500' },
+                      { label: t('hero.mockup.stat3'), val: '410.3K', change: '+26.4%', color: 'text-emerald-500' },
+                      { label: t('hero.mockup.stat4'), val: '356', change: '-5.2%', color: 'text-rose-500' },
                     ].map((stat, i) => (
                       <div key={i} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
                         <div className="text-[12px] text-gray-500 mb-2">{stat.label}</div>
@@ -190,7 +192,7 @@ export default function HeroSection() {
                   <div className="grid grid-cols-5 gap-4">
                     {/* Donut Chart Card */}
                     <div className="col-span-2 bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex flex-col">
-                      <div className="text-[13px] font-bold text-gray-900 mb-4">Hiệu quả theo nền tảng</div>
+                      <div className="text-[13px] font-bold text-gray-900 mb-4">{t('hero.mockup.chart1')}</div>
                       <div className="flex-1 flex items-center justify-center gap-6">
                         <div className="relative w-28 h-28 rounded-full border-[18px] border-blue-500 border-t-[#5B3DF5] border-r-pink-500 border-b-rose-500 flex items-center justify-center">
                           <div className="text-sm font-bold text-gray-900">410.3K</div>
@@ -202,7 +204,7 @@ export default function HeroSection() {
                             { name: 'TikTok', pct: '30%', color: 'bg-[#5B3DF5]' },
                             { name: 'Instagram', pct: '15%', color: 'bg-pink-500' },
                             { name: 'YouTube', pct: '10%', color: 'bg-rose-500' },
-                            { name: 'Khác', pct: '5%', color: 'bg-gray-300' },
+                            { name: t('hero.mockup.other'), pct: '5%', color: 'bg-gray-300' },
                           ].map((item, i) => (
                             <div key={i} className="flex items-center gap-2 text-[11px]">
                               <div className={`w-2 h-2 rounded-sm ${item.color}`}></div>
@@ -217,9 +219,9 @@ export default function HeroSection() {
                     {/* Line Chart Card */}
                     <div className="col-span-3 bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex flex-col">
                       <div className="flex items-center justify-between mb-4">
-                        <div className="text-[13px] font-bold text-gray-900">Tương tác</div>
+                        <div className="text-[13px] font-bold text-gray-900">{t('hero.mockup.interaction')}</div>
                         <div className="px-2 py-1 border border-gray-200 rounded text-[10px] text-gray-500 flex items-center gap-1">
-                          7 ngày qua
+                          {t('hero.mockup.last7days')}
                           <svg className="w-2.5 h-2.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
                         </div>
                       </div>
@@ -251,19 +253,19 @@ export default function HeroSection() {
 
                   {/* Bottom Table */}
                   <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex-1 flex flex-col">
-                    <div className="text-[13px] font-bold text-gray-900 mb-3">Bài viết gần đây</div>
+                    <div className="text-[13px] font-bold text-gray-900 mb-3">{t('hero.mockup.recent_posts')}</div>
                     <div className="flex items-center justify-between text-[11px] text-gray-500 mb-3 px-2">
-                      <div className="w-[240px]">Bài viết</div>
-                      <div className="w-[80px]">Kênh</div>
-                      <div className="w-[120px]">Thời gian</div>
-                      <div className="w-[80px]">Trạng thái</div>
-                      <div className="w-[60px] text-right">Tương tác</div>
+                      <div className="w-[240px]">{t('hero.mockup.post')}</div>
+                      <div className="w-[80px]">{t('hero.mockup.channel')}</div>
+                      <div className="w-[120px]">{t('hero.mockup.time')}</div>
+                      <div className="w-[80px]">{t('hero.mockup.status')}</div>
+                      <div className="w-[60px] text-right">{t('hero.mockup.interaction')}</div>
                     </div>
                     <div className="flex flex-col gap-3">
                       {[
-                        { title: 'Bí quyết tăng hiệu quả bán hàng online', platforms: ['bg-blue-500', 'bg-black'], time: '07/05/2024 09:30', status: 'Đã đăng', val: '1.2K' },
-                        { title: 'Top 5 công cụ hỗ trợ Marketer', platforms: ['bg-pink-500'], time: '07/05/2024 08:00', status: 'Đã đăng', val: '856' },
-                        { title: 'Xu hướng Social Media 2024', platforms: ['bg-red-500'], time: '06/05/2024 20:15', status: 'Đã đăng', val: '2.3K' }
+                        { title: t('hero.mockup.post1'), platforms: ['bg-blue-500', 'bg-black'], time: '07/05/2024 09:30', status: t('hero.mockup.posted'), val: '1.2K' },
+                        { title: t('hero.mockup.post2'), platforms: ['bg-pink-500'], time: '07/05/2024 08:00', status: t('hero.mockup.posted'), val: '856' },
+                        { title: t('hero.mockup.post3'), platforms: ['bg-red-500'], time: '06/05/2024 20:15', status: t('hero.mockup.posted'), val: '2.3K' }
                       ].map((row, i) => (
                         <div key={i} className="flex items-center justify-between px-2 py-1 hover:bg-gray-50 rounded-lg">
                           <div className="w-[240px] flex items-center gap-3">

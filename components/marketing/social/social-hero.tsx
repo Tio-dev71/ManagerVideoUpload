@@ -4,8 +4,10 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { ArrowRight, ChevronRight, Home, LayoutGrid, Clock, TrendingUp, CheckSquare, Layers, Calendar, Image as ImageIcon, FileText, Users, Settings, Search, Bell } from 'lucide-react';
 import Image from 'next/image';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 export default function SocialHero() {
+  const { t } = useLanguage();
   return (
     <div className="relative overflow-hidden bg-white pt-24 pb-20 lg:pt-28 lg:pb-28">
       {/* Background Gradients */}
@@ -14,15 +16,14 @@ export default function SocialHero() {
 
       <div className="max-w-[1350px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
-        {/* Breadcrumbs */}
         <div className="flex items-center gap-2 text-sm text-gray-500 mb-10 font-medium">
           <Link href="/" className="hover:text-[#5B3DF5] transition-colors flex items-center gap-1.5">
             <Home className="w-4 h-4" />
-            Trang chủ
+            {t('breadcrumb.home')}
           </Link>
           <ChevronRight className="w-4 h-4 text-gray-300" />
           <Link href="/products" className="hover:text-[#5B3DF5] transition-colors">
-            Sản phẩm
+            {t('breadcrumb.products')}
           </Link>
           <ChevronRight className="w-4 h-4 text-gray-300" />
           <span className="text-gray-900 font-bold">Topify Social</span>
@@ -38,7 +39,7 @@ export default function SocialHero() {
               className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-[#5B3DF5] text-xs font-bold tracking-wide uppercase mb-6 shadow-sm"
             >
               <LayoutGrid className="w-3.5 h-3.5" />
-              TOPIFY SOCIAL
+              {t('social.hero.tag')}
             </motion.div>
 
             <motion.h1
@@ -55,9 +56,8 @@ export default function SocialHero() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
               className="text-[22px] md:text-2xl font-bold text-gray-800 mb-6 leading-snug"
-            >
-              Quản lý & đăng bài đa kênh dễ dàng – nhanh chóng – hiệu quả
-            </motion.div>
+              dangerouslySetInnerHTML={{ __html: t('social.hero.title') }}
+            />
 
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -65,7 +65,7 @@ export default function SocialHero() {
               transition={{ duration: 0.5, delay: 0.3 }}
               className="text-[17px] text-gray-600 mb-10 max-w-xl leading-relaxed"
             >
-              Topify Social giúp bạn quản lý nhiều kênh mạng xã hội tập trung tại một nơi, lên lịch đăng bài, theo dõi hiệu quả và tối ưu nội dung để tăng tương tác vượt trội.
+              {t('social.hero.desc')}
             </motion.p>
 
             {/* 4 Feature Points */}
@@ -79,29 +79,29 @@ export default function SocialHero() {
                 <div className="w-10 h-10 rounded-xl bg-blue-100/50 flex items-center justify-center text-[#5B3DF5] mb-3">
                   <Layers className="w-5 h-5" />
                 </div>
-                <h4 className="text-[15px] font-bold text-gray-900 mb-1">Đa nền tảng</h4>
-                <p className="text-[13px] text-gray-600 leading-relaxed">1 nền tảng quản lý tất cả kênh</p>
+                <h4 className="text-[15px] font-bold text-gray-900 mb-1">{t('social.hero.f1.title')}</h4>
+                <p className="text-[13px] text-gray-600 leading-relaxed">{t('social.hero.f1.desc')}</p>
               </div>
               <div>
                 <div className="w-10 h-10 rounded-xl bg-blue-100/50 flex items-center justify-center text-[#5B3DF5] mb-3">
                   <Clock className="w-5 h-5" />
                 </div>
-                <h4 className="text-[15px] font-bold text-gray-900 mb-1">Tiết kiệm thời gian</h4>
-                <p className="text-[13px] text-gray-600 leading-relaxed">Lên lịch & đăng bài tự động</p>
+                <h4 className="text-[15px] font-bold text-gray-900 mb-1">{t('social.hero.f2.title')}</h4>
+                <p className="text-[13px] text-gray-600 leading-relaxed">{t('social.hero.f2.desc')}</p>
               </div>
               <div>
                 <div className="w-10 h-10 rounded-xl bg-blue-100/50 flex items-center justify-center text-[#5B3DF5] mb-3">
                   <TrendingUp className="w-5 h-5" />
                 </div>
-                <h4 className="text-[15px] font-bold text-gray-900 mb-1">Tăng hiệu quả</h4>
-                <p className="text-[13px] text-gray-600 leading-relaxed">Tối ưu nội dung, tăng tương tác</p>
+                <h4 className="text-[15px] font-bold text-gray-900 mb-1">{t('social.hero.f3.title')}</h4>
+                <p className="text-[13px] text-gray-600 leading-relaxed">{t('social.hero.f3.desc')}</p>
               </div>
               <div>
                 <div className="w-10 h-10 rounded-xl bg-blue-100/50 flex items-center justify-center text-[#5B3DF5] mb-3">
                   <CheckSquare className="w-5 h-5" />
                 </div>
-                <h4 className="text-[15px] font-bold text-gray-900 mb-1">Dễ sử dụng</h4>
-                <p className="text-[13px] text-gray-600 leading-relaxed">Giao diện thân thiện, dễ làm quen</p>
+                <h4 className="text-[15px] font-bold text-gray-900 mb-1">{t('social.hero.f4.title')}</h4>
+                <p className="text-[13px] text-gray-600 leading-relaxed">{t('social.hero.f4.desc')}</p>
               </div>
             </motion.div>
 
@@ -116,7 +116,7 @@ export default function SocialHero() {
                 href="/login"
                 className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3.5 text-[15px] font-semibold text-white bg-[#5B3DF5] rounded-xl hover:bg-[#4F2FE0] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
               >
-                Dùng thử miễn phí
+                {t('social.hero.btn_free')}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Link>
               <button
@@ -125,7 +125,7 @@ export default function SocialHero() {
                 <div className="w-6 h-6 rounded-full flex items-center justify-center mr-2 border-2 border-[#5B3DF5] group-hover:scale-110 transition-transform">
                   <svg className="w-2.5 h-2.5 ml-0.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" /></svg>
                 </div>
-                Xem demo
+                {t('social.hero.btn_demo')}
               </button>
             </motion.div>
           </div>
@@ -154,14 +154,14 @@ export default function SocialHero() {
                 </div>
                 <div className="px-3 flex flex-col gap-1">
                   {[
-                    { n: 'Tổng quan', i: <LayoutGrid className="w-4 h-4"/>, act: true },
-                    { n: 'Kênh', i: <Layers className="w-4 h-4"/> },
-                    { n: 'Bài viết', i: <FileText className="w-4 h-4"/> },
-                    { n: 'Lịch nội dung', i: <Calendar className="w-4 h-4"/> },
-                    { n: 'Kho nội dung', i: <ImageIcon className="w-4 h-4"/> },
-                    { n: 'Báo cáo', i: <TrendingUp className="w-4 h-4"/> },
-                    { n: 'Đội nhóm', i: <Users className="w-4 h-4"/> },
-                    { n: 'Cài đặt', i: <Settings className="w-4 h-4"/> },
+                    { n: t('social.mockup.menu.overview'), i: <LayoutGrid className="w-4 h-4"/>, act: true },
+                    { n: t('social.mockup.menu.channels'), i: <Layers className="w-4 h-4"/> },
+                    { n: t('social.mockup.menu.posts'), i: <FileText className="w-4 h-4"/> },
+                    { n: t('social.mockup.menu.calendar'), i: <Calendar className="w-4 h-4"/> },
+                    { n: t('social.mockup.menu.assets'), i: <ImageIcon className="w-4 h-4"/> },
+                    { n: t('social.mockup.menu.reports'), i: <TrendingUp className="w-4 h-4"/> },
+                    { n: t('social.mockup.menu.team'), i: <Users className="w-4 h-4"/> },
+                    { n: t('social.mockup.menu.settings'), i: <Settings className="w-4 h-4"/> },
                   ].map((it, idx) => (
                     <div key={idx} className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm ${it.act ? 'bg-white text-[#5B3DF5] font-bold shadow-sm' : 'text-gray-600 font-medium'}`}>
                       {it.i} {it.n}
@@ -174,7 +174,7 @@ export default function SocialHero() {
               <div className="flex-1 bg-white p-8 flex flex-col overflow-hidden">
                 {/* Header */}
                 <div className="flex justify-between items-center mb-8">
-                  <h2 className="text-2xl font-bold text-gray-900">Tổng quan</h2>
+                  <h2 className="text-2xl font-bold text-gray-900">{t('social.mockup.menu.overview')}</h2>
                   <div className="flex items-center gap-4">
                     <div className="px-4 py-2 bg-gray-50 rounded-lg text-sm text-gray-600 font-medium border border-gray-100">
                       01/05/2024 - 31/05/2024
@@ -192,10 +192,10 @@ export default function SocialHero() {
                 {/* 4 Stats Cards */}
                 <div className="grid grid-cols-4 gap-4 mb-6">
                   {[
-                    { n: 'Kênh kết nối', v: '23', d: '+12%', c: 'text-green-500' },
-                    { n: 'Bài viết đã đăng', v: '1.284', d: '+18%', c: 'text-green-500' },
-                    { n: 'Tương tác', v: '215.6K', d: '-20%', c: 'text-red-500', isDown: true },
-                    { n: 'Lượt tiếp cận', v: '456.8K', d: '+21%', c: 'text-green-500' },
+                    { n: t('social.mockup.stats.channels'), v: '23', d: '+12%', c: 'text-green-500' },
+                    { n: t('social.mockup.stats.posts'), v: '1.284', d: '+18%', c: 'text-green-500' },
+                    { n: t('social.mockup.stats.engagement'), v: '215.6K', d: '-20%', c: 'text-red-500', isDown: true },
+                    { n: t('social.mockup.stats.reach'), v: '456.8K', d: '+21%', c: 'text-green-500' },
                   ].map((st, i) => (
                     <div key={i} className="bg-white border border-gray-100 rounded-xl p-5 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
                       <div className="text-sm font-semibold text-gray-500 mb-3">{st.n}</div>
@@ -213,11 +213,11 @@ export default function SocialHero() {
                 <div className="grid grid-cols-[1.2fr_1fr] gap-6 mb-6">
                   {/* Line Chart */}
                   <div className="bg-white border border-gray-100 rounded-xl p-6 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col h-[280px]">
-                    <div className="text-sm font-bold text-gray-900 mb-6">Hiệu quả theo thời gian</div>
+                    <div className="text-sm font-bold text-gray-900 mb-6">{t('social.mockup.chart1.title')}</div>
                     <div className="flex gap-4 text-[10px] font-bold text-gray-500 mb-4 justify-center">
-                      <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-blue-500"></div> Lượt tiếp cận</div>
-                      <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-pink-500"></div> Tương tác</div>
-                      <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-purple-500"></div> Lượt click</div>
+                      <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-blue-500"></div> {t('social.mockup.stats.reach')}</div>
+                      <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-pink-500"></div> {t('social.mockup.stats.engagement')}</div>
+                      <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-purple-500"></div> {t('social.mockup.chart1.legend.clicks')}</div>
                     </div>
                     <div className="flex-1 relative w-full h-full pb-6 pl-8">
                       {/* Y axis */}
@@ -245,7 +245,7 @@ export default function SocialHero() {
 
                   {/* Donut Chart */}
                   <div className="bg-white border border-gray-100 rounded-xl p-6 shadow-[0_2px_10px_rgba(0,0,0,0.02)] h-[280px]">
-                    <div className="text-sm font-bold text-gray-900 mb-6">Hiệu quả theo nền tảng</div>
+                    <div className="text-sm font-bold text-gray-900 mb-6">{t('social.mockup.chart2.title')}</div>
                     <div className="flex flex-col md:flex-row items-center gap-6 h-full pb-4">
                       <div className="w-[140px] h-[140px] relative">
                          <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90">
@@ -282,24 +282,24 @@ export default function SocialHero() {
                 {/* Table */}
                 <div className="bg-white border border-gray-100 rounded-xl shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex-1 overflow-hidden flex flex-col">
                   <div className="px-6 py-5 border-b border-gray-100">
-                    <div className="text-sm font-bold text-gray-900">Bài viết gần đây</div>
+                    <div className="text-sm font-bold text-gray-900">{t('social.mockup.table.title')}</div>
                   </div>
                   <div className="overflow-x-auto flex-1">
                     <table className="w-full text-left border-collapse">
                       <thead>
                         <tr className="border-b border-gray-50 text-[11px] uppercase tracking-wider text-gray-400 font-bold bg-gray-50/50">
-                          <th className="px-6 py-3">Bài viết</th>
-                          <th className="px-6 py-3">Kênh</th>
-                          <th className="px-6 py-3">Thời gian</th>
-                          <th className="px-6 py-3">Trạng thái</th>
-                          <th className="px-6 py-3 text-right">Tương tác</th>
+                          <th className="px-6 py-3">{t('social.mockup.table.col_post')}</th>
+                          <th className="px-6 py-3">{t('social.mockup.table.col_channel')}</th>
+                          <th className="px-6 py-3">{t('social.mockup.table.col_time')}</th>
+                          <th className="px-6 py-3">{t('social.mockup.table.col_status')}</th>
+                          <th className="px-6 py-3 text-right">{t('social.mockup.table.col_engagement')}</th>
                         </tr>
                       </thead>
                       <tbody className="text-sm text-gray-600">
                         <tr className="border-b border-gray-50 hover:bg-gray-50/50">
                           <td className="px-6 py-4 font-medium text-gray-900 flex items-center gap-3">
                             <div className="w-8 h-8 bg-gray-100 rounded-lg shrink-0"></div>
-                            Bí quyết tăng hiệu quả bán hàng online
+                            {t('social.mockup.table.post1')}
                           </td>
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-1">
@@ -309,35 +309,35 @@ export default function SocialHero() {
                           </td>
                           <td className="px-6 py-4 text-xs font-medium">20/05/2024 09:30</td>
                           <td className="px-6 py-4">
-                            <span className="px-2 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded">Đã đăng</span>
+                            <span className="px-2 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded">{t('social.mockup.table.status_published')}</span>
                           </td>
                           <td className="px-6 py-4 text-right font-bold text-gray-900">1.2K</td>
                         </tr>
                         <tr className="border-b border-gray-50 hover:bg-gray-50/50">
                           <td className="px-6 py-4 font-medium text-gray-900 flex items-center gap-3">
                             <div className="w-8 h-8 bg-gray-100 rounded-lg shrink-0"></div>
-                            5 công cụ AI giúp bạn làm việc nhanh hơn
+                            {t('social.mockup.table.post2')}
                           </td>
                           <td className="px-6 py-4">
                             <div className="w-5 h-5 rounded-md bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-500 flex items-center justify-center text-white text-[10px] font-bold">i</div>
                           </td>
                           <td className="px-6 py-4 text-xs font-medium">19/05/2024 08:00</td>
                           <td className="px-6 py-4">
-                            <span className="px-2 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded">Đã đăng</span>
+                            <span className="px-2 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded">{t('social.mockup.table.status_published')}</span>
                           </td>
                           <td className="px-6 py-4 text-right font-bold text-gray-900">856</td>
                         </tr>
                         <tr className="hover:bg-gray-50/50">
                           <td className="px-6 py-4 font-medium text-gray-900 flex items-center gap-3">
                             <div className="w-8 h-8 bg-gray-100 rounded-lg shrink-0"></div>
-                            Xu hướng Social Media 2024
+                            {t('social.mockup.table.post3')}
                           </td>
                           <td className="px-6 py-4">
                             <div className="w-5 h-5 rounded-full bg-red-600 flex items-center justify-center text-white text-[10px] font-bold">▶</div>
                           </td>
                           <td className="px-6 py-4 text-xs font-medium">18/05/2024 20:15</td>
                           <td className="px-6 py-4">
-                            <span className="px-2 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded">Đã đăng</span>
+                            <span className="px-2 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded">{t('social.mockup.table.status_published')}</span>
                           </td>
                           <td className="px-6 py-4 text-right font-bold text-gray-900">2.3K</td>
                         </tr>

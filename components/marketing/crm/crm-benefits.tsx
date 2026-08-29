@@ -3,38 +3,40 @@
 import { motion } from 'framer-motion';
 import { ShieldCheck, Zap, TrendingUp, Users, Headphones, MessageSquare, Bot } from 'lucide-react';
 import Image from 'next/image';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 export default function CrmBenefits() {
+  const { t } = useLanguage();
   const stats = [
     {
       icon: <ShieldCheck className="w-8 h-8 text-blue-600" />,
-      value: '99.9%',
-      label: 'Uptime hệ thống',
-      sub: 'ổn định'
+      value: t('crm.benefits.stats.v1'),
+      label: t('crm.benefits.stats.l1'),
+      sub: t('crm.benefits.stats.s1')
     },
     {
       icon: <Zap className="w-8 h-8 text-orange-500 fill-orange-500" />,
-      value: '60%+',
-      label: 'Tiết kiệm thời gian',
-      sub: 'phản hồi'
+      value: t('crm.benefits.stats.v2'),
+      label: t('crm.benefits.stats.l2'),
+      sub: t('crm.benefits.stats.s2')
     },
     {
       icon: <TrendingUp className="w-8 h-8 text-purple-600" />,
-      value: '35%+',
-      label: 'Tăng tỷ lệ chuyển đổi',
-      sub: 'trung bình'
+      value: t('crm.benefits.stats.v3'),
+      label: t('crm.benefits.stats.l3'),
+      sub: t('crm.benefits.stats.s3')
     },
     {
       icon: <Users className="w-8 h-8 text-indigo-600 fill-indigo-600/20" />,
-      value: '10.000+',
-      label: 'Doanh nghiệp đang',
-      sub: 'tin dùng'
+      value: t('crm.benefits.stats.v4'),
+      label: t('crm.benefits.stats.l4'),
+      sub: t('crm.benefits.stats.s4')
     },
     {
       icon: <Headphones className="w-8 h-8 text-purple-600" />,
-      value: '24/7',
-      label: 'Hỗ trợ kỹ thuật',
-      sub: 'nhanh chóng'
+      value: t('crm.benefits.stats.v5'),
+      label: t('crm.benefits.stats.l5'),
+      sub: t('crm.benefits.stats.s5')
     },
   ];
 

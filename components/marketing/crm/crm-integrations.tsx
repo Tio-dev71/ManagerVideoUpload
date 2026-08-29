@@ -1,14 +1,16 @@
 'use client';
 
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { FileSpreadsheet, Webhook, Code, ShoppingBag, Heart, MessageCircle } from 'lucide-react';
 
 export default function CrmIntegrations() {
+  const { t } = useLanguage();
   return (
     <div className="py-20 bg-gray-50 border-t border-gray-100 overflow-hidden">
       <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-10">
           <h3 className="text-xl md:text-2xl font-bold text-gray-900">
-            Tích hợp mạnh mẽ – Kết nối dễ dàng
+            {t('crm.integrations.title')}
           </h3>
         </div>
 
@@ -50,7 +52,7 @@ export default function CrmIntegrations() {
           </div>
 
           <div className="text-sm font-bold text-gray-500 ml-4">
-            và hơn 100+ tích hợp khác
+            {t('crm.integrations.more')}
           </div>
 
         </div>

@@ -1,71 +1,43 @@
 import NextAuth from 'next-auth';
 import { PrismaAdapter } from '@auth/prisma-adapter';
 import CredentialsProvider from 'next-auth/providers/credentials';
+import GoogleProvider from 'next-auth/providers/google';
 import prisma from '@/lib/db';
+import bcrypt from 'bcryptjs';
 
 const nextAuthResult = NextAuth({
   adapter: PrismaAdapter(prisma),
   providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      allowDangerousEmailAccountLinking: true,
+    }),
     CredentialsProvider({
-      name: "Email",
+      name: "Email & Password",
       credentials: {
-        email: { label: "Email", type: "email", placeholder: "admin@example.com" }
+        email: { label: "Email", type: "email", placeholder: "admin@example.com" },
+        password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        if (!credentials?.email) return null;
+        if (!credentials?.email || !credentials?.password) return null;
         
         const userEmail = (credentials.email as string).toLowerCase().trim();
-        const adminEmail = process.env.ADMIN_EMAIL?.toLowerCase().replace(/['"]/g, '').trim();
-
-        // Check if email is in the allowed list
-        let allowed = await prisma.allowedEmail.findUnique({
-          where: { email: userEmail },
-        });
-
-        // Auto-seed admin if user is the designated admin
-        if (userEmail === adminEmail) {
-          if (!allowed) {
-            const workspace = await prisma.workspace.upsert({
-              where: { id: 'default-workspace' },
-              update: {},
-              create: { id: 'default-workspace', name: 'Default Workspace' },
-            });
-
-            allowed = await prisma.allowedEmail.create({
-              data: {
-                email: userEmail,
-                role: 'SUPER_ADMIN',
-                workspaceId: workspace.id,
-              }
-            });
-          }
-        }
-
-        if (!allowed) {
-          return null;
-        }
+        const userPassword = credentials.password as string;
 
         // Check if user exists in DB
-        let user = await prisma.user.findUnique({
+        const user = await prisma.user.findUnique({
           where: { email: userEmail }
         });
 
-        if (!user) {
-           user = await prisma.user.create({
-             data: {
-               email: userEmail,
-               role: allowed.role,
-               workspaceId: allowed.workspaceId,
-             }
-           });
-        } else {
-           user = await prisma.user.update({
-             where: { id: user.id },
-             data: {
-               role: allowed.role,
-               workspaceId: allowed.workspaceId,
-             }
-           });
+        if (!user || !user.password) {
+          return null; // User not found or hasn't set a password (e.g. OAuth only)
+        }
+
+        // Verify password
+        const passwordsMatch = await bcrypt.compare(userPassword, user.password);
+        if (!passwordsMatch) {
+          return null;
         }
 
         return user;

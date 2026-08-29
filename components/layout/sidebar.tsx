@@ -22,33 +22,35 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
+import { ThemeToggle } from '@/components/theme-toggle';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
+
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Live Dashboard', href: '/live', icon: Play },
-  { name: 'Posts', href: '/posts', icon: Calendar },
-  { name: 'Downloader', href: '/downloader', icon: Download },
-  { name: 'FB Accounts', href: '/accounts', icon: Users },
-  { name: 'Proxies', href: '/proxies', icon: Globe },
-  { name: 'Automation', href: '/automation', icon: Play },
-  { name: 'History', href: '/history', icon: Activity },
+  { key: 'sidebar.dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { key: 'sidebar.live', href: '/live', icon: Play },
+  { key: 'sidebar.posts', href: '/posts', icon: Calendar },
+  { key: 'sidebar.downloader', href: '/downloader', icon: Download },
+  { key: 'sidebar.fb_accounts', href: '/accounts', icon: Users },
+  { key: 'sidebar.proxies', href: '/proxies', icon: Globe },
+  { key: 'sidebar.automation', href: '/automation', icon: Play },
+  { key: 'sidebar.history', href: '/history', icon: Activity },
 ];
 
 const adminNavigation = [
-  { name: 'Team', href: '/team', icon: Users },
-  { name: 'Settings', href: '/settings', icon: Settings },
+  { key: 'sidebar.team', href: '/team', icon: Users },
+  { key: 'sidebar.settings', href: '/settings', icon: Settings },
 ];
 
 const superAdminNavigation = [
-  { name: 'Workspaces', href: '/super-admin', icon: Building2 },
+  { key: 'sidebar.workspaces', href: '/super-admin', icon: Building2 },
 ];
-
-import { ThemeToggle } from '@/components/theme-toggle';
 
 export function Sidebar() {
   const pathname = usePathname();
   const { data: session } = useSession();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { t } = useLanguage();
 
   const isSuperAdmin = session?.user?.role === 'SUPER_ADMIN';
   const isAdmin = session?.user?.role === 'ADMIN' || isSuperAdmin;
@@ -92,15 +94,15 @@ export function Sidebar() {
       >
         {/* Header */}
         <div className={`flex items-center h-16 px-4 border-b border-[var(--color-sidebar-border)] ${collapsed ? 'justify-center' : 'justify-between'}`}>
-          <Link href="/dashboard" className="flex items-center gap-2.5 min-w-0">
-            <div className="flex-shrink-0 w-9 h-9 flex items-center justify-center">
-              <Image src="/tiodevlogo.png" alt="Topify Logo" width={36} height={36} className="rounded-xl object-cover" />
-            </div>
-            {!collapsed && (
-              <span className="text-[15px] font-bold tracking-tight text-[var(--color-foreground)]">
-                Topify
-              </span>
-            )}
+          <Link href="/" className={`flex items-center min-w-0 overflow-hidden transition-all ${collapsed ? 'justify-center w-10' : 'w-[160px]'}`}>
+            <Image 
+              src="/Topify-logo.png" 
+              alt="Topify Logo" 
+              width={200} 
+              height={56} 
+              className={`h-10 w-auto object-contain object-left ${collapsed ? 'max-w-none' : ''}`} 
+              priority
+            />
           </Link>
           
           {/* Desktop collapse */}
@@ -145,10 +147,10 @@ export function Sidebar() {
                     }
                     ${collapsed ? 'justify-center px-2' : ''}
                   `}
-                  title={collapsed ? item.name : undefined}
+                  title={collapsed ? (t(item.key) as string) : undefined}
                 >
                   <Icon className={`w-[18px] h-[18px] flex-shrink-0 ${active ? 'text-[var(--color-sidebar-active)]' : ''}`} />
-                  {!collapsed && <span>{item.name}</span>}
+                  {!collapsed && <span>{t(item.key)}</span>}
                 </Link>
               );
             })}
@@ -159,7 +161,7 @@ export function Sidebar() {
             <div className="mt-5 pt-5 border-t border-[var(--color-sidebar-border)]">
               {!collapsed && (
                 <p className="px-3 mb-2 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-muted-foreground)]">
-                  Admin
+                  {t('sidebar.admin')}
                 </p>
               )}
               <div className="space-y-1">
@@ -180,10 +182,10 @@ export function Sidebar() {
                         }
                         ${collapsed ? 'justify-center px-2' : ''}
                       `}
-                      title={collapsed ? item.name : undefined}
+                      title={collapsed ? (t(item.key) as string) : undefined}
                     >
                       <Icon className={`w-[18px] h-[18px] flex-shrink-0 ${active ? 'text-[var(--color-sidebar-active)]' : ''}`} />
-                      {!collapsed && <span>{item.name}</span>}
+                      {!collapsed && <span>{t(item.key)}</span>}
                     </Link>
                   );
                 })}
@@ -196,7 +198,7 @@ export function Sidebar() {
             <div className="mt-5 pt-5 border-t border-[var(--color-sidebar-border)]">
               {!collapsed && (
                 <p className="px-3 mb-2 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-muted-foreground)]">
-                  System
+                  {t('sidebar.system')}
                 </p>
               )}
               <div className="space-y-1">
@@ -217,10 +219,10 @@ export function Sidebar() {
                         }
                         ${collapsed ? 'justify-center px-2' : ''}
                       `}
-                      title={collapsed ? item.name : undefined}
+                      title={collapsed ? (t(item.key) as string) : undefined}
                     >
                       <Icon className={`w-[18px] h-[18px] flex-shrink-0 ${active ? 'text-[var(--color-sidebar-active)]' : ''}`} />
-                      {!collapsed && <span>{item.name}</span>}
+                      {!collapsed && <span>{t(item.key)}</span>}
                     </Link>
                   );
                 })}
@@ -228,6 +230,24 @@ export function Sidebar() {
             </div>
           )}
         </nav>
+
+        {/* Back to Home */}
+        <div className={`p-3 border-t border-[var(--color-sidebar-border)] ${collapsed ? 'px-2' : ''}`}>
+          <Link
+            href="/"
+            onClick={() => setMobileOpen(false)}
+            className={`
+              flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium
+              text-[var(--color-muted-foreground)] hover:bg-[var(--color-muted)] hover:text-[var(--color-foreground)]
+              transition-all duration-200
+              ${collapsed ? 'justify-center px-2' : ''}
+            `}
+            title={collapsed ? (t('sidebar.back_home') as string) : undefined}
+          >
+            <Globe className={`w-[18px] h-[18px] flex-shrink-0`} />
+            {!collapsed && <span>{t('sidebar.back_home')}</span>}
+          </Link>
+        </div>
 
         {/* User section */}
         <div className={`p-3 border-t border-[var(--color-sidebar-border)] ${collapsed ? 'px-2' : ''}`}>
@@ -254,7 +274,7 @@ export function Sidebar() {
                 <button
                   onClick={() => signOut({ callbackUrl: '/login' })}
                   className="p-1.5 rounded-lg hover:bg-[var(--color-muted)] transition-colors"
-                  title="Sign out"
+                  title={t('sidebar.sign_out') as string}
                 >
                   <LogOut className="w-4 h-4 text-[var(--color-muted-foreground)]" />
                 </button>

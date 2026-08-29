@@ -4,8 +4,10 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { ArrowRight, ChevronRight, Home, CheckSquare, Users, TrendingUp, Share2, LayoutGrid, CheckCircle2, ListTodo, Columns, Calendar, UserPlus, Target, PieChart, FolderOpen, Settings, Bell } from 'lucide-react';
 import Image from 'next/image';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 export default function WorkHero() {
+  const { t } = useLanguage();
   return (
     <div className="relative overflow-hidden bg-white pt-24 pb-20 lg:pt-28 lg:pb-32">
       {/* Background Gradients */}
@@ -18,11 +20,11 @@ export default function WorkHero() {
         <div className="flex items-center gap-2 text-sm text-gray-500 mb-10 font-medium">
           <Link href="/" className="hover:text-blue-600 transition-colors flex items-center gap-1.5">
             <Home className="w-4 h-4" />
-            Trang chủ
+            {t('breadcrumb.home')}
           </Link>
           <ChevronRight className="w-4 h-4 text-gray-300" />
           <Link href="/products" className="hover:text-blue-600 transition-colors">
-            Sản phẩm
+            {t('breadcrumb.products')}
           </Link>
           <ChevronRight className="w-4 h-4 text-gray-300" />
           <span className="text-gray-900 font-bold">Topify Work</span>
@@ -38,7 +40,7 @@ export default function WorkHero() {
               className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-blue-600 text-xs font-bold tracking-wide uppercase mb-6 shadow-sm"
             >
               <CheckSquare className="w-3.5 h-3.5" />
-              TOPIFY WORK
+              {t('work.hero.tag')}
             </motion.div>
 
             <motion.h1
@@ -55,9 +57,8 @@ export default function WorkHero() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
               className="text-[22px] md:text-2xl font-bold text-gray-800 mb-6 leading-snug"
-            >
-              Quản trị công việc & đội nhóm <br className="hidden lg:block"/>Hiệu suất vượt trội – Kết quả đột phá
-            </motion.div>
+              dangerouslySetInnerHTML={{ __html: t('work.hero.title') }}
+            />
 
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -65,7 +66,7 @@ export default function WorkHero() {
               transition={{ duration: 0.5, delay: 0.3 }}
               className="text-[17px] text-gray-600 mb-10 max-w-xl leading-relaxed"
             >
-              Topify Work giúp doanh nghiệp quản lý công việc, theo dõi tiến độ, phân bổ nguồn lực và đánh giá hiệu suất đội nhóm một cách khoa học và minh bạch.
+              {t('work.hero.desc')}
             </motion.p>
 
             {/* 4 Feature Points */}
@@ -79,29 +80,29 @@ export default function WorkHero() {
                 <div className="w-10 h-10 rounded-xl bg-blue-100/50 flex items-center justify-center text-blue-600 mb-3">
                   <Users className="w-5 h-5 fill-blue-600/20" />
                 </div>
-                <h4 className="text-[15px] font-bold text-gray-900 mb-1">Giao việc dễ dàng</h4>
-                <p className="text-[13px] text-gray-600 leading-relaxed">Phân công rõ ràng, ai làm gì, khi nào</p>
+                <h4 className="text-[15px] font-bold text-gray-900 mb-1">{t('work.hero.f1.title')}</h4>
+                <p className="text-[13px] text-gray-600 leading-relaxed">{t('work.hero.f1.desc')}</p>
               </div>
               <div>
                 <div className="w-10 h-10 rounded-xl bg-blue-100/50 flex items-center justify-center text-blue-600 mb-3">
                   <CheckSquare className="w-5 h-5 fill-blue-600/20" />
                 </div>
-                <h4 className="text-[15px] font-bold text-gray-900 mb-1">Theo dõi tiến độ</h4>
-                <p className="text-[13px] text-gray-600 leading-relaxed">Cập nhật real-time, minh bạch, chính xác</p>
+                <h4 className="text-[15px] font-bold text-gray-900 mb-1">{t('work.hero.f2.title')}</h4>
+                <p className="text-[13px] text-gray-600 leading-relaxed">{t('work.hero.f2.desc')}</p>
               </div>
               <div>
                 <div className="w-10 h-10 rounded-xl bg-blue-100/50 flex items-center justify-center text-blue-600 mb-3">
                   <TrendingUp className="w-5 h-5" />
                 </div>
-                <h4 className="text-[15px] font-bold text-gray-900 mb-1">Tối ưu hiệu suất</h4>
-                <p className="text-[13px] text-gray-600 leading-relaxed">Đo lường, đánh giá & cải tiến liên tục</p>
+                <h4 className="text-[15px] font-bold text-gray-900 mb-1">{t('work.hero.f3.title')}</h4>
+                <p className="text-[13px] text-gray-600 leading-relaxed">{t('work.hero.f3.desc')}</p>
               </div>
               <div>
                 <div className="w-10 h-10 rounded-xl bg-blue-100/50 flex items-center justify-center text-blue-600 mb-3">
                   <Share2 className="w-5 h-5 fill-blue-600/20" />
                 </div>
-                <h4 className="text-[15px] font-bold text-gray-900 mb-1">Kết nối toàn diện</h4>
-                <p className="text-[13px] text-gray-600 leading-relaxed">Liên thông Social, CRM và nhiều công cụ khác</p>
+                <h4 className="text-[15px] font-bold text-gray-900 mb-1">{t('work.hero.f4.title')}</h4>
+                <p className="text-[13px] text-gray-600 leading-relaxed">{t('work.hero.f4.desc')}</p>
               </div>
             </motion.div>
 
@@ -116,7 +117,7 @@ export default function WorkHero() {
                 href="/login"
                 className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3.5 text-[15px] font-bold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
               >
-                Dùng thử miễn phí
+                {t('work.hero.btn_free')}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Link>
               <button
@@ -125,7 +126,7 @@ export default function WorkHero() {
                 <div className="w-6 h-6 rounded-full flex items-center justify-center mr-2 border-2 border-blue-600 group-hover:scale-110 transition-transform">
                   <svg className="w-2.5 h-2.5 ml-0.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" /></svg>
                 </div>
-                Xem demo
+                {t('work.hero.btn_demo')}
               </button>
             </motion.div>
           </div>
@@ -154,16 +155,16 @@ export default function WorkHero() {
                 </div>
                 <div className="px-3 flex flex-col gap-1">
                   {[
-                    { n: 'Tổng quan', i: <LayoutGrid className="w-4 h-4"/>, act: true },
-                    { n: 'Công việc', i: <ListTodo className="w-4 h-4"/> },
-                    { n: 'Dự án', i: <FolderOpen className="w-4 h-4"/> },
-                    { n: 'Kanban', i: <Columns className="w-4 h-4"/> },
-                    { n: 'Lịch', i: <Calendar className="w-4 h-4"/> },
-                    { n: 'Giao việc', i: <UserPlus className="w-4 h-4"/> },
-                    { n: 'Nhóm', i: <Users className="w-4 h-4"/> },
-                    { n: 'Mục tiêu (OKR)', i: <Target className="w-4 h-4"/> },
-                    { n: 'Báo cáo', i: <PieChart className="w-4 h-4"/> },
-                    { n: 'Cài đặt', i: <Settings className="w-4 h-4"/> },
+                    { n: t('work.mockup.menu.overview'), i: <LayoutGrid className="w-4 h-4"/>, act: true },
+                    { n: t('work.mockup.menu.tasks'), i: <ListTodo className="w-4 h-4"/> },
+                    { n: t('work.mockup.menu.projects'), i: <FolderOpen className="w-4 h-4"/> },
+                    { n: t('work.mockup.menu.kanban'), i: <Columns className="w-4 h-4"/> },
+                    { n: t('work.mockup.menu.calendar'), i: <Calendar className="w-4 h-4"/> },
+                    { n: t('work.mockup.menu.assign'), i: <UserPlus className="w-4 h-4"/> },
+                    { n: t('work.mockup.menu.teams'), i: <Users className="w-4 h-4"/> },
+                    { n: t('work.mockup.menu.okr'), i: <Target className="w-4 h-4"/> },
+                    { n: t('work.mockup.menu.reports'), i: <PieChart className="w-4 h-4"/> },
+                    { n: t('work.mockup.menu.settings'), i: <Settings className="w-4 h-4"/> },
                   ].map((it, idx) => (
                     <div key={idx} className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm ${it.act ? 'bg-white text-blue-600 font-bold shadow-sm' : 'text-gray-600 font-medium hover:bg-gray-100 cursor-pointer'}`}>
                       {it.i} {it.n}
@@ -176,7 +177,7 @@ export default function WorkHero() {
               <div className="flex-1 bg-white p-8 flex flex-col overflow-hidden">
                 {/* Header */}
                 <div className="flex justify-between items-center mb-8">
-                  <h2 className="text-2xl font-bold text-gray-900">Tổng quan</h2>
+                  <h2 className="text-2xl font-bold text-gray-900">{t('work.mockup.menu.overview')}</h2>
                   <div className="flex items-center gap-4">
                     <div className="px-4 py-2 bg-gray-50 rounded-lg text-sm text-gray-600 font-medium border border-gray-100 flex items-center gap-2 cursor-pointer">
                       01/05/2024 - 31/05/2024
@@ -194,10 +195,10 @@ export default function WorkHero() {
                 {/* 4 Stats Cards */}
                 <div className="grid grid-cols-4 gap-4 mb-6">
                   {[
-                    { n: 'Tổng công việc', v: '128', d: '+12.5%', c: 'text-green-500' },
-                    { n: 'Hoàn thành', v: '96', d: '+75%', c: 'text-green-500' },
-                    { n: 'Đang thực hiện', v: '24', d: '18.8%', c: 'text-blue-500' },
-                    { n: 'Quá hạn', v: '8', d: '6.2%', c: 'text-red-500' },
+                    { n: t('work.mockup.stats.total_tasks'), v: '128', d: '+12.5%', c: 'text-green-500' },
+                    { n: t('work.mockup.stats.completed'), v: '96', d: '+75%', c: 'text-green-500' },
+                    { n: t('work.mockup.stats.in_progress'), v: '24', d: '18.8%', c: 'text-blue-500' },
+                    { n: t('work.mockup.stats.overdue'), v: '8', d: '6.2%', c: 'text-red-500' },
                   ].map((st, i) => (
                     <div key={i} className="bg-white border border-gray-100 rounded-xl p-5 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col justify-between">
                       <div className="text-sm font-semibold text-gray-500 mb-3">{st.n}</div>
@@ -213,9 +214,9 @@ export default function WorkHero() {
 
                 {/* Charts Grid */}
                 <div className="grid grid-cols-[1fr_1.2fr] gap-6 mb-6">
-                  {/* Donut Chart (Tiến độ công việc) */}
+                  {/* Donut Chart ({t('work.mockup.charts.task_progress')}) */}
                   <div className="bg-white border border-gray-100 rounded-xl p-6 shadow-[0_2px_10px_rgba(0,0,0,0.02)] h-[280px]">
-                    <div className="text-sm font-bold text-gray-900 mb-6">Tiến độ công việc</div>
+                    <div className="text-sm font-bold text-gray-900 mb-6">{t('work.mockup.charts.task_progress')}</div>
                     <div className="flex items-center gap-6 h-full pb-4">
                       <div className="w-[120px] h-[120px] relative shrink-0">
                          <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90">
@@ -230,10 +231,10 @@ export default function WorkHero() {
                       </div>
                       <div className="flex flex-col gap-3 flex-1 w-full justify-center">
                         {[
-                          { l: 'Hoàn thành', c: 'bg-blue-600', p: '75%' },
-                          { l: 'Đang thực hiện', c: 'bg-sky-400', p: '18.8%' },
-                          { l: 'Chưa bắt đầu', c: 'bg-gray-300', p: '4.7%' },
-                          { l: 'Quá hạn', c: 'bg-red-500', p: '6.2%' }
+                          { l: t('work.mockup.stats.completed'), c: 'bg-blue-600', p: '75%' },
+                          { l: t('work.mockup.stats.in_progress'), c: 'bg-sky-400', p: '18.8%' },
+                          { l: t('work.mockup.charts.not_started'), c: 'bg-gray-300', p: '4.7%' },
+                          { l: t('work.mockup.stats.overdue'), c: 'bg-red-500', p: '6.2%' }
                         ].map((lg, i) => (
                           <div key={i} className="flex items-center justify-between text-[11px]">
                             <div className="flex items-center gap-1.5">
@@ -247,10 +248,10 @@ export default function WorkHero() {
                     </div>
                   </div>
 
-                  {/* Bar Chart (Hiệu suất đội nhóm) */}
+                  {/* Bar Chart ({t('work.mockup.charts.team_performance')}) */}
                   <div className="bg-white border border-gray-100 rounded-xl p-6 shadow-[0_2px_10px_rgba(0,0,0,0.02)] h-[280px] flex flex-col">
                     <div className="flex justify-between items-center mb-6">
-                      <div className="text-sm font-bold text-gray-900">Hiệu suất đội nhóm</div>
+                      <div className="text-sm font-bold text-gray-900">{t('work.mockup.charts.team_performance')}</div>
                       <div className="px-2 py-1 bg-gray-50 rounded text-xs text-gray-500 border border-gray-100 cursor-pointer">7 ngày qua ▾</div>
                     </div>
                     <div className="flex-1 relative w-full h-full pb-6 pl-8">
@@ -282,16 +283,16 @@ export default function WorkHero() {
                 {/* Table */}
                 <div className="bg-white border border-gray-100 rounded-xl shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex-1 overflow-hidden flex flex-col">
                   <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center">
-                    <div className="text-sm font-bold text-gray-900">Công việc sắp tới</div>
+                    <div className="text-sm font-bold text-gray-900">{t('work.mockup.table.upcoming_tasks')}</div>
                   </div>
                   <div className="overflow-x-auto flex-1">
                     <table className="w-full text-left border-collapse">
                       <thead>
                         <tr className="border-b border-gray-50 text-[11px] uppercase tracking-wider text-gray-400 font-bold bg-gray-50/50">
-                          <th className="px-6 py-3">Công việc</th>
-                          <th className="px-6 py-3">Người thực hiện</th>
-                          <th className="px-6 py-3">Deadline</th>
-                          <th className="px-6 py-3">Mức độ</th>
+                          <th className="px-6 py-3">{t('work.mockup.table.task')}</th>
+                          <th className="px-6 py-3">{t('work.mockup.table.assignee')}</th>
+                          <th className="px-6 py-3">{t('work.mockup.table.deadline')}</th>
+                          <th className="px-6 py-3">{t('work.mockup.table.priority')}</th>
                         </tr>
                       </thead>
                       <tbody className="text-sm text-gray-600">
@@ -302,15 +303,15 @@ export default function WorkHero() {
                                 <CheckSquare className="w-4 h-4 text-blue-600" />
                               </div>
                               <div>
-                                <div className="font-bold text-gray-900 text-xs">Xây dựng chiến dịch Social Tháng 5</div>
-                                <div className="text-[10px] text-gray-500">Dự án Marketing</div>
+                                <div className="font-bold text-gray-900 text-xs">{t('work.mockup.table.task1')}</div>
+                                <div className="text-[10px] text-gray-500">{t('work.mockup.table.proj1')}</div>
                               </div>
                             </div>
                           </td>
                           <td className="px-6 py-3 text-xs font-medium text-gray-900">Minh Anh</td>
                           <td className="px-6 py-3 text-[11px] font-medium text-gray-500">02/05/2024</td>
                           <td className="px-6 py-3">
-                            <span className="px-2 py-1 bg-red-50 text-red-600 text-[10px] font-bold rounded">Cao</span>
+                            <span className="px-2 py-1 bg-red-50 text-red-600 text-[10px] font-bold rounded">{t('work.mockup.table.priority_high')}</span>
                           </td>
                         </tr>
                         <tr className="border-b border-gray-50 hover:bg-gray-50/50">
@@ -320,15 +321,15 @@ export default function WorkHero() {
                                 <LayoutGrid className="w-4 h-4 text-purple-600" />
                               </div>
                               <div>
-                                <div className="font-bold text-gray-900 text-xs">Thiết kế Landing page sản phẩm mới</div>
-                                <div className="text-[10px] text-gray-500">Dự án Website</div>
+                                <div className="font-bold text-gray-900 text-xs">{t('work.mockup.table.task2')}</div>
+                                <div className="text-[10px] text-gray-500">{t('work.mockup.table.proj2')}</div>
                               </div>
                             </div>
                           </td>
                           <td className="px-6 py-3 text-xs font-medium text-gray-900">Tuấn Kiệt</td>
                           <td className="px-6 py-3 text-[11px] font-medium text-gray-500">03/05/2024</td>
                           <td className="px-6 py-3">
-                            <span className="px-2 py-1 bg-orange-50 text-orange-600 text-[10px] font-bold rounded">Trung bình</span>
+                            <span className="px-2 py-1 bg-orange-50 text-orange-600 text-[10px] font-bold rounded">{t('work.mockup.table.priority_medium')}</span>
                           </td>
                         </tr>
                         <tr className="hover:bg-gray-50/50">
@@ -338,15 +339,15 @@ export default function WorkHero() {
                                 <PieChart className="w-4 h-4 text-green-600" />
                               </div>
                               <div>
-                                <div className="font-bold text-gray-900 text-xs">Báo cáo hiệu quả chiến dịch Quý 2</div>
-                                <div className="text-[10px] text-gray-500">Dự án Marketing</div>
+                                <div className="font-bold text-gray-900 text-xs">{t('work.mockup.table.task3')}</div>
+                                <div className="text-[10px] text-gray-500">{t('work.mockup.table.proj1')}</div>
                               </div>
                             </div>
                           </td>
                           <td className="px-6 py-3 text-xs font-medium text-gray-900">Thu Hằng</td>
                           <td className="px-6 py-3 text-[11px] font-medium text-gray-500">05/05/2024</td>
                           <td className="px-6 py-3">
-                            <span className="px-2 py-1 bg-green-50 text-green-600 text-[10px] font-bold rounded">Thấp</span>
+                            <span className="px-2 py-1 bg-green-50 text-green-600 text-[10px] font-bold rounded">{t('work.mockup.table.priority_low')}</span>
                           </td>
                         </tr>
                       </tbody>
@@ -354,7 +355,7 @@ export default function WorkHero() {
                   </div>
                   <div className="px-6 py-3 border-t border-gray-100 flex justify-end">
                     <div className="text-xs font-bold text-blue-600 cursor-pointer hover:underline flex items-center">
-                      Xem tất cả công việc <ArrowRight className="w-3 h-3 ml-1" />
+                      {t('work.mockup.table.view_all')} <ArrowRight className="w-3 h-3 ml-1" />
                     </div>
                   </div>
                 </div>
