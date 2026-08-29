@@ -106,10 +106,10 @@ export default function PostsPage() {
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="page-header">
         <div>
-          <h1 className="text-[28px] font-semibold tracking-tight">Posts</h1>
-          <p className="text-[var(--color-muted-foreground)] mt-1">
+          <h1 className="page-title">Posts</h1>
+          <p className="page-subtitle">
             Manage all your scheduled and published reels
           </p>
         </div>
@@ -122,18 +122,12 @@ export default function PostsPage() {
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
         {/* Filter tabs */}
-        <div className="flex gap-1 bg-[var(--color-muted)] p-1 rounded-xl overflow-x-auto">
+        <div className="tab-list overflow-x-auto">
           {filterTabs.map((tab) => (
             <button
               key={tab.value}
               onClick={() => setFilter(tab.value)}
-              className={`
-                px-3.5 py-1.5 rounded-lg text-[13px] font-medium whitespace-nowrap transition-all
-                ${filter === tab.value
-                  ? 'bg-white text-[var(--color-foreground)] shadow-sm'
-                  : 'text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)]'
-                }
-              `}
+              className={`tab-trigger whitespace-nowrap ${filter === tab.value ? 'active' : ''}`}
             >
               {tab.label}
             </button>

@@ -141,16 +141,18 @@ export default function TeamPage() {
   return (
     <div className="max-w-[720px] mx-auto space-y-8 animate-fade-in">
       {/* Header */}
-      <div>
-        <h1 className="text-[28px] font-semibold tracking-tight">Team</h1>
-        <p className="text-[var(--color-muted-foreground)] mt-1">
-          Manage who can access Topify
-        </p>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Team</h1>
+          <p className="page-subtitle">
+            Manage who can access Topify
+          </p>
+        </div>
       </div>
 
       {/* Add Member */}
       <div className="card-apple p-6">
-        <h2 className="text-[17px] font-semibold mb-1">Add team member</h2>
+        <h2 className="text-[16px] font-semibold mb-1 text-[var(--color-foreground)]">Add team member</h2>
         <p className="text-[13px] text-[var(--color-muted-foreground)] mb-4">
           Add an email address to allow a new staff member to sign in.
         </p>
@@ -162,7 +164,7 @@ export default function TeamPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="colleague@company.com"
-              className="input-apple !pl-10"
+              className="input-apple !pl-10 w-full"
               required
               disabled={adding}
             />
@@ -184,7 +186,7 @@ export default function TeamPage() {
 
       {/* Members List */}
       <div>
-        <h2 className="text-[17px] font-semibold mb-3">Team members</h2>
+        <h2 className="text-[16px] font-semibold mb-3 text-[var(--color-foreground)]">Team members</h2>
         <div className="card-apple overflow-hidden">
           {loading ? (
             <div className="p-6 space-y-4">
@@ -201,7 +203,7 @@ export default function TeamPage() {
           ) : members.length === 0 ? (
             <div className="p-12 text-center">
               <Users className="w-12 h-12 text-[var(--color-muted-foreground)] mx-auto mb-3 opacity-30" />
-              <p className="text-[15px] font-medium">No team members yet</p>
+              <p className="text-[14px] font-medium text-[var(--color-foreground)]">No team members yet</p>
               <p className="text-[13px] text-[var(--color-muted-foreground)] mt-1">
                 Add email addresses above to invite your team
               </p>
@@ -209,24 +211,24 @@ export default function TeamPage() {
           ) : (
             <div className="divide-y divide-[var(--color-border)]">
               {members.map((member) => (
-                <div key={member.id} className="flex items-center justify-between p-4 group">
+                <div key={member.id} className="flex items-center justify-between p-4 group hover:bg-[var(--color-muted)] transition-colors">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center flex-shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-[var(--color-primary)] flex items-center justify-center flex-shrink-0">
                       <span className="text-white text-sm font-medium">
                         {member.email[0].toUpperCase()}
                       </span>
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <p className="text-[14px] font-medium">{member.email}</p>
+                        <p className="text-[14px] font-medium text-[var(--color-foreground)]">{member.email}</p>
                         <select
                           value={member.role}
                           onChange={(e) => updateMemberRole(member.id, e.target.value)}
                           disabled={updating === member.id}
                           className={`text-[11px] font-medium px-2 py-0.5 rounded-full outline-none cursor-pointer border ${
                             member.role === 'ADMIN'
-                              ? 'bg-purple-50 text-purple-700 border-purple-200'
-                              : 'bg-gray-100 text-gray-700 border-gray-200'
+                              ? 'bg-[var(--color-primary-soft)] text-[var(--color-primary)] border-transparent'
+                              : 'bg-[var(--color-muted)] text-[var(--color-muted-foreground)] border-[var(--color-border)]'
                           } ${updating === member.id ? 'opacity-50' : ''}`}
                         >
                           <option value="STAFF">Staff</option>
@@ -243,7 +245,7 @@ export default function TeamPage() {
                     <button
                       onClick={() => generateMagicLink(member.email)}
                       disabled={generating === member.email}
-                      className="p-2 rounded-lg hover:bg-blue-50 transition-colors text-[var(--color-muted-foreground)] hover:text-blue-600 flex items-center gap-1.5"
+                      className="p-2 rounded-lg hover:bg-[var(--color-primary-soft)] transition-colors text-[var(--color-muted-foreground)] hover:text-[var(--color-primary)] flex items-center gap-1.5"
                       title="Generate and copy login link (Bypass Email)"
                     >
                       {generating === member.email ? (
@@ -257,10 +259,10 @@ export default function TeamPage() {
                     {member.role !== 'ADMIN' && (
                       <button
                         onClick={() => removeMember(member.id, member.email)}
-                        className="p-2 rounded-lg hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100"
+                        className="p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-950 transition-colors opacity-0 group-hover:opacity-100"
                         title="Remove member"
                       >
-                        <Trash2 className="w-4 h-4 text-red-400" />
+                        <Trash2 className="w-4 h-4 text-red-500" />
                       </button>
                     )}
                   </div>

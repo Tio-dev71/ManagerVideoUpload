@@ -120,15 +120,17 @@ export default function SuperAdminPage() {
 
   return (
     <div className="max-w-[960px] mx-auto space-y-8 animate-fade-in">
-      <div>
-        <h1 className="text-[28px] font-semibold tracking-tight text-purple-600">Super Admin</h1>
-        <p className="text-[var(--color-muted-foreground)] mt-1">
-          Manage tenants and workspaces.
-        </p>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title text-[var(--color-primary)]">Super Admin</h1>
+          <p className="page-subtitle">
+            Manage tenants and workspaces.
+          </p>
+        </div>
       </div>
 
-      <div className="card-apple p-6 border-purple-100">
-        <h2 className="text-[17px] font-semibold mb-1">Create New Client Workspace</h2>
+      <div className="card-apple p-6 border-[var(--color-primary-soft)] border-2">
+        <h2 className="text-[16px] font-semibold mb-1 text-[var(--color-foreground)]">Create New Client Workspace</h2>
         <p className="text-[13px] text-[var(--color-muted-foreground)] mb-4">
           Provision a new isolated workspace and assign an Admin email.
         </p>
@@ -140,7 +142,7 @@ export default function SuperAdminPage() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Company Name"
-              className="input-apple !pl-10"
+              className="input-apple !pl-10 w-full"
               required
               disabled={adding}
             />
@@ -152,7 +154,7 @@ export default function SuperAdminPage() {
               value={adminEmail}
               onChange={(e) => setAdminEmail(e.target.value)}
               placeholder="admin@company.com"
-              className="input-apple !pl-10"
+              className="input-apple !pl-10 w-full"
               required
               disabled={adding}
             />
@@ -160,7 +162,7 @@ export default function SuperAdminPage() {
           <button
             type="submit"
             disabled={adding || !name.trim() || !adminEmail.trim()}
-            className="btn-primary bg-purple-600 hover:bg-purple-700 text-white inline-flex items-center gap-2 text-[14px] whitespace-nowrap"
+            className="btn-primary inline-flex items-center gap-2 text-[14px] whitespace-nowrap"
           >
             {adding ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
             Create Tenant
@@ -169,29 +171,29 @@ export default function SuperAdminPage() {
       </div>
 
       <div>
-        <h2 className="text-[17px] font-semibold mb-3">Workspaces</h2>
+        <h2 className="text-[16px] font-semibold mb-3 text-[var(--color-foreground)]">Workspaces</h2>
         <div className="card-apple overflow-hidden">
           {loading ? (
-            <div className="p-6">Loading workspaces...</div>
+            <div className="p-6 text-[var(--color-muted-foreground)]">Loading workspaces...</div>
           ) : workspaces.length === 0 ? (
-            <div className="p-12 text-center text-gray-500">No workspaces found</div>
+            <div className="p-12 text-center text-[var(--color-muted-foreground)]">No workspaces found</div>
           ) : (
             <div className="divide-y divide-[var(--color-border)]">
               {workspaces.map((ws) => (
-                <div key={ws.id} className="flex items-center justify-between p-4">
+                <div key={ws.id} className="flex items-center justify-between p-4 hover:bg-[var(--color-muted)] transition-colors">
                   <div>
-                    <h3 className="font-medium text-[15px]">{ws.name}</h3>
+                    <h3 className="font-medium text-[15px] text-[var(--color-foreground)]">{ws.name}</h3>
                     {ws.allowedEmails?.[0]?.email && (
-                      <p className="text-[13px] text-purple-600 font-medium mt-0.5">
+                      <p className="text-[13px] text-[var(--color-primary)] font-medium mt-0.5">
                         {ws.allowedEmails[0].email}
                       </p>
                     )}
-                    <p className="text-[12px] text-gray-500 mt-1">
+                    <p className="text-[12px] text-[var(--color-muted-foreground)] mt-1">
                       Created {format(new Date(ws.createdAt), 'MMM d, yyyy')}
                     </p>
                   </div>
                   <div className="flex items-center gap-4">
-                    <div className="flex gap-4 text-[13px] text-gray-500">
+                    <div className="flex gap-4 text-[13px] text-[var(--color-muted-foreground)]">
                       <div className="flex items-center gap-1">
                         <Users className="w-4 h-4" /> {ws._count.users} Users
                       </div>
@@ -203,7 +205,7 @@ export default function SuperAdminPage() {
                       <button
                         onClick={() => generateMagicLink(ws.allowedEmails[0].email)}
                         disabled={generating === ws.allowedEmails[0].email}
-                        className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors flex items-center gap-1.5"
+                        className="p-2 rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)] hover:bg-[var(--color-muted)] transition-colors flex items-center gap-1.5"
                         title="Copy Admin Login Link"
                       >
                         {generating === ws.allowedEmails[0].email ? (
@@ -218,7 +220,7 @@ export default function SuperAdminPage() {
                       <button
                         onClick={() => deleteWorkspace(ws.id, ws.name)}
                         disabled={deleting === ws.id}
-                        className="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors flex items-center justify-center w-8 h-8 flex-shrink-0"
+                        className="p-2 rounded-lg bg-red-50 text-red-600 dark:bg-red-950/30 dark:hover:bg-red-900/50 hover:bg-red-100 transition-colors flex items-center justify-center w-8 h-8 flex-shrink-0"
                         title="Delete Workspace"
                       >
                         {deleting === ws.id ? (

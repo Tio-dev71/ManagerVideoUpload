@@ -181,11 +181,13 @@ export default function SettingsPage() {
   return (
     <div className="max-w-[720px] mx-auto space-y-10 animate-fade-in pb-8">
       {/* Header */}
-      <div>
-        <h1 className="text-[28px] font-semibold tracking-tight">Settings</h1>
-        <p className="text-[var(--color-muted-foreground)] mt-1">
-          Manage API credentials and social media connections
-        </p>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Settings</h1>
+          <p className="page-subtitle">
+            Manage API credentials and social media connections
+          </p>
+        </div>
       </div>
 
       {/* ─── API Configuration ─── */}
@@ -197,10 +199,10 @@ export default function SettingsPage() {
                 <Key className="w-4 h-4 text-white" />
               </div>
               <div>
-                <h2 className="text-[17px] font-semibold">
+                <h2 className="text-[16px] font-semibold text-[var(--color-foreground)]">
                   {session.user.role === 'SUPER_ADMIN' ? 'System API Configuration' : 'Workspace API Configuration'}
                 </h2>
-                <p className="text-[12px] text-[var(--color-muted-foreground)]">
+                <p className="text-[13px] text-[var(--color-muted-foreground)]">
                   {session.user.role === 'SUPER_ADMIN' 
                     ? 'Configure OAuth client credentials globally. These act as fallback for all workspaces.'
                     : 'Configure your custom OAuth client credentials for this workspace.'}
@@ -297,8 +299,8 @@ export default function SettingsPage() {
             <Link2 className="w-4 h-4 text-white" />
           </div>
           <div>
-            <h2 className="text-[17px] font-semibold">Connected Accounts</h2>
-            <p className="text-[12px] text-[var(--color-muted-foreground)]">
+            <h2 className="text-[16px] font-semibold text-[var(--color-foreground)]">Connected Accounts</h2>
+            <p className="text-[13px] text-[var(--color-muted-foreground)]">
               Link your social accounts after configuring API credentials
             </p>
           </div>

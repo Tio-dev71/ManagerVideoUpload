@@ -165,14 +165,14 @@ export default function AccountsPage() {
   };
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
+    <div className="space-y-6 animate-fade-in">
+      <div className="page-header">
         <div>
-          <h1 className="text-2xl font-bold dark:text-white flex items-center gap-2">
-            <Users className="w-6 h-6 text-blue-500" />
+          <h1 className="page-title flex items-center gap-2">
+            <Users className="w-6 h-6 text-[var(--color-primary)]" />
             Facebook Accounts
           </h1>
-          <p className="text-sm text-neutral-500 mt-1">
+          <p className="page-subtitle">
             Manage your profiles for automated marketing and posting.
           </p>
         </div>
@@ -180,10 +180,10 @@ export default function AccountsPage() {
           <button
             onClick={handleRunSelected}
             disabled={selectedIds.length === 0 || isRunningMultiple}
-            className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-lg font-medium transition-colors"
+            className="btn-secondary flex items-center gap-2 text-[14px] bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border-transparent"
           >
             {isRunningMultiple ? (
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              <div className="w-4 h-4 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
             ) : (
               <Play className="w-4 h-4 fill-current" />
             )}
@@ -192,7 +192,7 @@ export default function AccountsPage() {
           
           <button
             onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+            className="btn-primary flex items-center gap-2 text-[14px]"
           >
             <Plus className="w-4 h-4" />
             Add Accounts
@@ -202,29 +202,29 @@ export default function AccountsPage() {
 
       {loading ? (
         <div className="flex items-center justify-center h-64">
-          <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-8 h-8 border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin"></div>
         </div>
       ) : (
-        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl overflow-hidden shadow-sm">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-neutral-50 dark:bg-neutral-950 border-b border-neutral-200 dark:border-neutral-800">
+        <div className="card-apple overflow-hidden">
+          <table className="w-full text-left text-[14px]">
+            <thead className="bg-[var(--color-muted)] border-b border-[var(--color-border)]">
               <tr>
                 <th className="px-6 py-4 w-12">
                   <input 
                     type="checkbox"
-                    className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                    className="w-4 h-4 rounded border-[var(--color-border)] text-[var(--color-primary)] focus:ring-[var(--color-primary)] cursor-pointer"
                     checked={selectedIds.length === accounts.length && accounts.length > 0}
                     onChange={toggleSelectAll}
                   />
                 </th>
-                <th className="px-6 py-4 font-medium text-neutral-500 dark:text-neutral-400">Name</th>
-                <th className="px-6 py-4 font-medium text-neutral-500 dark:text-neutral-400">UID</th>
-                <th className="px-6 py-4 font-medium text-neutral-500 dark:text-neutral-400">Status</th>
-                <th className="px-6 py-4 font-medium text-neutral-500 dark:text-neutral-400">Profile Path</th>
-                <th className="px-6 py-4 font-medium text-neutral-500 dark:text-neutral-400 text-right">Actions</th>
+                <th className="px-6 py-4 font-medium text-[var(--color-muted-foreground)]">Name</th>
+                <th className="px-6 py-4 font-medium text-[var(--color-muted-foreground)]">UID</th>
+                <th className="px-6 py-4 font-medium text-[var(--color-muted-foreground)]">Status</th>
+                <th className="px-6 py-4 font-medium text-[var(--color-muted-foreground)]">Profile Path</th>
+                <th className="px-6 py-4 font-medium text-[var(--color-muted-foreground)] text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
+            <tbody className="divide-y divide-[var(--color-border)]">
               {accounts.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-12 text-center text-neutral-500">
@@ -314,37 +314,37 @@ export default function AccountsPage() {
 
       {/* Add Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-neutral-900 rounded-2xl w-full max-w-lg shadow-xl overflow-hidden border border-neutral-200 dark:border-neutral-800">
-            <div className="px-6 py-4 border-b border-neutral-200 dark:border-neutral-800 flex justify-between items-center">
-              <h3 className="text-lg font-bold dark:text-white">Import Accounts</h3>
-              <button onClick={() => setShowAddModal(false)} className="text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
+          <div className="card-apple w-full max-w-lg shadow-xl overflow-hidden scale-100">
+            <div className="px-6 py-4 border-b border-[var(--color-border)] flex justify-between items-center">
+              <h3 className="text-[16px] font-semibold text-[var(--color-foreground)]">Import Accounts</h3>
+              <button onClick={() => setShowAddModal(false)} className="text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)] transition-colors">
                 ✕
               </button>
             </div>
             <div className="p-6">
-              <p className="text-sm text-neutral-500 mb-3">
+              <p className="text-[14px] text-[var(--color-muted-foreground)] mb-3">
                 Paste your accounts below. 1 account per line.<br />
-                Format: <code className="bg-neutral-100 dark:bg-neutral-800 px-1 py-0.5 rounded">UID|Pass|2FA|Email</code>
+                Format: <code className="bg-[var(--color-muted)] px-1.5 py-0.5 rounded text-[var(--color-primary)] font-mono text-[12px]">UID|Pass|2FA|Email</code>
               </p>
               <textarea
                 value={rawInput}
                 onChange={(e) => setRawInput(e.target.value)}
                 placeholder="100012345678|Password123|JBSWY3DPEHPK3PXP"
-                className="w-full h-48 p-3 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl text-sm font-mono focus:ring-2 focus:ring-blue-500 outline-none resize-none dark:text-neutral-200"
+                className="input-apple w-full h-48 resize-none font-mono text-[13px]"
               />
             </div>
-            <div className="px-6 py-4 bg-neutral-50 dark:bg-neutral-950 border-t border-neutral-200 dark:border-neutral-800 flex justify-end gap-3">
+            <div className="px-6 py-4 bg-[var(--color-muted)] border-t border-[var(--color-border)] flex justify-end gap-3">
               <button
                 onClick={() => setShowAddModal(false)}
-                className="px-4 py-2 font-medium text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-lg transition-colors"
+                className="btn-secondary"
               >
                 Cancel
               </button>
               <button
                 onClick={handleAddAccounts}
                 disabled={adding || !rawInput.trim()}
-                className="px-4 py-2 font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded-lg transition-colors flex items-center gap-2"
+                className="btn-primary"
               >
                 {adding ? 'Importing...' : 'Import'}
               </button>

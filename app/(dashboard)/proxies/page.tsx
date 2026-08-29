@@ -73,36 +73,36 @@ export default function ProxiesPage() {
   };
 
   return (
-    <div className="p-8 max-w-7xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 animate-fade-in">
+      <div className="page-header">
         <div>
-          <h1 className="text-2xl font-bold dark:text-white flex items-center gap-2">
-            <Globe className="w-6 h-6 text-blue-500" />
+          <h1 className="page-title flex items-center gap-2">
+            <Globe className="w-6 h-6 text-[var(--color-primary)]" />
             Proxy Manager
           </h1>
-          <p className="text-sm text-neutral-500 mt-1">Manage and assign HTTP/SOCKS proxies to profiles.</p>
+          <p className="page-subtitle">Manage and assign HTTP/SOCKS proxies to profiles.</p>
         </div>
         
         <div className="flex gap-3">
           <button
             onClick={() => {}}
-            className="px-4 py-2 bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-lg text-sm font-medium transition-colors"
+            className="btn-secondary"
           >
             Test All
           </button>
           <button
             onClick={() => setShowModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
+            className="btn-primary flex items-center gap-2 text-[14px]"
           >
             <Plus className="w-4 h-4" /> Bulk Import
           </button>
         </div>
       </div>
 
-      <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl overflow-hidden shadow-sm">
+      <div className="card-apple overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-neutral-600 dark:text-neutral-400">
-            <thead className="bg-neutral-50 dark:bg-neutral-950/50 text-neutral-500 dark:text-neutral-400 border-b border-neutral-200 dark:border-neutral-800">
+          <table className="w-full text-left text-[14px] text-[var(--color-foreground)]">
+            <thead className="bg-[var(--color-muted)] text-[var(--color-muted-foreground)] border-b border-[var(--color-border)]">
               <tr>
                 <th className="px-6 py-4 font-medium">Protocol</th>
                 <th className="px-6 py-4 font-medium">Host:Port</th>
@@ -111,7 +111,7 @@ export default function ProxiesPage() {
                 <th className="px-6 py-4 font-medium text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-neutral-200 dark:divide-neutral-800">
+            <tbody className="divide-y divide-[var(--color-border)]">
               {proxies.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-6 py-12 text-center text-neutral-500">
@@ -158,36 +158,39 @@ export default function ProxiesPage() {
 
       {/* Bulk Import Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-neutral-900 rounded-2xl w-full max-w-lg overflow-hidden shadow-xl border border-neutral-200 dark:border-neutral-800">
-            <div className="p-6 border-b border-neutral-200 dark:border-neutral-800">
-              <h3 className="text-lg font-bold dark:text-white">Bulk Import Proxies</h3>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
+          <div className="card-apple w-full max-w-lg overflow-hidden shadow-xl scale-100">
+            <div className="p-6 border-b border-[var(--color-border)] flex justify-between items-center">
+              <h3 className="text-[16px] font-semibold text-[var(--color-foreground)]">Bulk Import Proxies</h3>
+              <button onClick={() => setShowModal(false)} className="text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)] transition-colors">
+                ✕
+              </button>
             </div>
             <div className="p-6">
-              <label className="block text-sm font-medium mb-2 dark:text-neutral-300">
+              <label className="block text-[13px] font-medium mb-2 text-[var(--color-foreground)]">
                 Paste proxies (One per line)
               </label>
               <textarea
                 value={bulkInput}
                 onChange={e => setBulkInput(e.target.value)}
                 placeholder="host:port:user:pass&#10;192.168.1.1:8080:admin:12345"
-                className="w-full h-48 p-4 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl text-sm font-mono focus:ring-2 focus:ring-blue-500 outline-none resize-none dark:text-neutral-200"
+                className="input-apple w-full h-48 resize-none font-mono text-[13px]"
               />
-              <p className="text-xs text-neutral-500 mt-2">
-                Supported formats: <code className="bg-neutral-100 dark:bg-neutral-800 px-1 rounded">host:port</code> or <code className="bg-neutral-100 dark:bg-neutral-800 px-1 rounded">host:port:user:pass</code>
+              <p className="text-[12px] text-[var(--color-muted-foreground)] mt-2">
+                Supported formats: <code className="bg-[var(--color-muted)] px-1.5 py-0.5 rounded text-[var(--color-primary)]">host:port</code> or <code className="bg-[var(--color-muted)] px-1.5 py-0.5 rounded text-[var(--color-primary)]">host:port:user:pass</code>
               </p>
             </div>
-            <div className="p-6 border-t border-neutral-200 dark:border-neutral-800 flex justify-end gap-3 bg-neutral-50 dark:bg-neutral-950/50">
+            <div className="p-6 border-t border-[var(--color-border)] flex justify-end gap-3 bg-[var(--color-muted)]">
               <button
                 onClick={() => setShowModal(false)}
-                className="px-4 py-2 text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors"
+                className="btn-secondary"
               >
                 Cancel
               </button>
               <button
                 onClick={handleBulkImport}
                 disabled={!bulkInput.trim()}
-                className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
+                className="btn-primary"
               >
                 Import Proxies
               </button>

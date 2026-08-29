@@ -1,12 +1,21 @@
-import { redirect } from 'next/navigation';
-import { auth } from '@/lib/auth';
+import Navbar from '@/components/marketing/navbar';
+import HeroSection from '@/components/marketing/hero';
+import FeaturesSection from '@/components/marketing/features';
+import PlatformsSection from '@/components/marketing/platforms';
+import CtaSection from '@/components/marketing/cta';
+import Footer from '@/components/marketing/footer';
 
-export default async function Home() {
-  const session = { user: { email: 'mock@admin.com', name: 'Mock Admin', role: 'SUPER_ADMIN' } }; // await auth();
-  
-  if (session) {
-    redirect('/dashboard');
-  } else {
-    redirect('/login');
-  }
+export default function Home() {
+  return (
+    <div className="min-h-screen bg-white text-gray-900 selection:bg-blue-500/30">
+      <Navbar />
+      <main>
+        <HeroSection />
+        <FeaturesSection />
+        <PlatformsSection />
+        <CtaSection />
+      </main>
+      <Footer />
+    </div>
+  );
 }

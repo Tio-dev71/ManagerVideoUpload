@@ -144,17 +144,19 @@ export default function DownloaderPage() {
   const videoMedias = medias.filter(m => m.extension !== 'mp3' && !m.type?.includes('audio'));
 
   return (
-    <div className="p-6 max-w-5xl mx-auto w-full space-y-8">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight text-neutral-900 dark:text-white">
-          Video Downloader
-        </h1>
-        <p className="text-neutral-500 dark:text-neutral-400">
-          Download videos and audio from YouTube, Facebook, TikTok, and more.
-        </p>
+    <div className="space-y-6 animate-fade-in">
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">
+            Video Downloader
+          </h1>
+          <p className="page-subtitle">
+            Download videos and audio from YouTube, Facebook, TikTok, and more.
+          </p>
+        </div>
       </div>
 
-      <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-6 shadow-sm">
+      <div className="card-apple p-6">
         <form onSubmit={handleFetch} className="flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -165,14 +167,14 @@ export default function DownloaderPage() {
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="Paste your video link here..."
-              className="block w-full pl-10 pr-3 py-3 border border-neutral-300 dark:border-neutral-700 rounded-xl leading-5 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all"
+              className="input-apple !pl-10 !py-3"
               required
             />
           </div>
           <button
             type="submit"
             disabled={loading || !url}
-            className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-sm font-medium rounded-xl text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+            className="btn-primary px-6"
           >
             {loading ? (
               <>
@@ -203,7 +205,7 @@ export default function DownloaderPage() {
       )}
 
       {result && !error && (
-        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-6 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="card-apple p-6 animate-fade-in">
           <div className="flex flex-col md:flex-row gap-6">
             {/* Thumbnail */}
             {(result.thumbnail || result.picture) && (
@@ -232,32 +234,32 @@ export default function DownloaderPage() {
                 </div>
 
                 {videoMedias.length > 0 && (
-                  <div className="p-4 bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800/30 rounded-xl space-y-4 mb-4">
-                    <p className="text-xs text-blue-700 dark:text-blue-300 font-medium">Để dùng tính năng Auto-Post cho một video bên dưới, hãy nhập Link Nhóm và Caption trước:</p>
+                  <div className="p-4 bg-[var(--color-primary-soft)] border border-[var(--color-primary)] border-opacity-30 rounded-xl space-y-4 mb-4">
+                    <p className="text-[13px] text-[var(--color-primary)] font-medium">Để dùng tính năng Auto-Post cho một video bên dưới, hãy nhập Link Nhóm và Caption trước:</p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="space-y-1">
-                        <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">Facebook Group URL</label>
+                      <div className="space-y-1.5">
+                        <label className="text-[13px] font-semibold text-[var(--color-foreground)]">Facebook Group URL</label>
                         <input 
                           type="url"
                           placeholder="https://www.facebook.com/groups/yourgroup"
                           value={groupUrl}
                           onChange={(e) => setGroupUrl(e.target.value)}
-                          className="w-full p-2 border border-neutral-300 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-900 text-sm"
+                          className="input-apple"
                         />
                       </div>
-                      <div className="space-y-1">
-                        <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">Post Caption</label>
+                      <div className="space-y-1.5">
+                        <label className="text-[13px] font-semibold text-[var(--color-foreground)]">Post Caption</label>
                         <textarea 
                           rows={1}
                           placeholder="Write something about this video..."
                           value={caption}
                           onChange={(e) => setCaption(e.target.value)}
-                          className="w-full p-2 border border-neutral-300 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-900 text-sm resize-none"
+                          className="input-apple resize-none min-h-[42px]"
                         />
                       </div>
                     </div>
                     
-                    <div className="space-y-2 pt-2 border-t border-blue-200 dark:border-blue-800/30">
+                    <div className="space-y-2 pt-3 border-t border-[var(--color-primary)] border-opacity-20">
                       <label className="flex items-center gap-2 text-xs font-semibold text-neutral-700 dark:text-neutral-300">
                         <Users className="w-3.5 h-3.5" />
                         Select Accounts to Post
@@ -265,12 +267,12 @@ export default function DownloaderPage() {
                       {accounts.length === 0 ? (
                         <div className="text-xs text-neutral-500">No accounts available. Please add them in the FB Accounts page.</div>
                       ) : (
-                        <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto p-2 bg-white dark:bg-neutral-900 rounded-lg border border-neutral-200 dark:border-neutral-800">
+                        <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto p-2 bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 custom-scrollbar">
                           {accounts.map(acc => (
-                            <label key={acc.id} className="flex items-center gap-1.5 cursor-pointer bg-neutral-50 dark:bg-neutral-950 px-2 py-1 rounded-md border border-neutral-200 dark:border-neutral-800 hover:bg-blue-50 dark:hover:bg-blue-900/20">
+                            <label key={acc.id} className="flex items-center gap-1.5 cursor-pointer bg-neutral-50 dark:bg-neutral-950 px-3 py-1.5 rounded-lg border border-neutral-200 dark:border-neutral-800 hover:bg-[var(--color-primary-soft)] hover:border-[var(--color-primary)] hover:border-opacity-30 transition-all">
                               <input 
                                 type="checkbox" 
-                                className="rounded text-blue-600 focus:ring-blue-500 bg-white border-neutral-300"
+                                className="rounded text-[var(--color-primary)] focus:ring-[var(--color-primary)] bg-white border-neutral-300"
                                 checked={selectedAccounts.includes(acc.id)}
                                 onChange={(e) => {
                                   if (e.target.checked) {
@@ -280,7 +282,7 @@ export default function DownloaderPage() {
                                   }
                                 }}
                               />
-                              <span className="text-xs font-medium text-neutral-700 dark:text-neutral-300">{acc.name}</span>
+                              <span className="text-[13px] font-medium text-[var(--color-foreground)]">{acc.name}</span>
                             </label>
                           ))}
                         </div>
@@ -296,18 +298,18 @@ export default function DownloaderPage() {
                       return (
                         <div
                           key={idx}
-                          className="group flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 rounded-xl border border-neutral-200 dark:border-neutral-700 hover:border-blue-500 bg-white dark:bg-neutral-900 transition-all gap-4"
+                          className="group flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-2xl border border-[var(--color-border)] hover:border-[var(--color-primary)] bg-[var(--color-card)] transition-all gap-4"
                         >
                           <div className="flex items-center gap-3 overflow-hidden flex-1">
-                            <div className="p-2 rounded-lg bg-neutral-100 dark:bg-neutral-800 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/40 text-neutral-500 dark:text-neutral-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                            <div className="p-2.5 rounded-xl bg-[var(--color-muted)] group-hover:bg-[var(--color-primary-soft)] text-[var(--color-muted-foreground)] group-hover:text-[var(--color-primary)] transition-colors">
                               {isVideo ? <Video className="w-4 h-4" /> : <Music className="w-4 h-4" />}
                             </div>
                             <div className="truncate">
-                              <p className="text-sm font-medium text-neutral-900 dark:text-white truncate">
+                              <p className="text-[14px] font-medium text-[var(--color-foreground)] truncate">
                                 {media.quality || media.type || media.extension || 'Download File'}
                               </p>
                               {(media.extension || media.size) && (
-                                <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                                <p className="text-[12px] text-[var(--color-muted-foreground)] mt-0.5">
                                   {[media.extension, media.size].filter(Boolean).join(' • ')}
                                 </p>
                               )}
@@ -319,7 +321,7 @@ export default function DownloaderPage() {
                               href={media.url}
                               target="_blank"
                               rel="noreferrer noopener"
-                              className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-3 py-2 bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 text-xs font-medium rounded-lg transition-colors"
+                              className="btn-secondary flex-1 sm:flex-none py-2 text-[13px]"
                             >
                               <Download className="w-3.5 h-3.5" />
                               Tải về
@@ -339,7 +341,7 @@ export default function DownloaderPage() {
                                   handleAutoPost({ preventDefault: () => {} } as React.FormEvent);
                                 }}
                                 disabled={autoPostLoading}
-                                className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-xs font-medium rounded-lg transition-colors"
+                                className="btn-primary flex-1 sm:flex-none py-2 text-[13px]"
                               >
                                 {autoPostLoading && selectedVideo === media.url ? (
                                   <Loader2 className="w-3.5 h-3.5 animate-spin" />

@@ -61,86 +61,88 @@ export default function HistoryPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-[var(--color-text)]">Automation History</h1>
-        <p className="text-[var(--color-text-muted)]">Track automation activities and current running tasks.</p>
+    <div className="space-y-6 animate-fade-in">
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Automation History</h1>
+          <p className="page-subtitle">Track automation activities and current running tasks.</p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-background-elevated)] text-[var(--color-text)] shadow-sm">
+        <div className="card-apple">
           <div className="flex flex-row items-center justify-between p-6 pb-2">
-            <h3 className="text-sm font-medium">Running Tasks</h3>
+            <h3 className="text-[14px] font-semibold text-[var(--color-foreground)]">Running Tasks</h3>
             <Activity className="h-4 w-4 text-emerald-500" />
           </div>
           <div className="p-6 pt-0">
-            <div className="text-2xl font-bold">{stats.runningTasks}</div>
-            <p className="text-xs text-neutral-500 mt-1">Active automated sequences</p>
+            <div className="text-2xl font-bold text-[var(--color-foreground)]">{stats.runningTasks}</div>
+            <p className="text-[12px] text-[var(--color-muted-foreground)] mt-1">Active automated sequences</p>
           </div>
         </div>
         
-        <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-background-elevated)] text-[var(--color-text)] shadow-sm">
+        <div className="card-apple">
           <div className="flex flex-row items-center justify-between p-6 pb-2">
-            <h3 className="text-sm font-medium">Total Comments</h3>
+            <h3 className="text-[14px] font-semibold text-[var(--color-foreground)]">Total Comments</h3>
             <MessageSquare className="h-4 w-4 text-blue-500" />
           </div>
           <div className="p-6 pt-0">
-            <div className="text-2xl font-bold">{stats.totalComments}</div>
-            <p className="text-xs text-neutral-500 mt-1">Comments posted by automation</p>
+            <div className="text-2xl font-bold text-[var(--color-foreground)]">{stats.totalComments}</div>
+            <p className="text-[12px] text-[var(--color-muted-foreground)] mt-1">Comments posted by automation</p>
           </div>
         </div>
 
-        <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-background-elevated)] text-[var(--color-text)] shadow-sm">
+        <div className="card-apple">
           <div className="flex flex-row items-center justify-between p-6 pb-2">
-            <h3 className="text-sm font-medium">Total Posts</h3>
+            <h3 className="text-[14px] font-semibold text-[var(--color-foreground)]">Total Posts</h3>
             <Send className="h-4 w-4 text-purple-500" />
           </div>
           <div className="p-6 pt-0">
-            <div className="text-2xl font-bold">{stats.totalPosts}</div>
-            <p className="text-xs text-neutral-500 mt-1">Reels & Group posts published</p>
+            <div className="text-2xl font-bold text-[var(--color-foreground)]">{stats.totalPosts}</div>
+            <p className="text-[12px] text-[var(--color-muted-foreground)] mt-1">Reels & Group posts published</p>
           </div>
         </div>
       </div>
 
-      <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-background-elevated)] text-[var(--color-text)] shadow-sm">
-        <div className="p-6">
-          <h3 className="font-semibold leading-none tracking-tight">Recent Activity</h3>
+      <div className="card-apple overflow-hidden">
+        <div className="p-6 border-b border-[var(--color-border)]">
+          <h3 className="text-[16px] font-semibold text-[var(--color-foreground)]">Recent Activity</h3>
         </div>
-        <div className="p-6 pt-0">
+        <div className="p-0">
           {loading ? (
-            <div className="text-center py-8 text-neutral-500">Loading history...</div>
+            <div className="text-center py-8 text-[var(--color-muted-foreground)]">Loading history...</div>
           ) : logs.length === 0 ? (
-            <div className="text-center py-8 text-neutral-500">No automation logs found.</div>
+            <div className="text-center py-8 text-[var(--color-muted-foreground)]">No automation logs found.</div>
           ) : (
-            <div className="relative w-full overflow-auto">
-              <table className="w-full caption-bottom text-sm">
-                <thead className="[&_tr]:border-b">
-                  <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Time</th>
-                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Profile ID</th>
-                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Action</th>
-                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Content</th>
-                    <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground">Link</th>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-[14px] text-[var(--color-foreground)]">
+                <thead className="bg-[var(--color-muted)] text-[var(--color-muted-foreground)] border-b border-[var(--color-border)]">
+                  <tr>
+                    <th className="px-6 py-4 font-medium">Time</th>
+                    <th className="px-6 py-4 font-medium">Profile ID</th>
+                    <th className="px-6 py-4 font-medium">Action</th>
+                    <th className="px-6 py-4 font-medium">Content</th>
+                    <th className="px-6 py-4 font-medium text-right">Link</th>
                   </tr>
                 </thead>
-                <tbody className="[&_tr:last-child]:border-0">
+                <tbody className="divide-y divide-[var(--color-border)]">
                   {logs.map((log) => (
-                    <tr key={log.id} className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                      <td className="p-4 align-middle whitespace-nowrap text-neutral-500">
+                    <tr key={log.id} className="hover:bg-[var(--color-muted)] transition-colors">
+                      <td className="px-6 py-4 whitespace-nowrap text-[13px] text-[var(--color-muted-foreground)]">
                         {new Date(log.createdAt).toLocaleString('vi-VN')}
                       </td>
-                      <td className="p-4 align-middle font-medium">
+                      <td className="px-6 py-4 font-medium">
                         {log.profileId}
                       </td>
-                      <td className="p-4 align-middle">
+                      <td className="px-6 py-4">
                         {formatAction(log.actionType)}
                       </td>
-                      <td className="p-4 align-middle max-w-[300px] truncate" title={log.message || ''}>
+                      <td className="px-6 py-4 max-w-[300px] truncate" title={log.message || ''}>
                         {log.message || '-'}
                       </td>
-                      <td className="p-4 align-middle text-right">
+                      <td className="px-6 py-4 text-right">
                         {log.link ? (
-                          <a href={log.link} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-blue-500 hover:underline">
+                          <a href={log.link} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-[var(--color-primary)] hover:underline">
                             View <ExternalLink className="w-3 h-3" />
                           </a>
                         ) : '-'}

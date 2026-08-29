@@ -229,11 +229,13 @@ export default function CreateReelPage() {
   return (
     <div className="max-w-[720px] mx-auto animate-fade-in">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-[28px] font-semibold tracking-tight">Create Reels</h1>
-        <p className="text-[var(--color-muted-foreground)] mt-1">
-          Upload multiple videos to publish in bulk
-        </p>
+      <div className="page-header mb-8">
+        <div>
+          <h1 className="page-title">Create Reels</h1>
+          <p className="page-subtitle">
+            Upload multiple videos to publish in bulk
+          </p>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -409,20 +411,20 @@ export default function CreateReelPage() {
                 <button
                   type="button"
                   onClick={() => setPublishMode('now')}
-                  className={`flex-1 p-4 rounded-2xl border-2 text-left transition-all ${publishMode === 'now' ? 'border-[var(--color-foreground)] bg-[var(--color-foreground)] text-white' : 'border-[var(--color-border)] bg-white hover:border-gray-300'}`}
+                  className={`flex-1 p-4 rounded-2xl border-2 text-left transition-all ${publishMode === 'now' ? 'border-[var(--color-primary)] bg-[var(--color-primary-soft)] text-[var(--color-primary)]' : 'border-[var(--color-border)] bg-white hover:border-gray-300'}`}
                 >
-                  <Send className={`w-5 h-5 mb-2 ${publishMode === 'now' ? 'text-white' : 'text-[var(--color-muted-foreground)]'}`} />
+                  <Send className={`w-5 h-5 mb-2 ${publishMode === 'now' ? 'text-[var(--color-primary)]' : 'text-[var(--color-muted-foreground)]'}`} />
                   <p className="text-[14px] font-medium">Post Now</p>
-                  <p className={`text-[12px] mt-0.5 ${publishMode === 'now' ? 'text-gray-300' : 'text-[var(--color-muted-foreground)]'}`}>Publish immediately</p>
+                  <p className={`text-[12px] mt-0.5 ${publishMode === 'now' ? 'text-[var(--color-primary)] opacity-80' : 'text-[var(--color-muted-foreground)]'}`}>Publish immediately</p>
                 </button>
                 <button
                   type="button"
                   onClick={() => setPublishMode('schedule')}
-                  className={`flex-1 p-4 rounded-2xl border-2 text-left transition-all ${publishMode === 'schedule' ? 'border-[var(--color-foreground)] bg-[var(--color-foreground)] text-white' : 'border-[var(--color-border)] bg-white hover:border-gray-300'}`}
+                  className={`flex-1 p-4 rounded-2xl border-2 text-left transition-all ${publishMode === 'schedule' ? 'border-[var(--color-primary)] bg-[var(--color-primary-soft)] text-[var(--color-primary)]' : 'border-[var(--color-border)] bg-white hover:border-gray-300'}`}
                 >
-                  <Calendar className={`w-5 h-5 mb-2 ${publishMode === 'schedule' ? 'text-white' : 'text-[var(--color-muted-foreground)]'}`} />
+                  <Calendar className={`w-5 h-5 mb-2 ${publishMode === 'schedule' ? 'text-[var(--color-primary)]' : 'text-[var(--color-muted-foreground)]'}`} />
                   <p className="text-[14px] font-medium">Schedule</p>
-                  <p className={`text-[12px] mt-0.5 ${publishMode === 'schedule' ? 'text-gray-300' : 'text-[var(--color-muted-foreground)]'}`}>Pick date & time</p>
+                  <p className={`text-[12px] mt-0.5 ${publishMode === 'schedule' ? 'text-[var(--color-primary)] opacity-80' : 'text-[var(--color-muted-foreground)]'}`}>Pick date & time</p>
                 </button>
               </div>
             </div>

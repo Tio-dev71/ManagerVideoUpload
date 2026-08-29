@@ -163,10 +163,10 @@ export default function PostDetailPage() {
       </Link>
 
       {/* Header */}
-      <div className="flex items-start justify-between gap-4">
+      <div className="page-header">
         <div>
-          <h1 className="text-[24px] font-semibold tracking-tight">{post.title}</h1>
-          <div className="flex items-center gap-3 mt-2 text-[13px] text-[var(--color-muted-foreground)]">
+          <h1 className="page-title">{post.title}</h1>
+          <div className="page-subtitle flex items-center gap-3">
             <span className="inline-flex items-center gap-1">
               <User className="w-3.5 h-3.5" />
               {post.createdBy.name || post.createdBy.email}

@@ -46,7 +46,7 @@ function LoginForm() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[var(--color-background)] px-4">
-      <div className="fixed inset-0 bg-gradient-to-br from-blue-50/50 via-transparent to-purple-50/30 pointer-events-none" />
+      <div className="fixed inset-0 bg-gradient-to-br from-[#5B3DF5]/10 via-transparent to-[#5B3DF5]/5 pointer-events-none" />
 
       <div className="relative w-full max-w-[420px] animate-fade-in">
         {/* Logo */}

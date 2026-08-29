@@ -125,7 +125,7 @@ export default function DashboardPage() {
 
       {/* Onboarding banner — Admin only, no connections */}
       {isAdmin && !hasConnections && !loading && (
-        <div className="card-apple p-6 border-[var(--color-primary)] border-opacity-30 bg-gradient-to-r from-blue-50/80 to-purple-50/50">
+        <div className="card-apple p-6 border-[var(--color-primary)] border-opacity-30 bg-gradient-to-r from-[var(--color-primary-soft)] to-transparent">
           <div className="flex items-start gap-4">
             <div className="w-11 h-11 rounded-2xl bg-[var(--color-primary)] flex items-center justify-center flex-shrink-0">
               <Link2 className="w-5 h-5 text-white" />
