@@ -59,7 +59,7 @@ export default function CrmCta() {
                 className="flex flex-wrap items-center gap-x-8 gap-y-4"
               >
                 {[
-                  '{t('crm.cta.btn_free')} 7 ngày',
+                  `${t('crm.cta.btn_free')} 7 ngày`,
                   t('crm.cta.check2'),
                   t('crm.cta.check3')
                 ].map((text, idx) => (

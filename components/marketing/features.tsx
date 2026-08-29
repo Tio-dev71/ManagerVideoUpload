@@ -62,9 +62,9 @@ export default function FeaturesSection() {
 
   return (
     <div id="features" className="bg-white py-24 relative overflow-hidden">
-      
+
       <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        
+
         {/* Clients Row */}
         <ClientMarquee />
 
@@ -75,7 +75,7 @@ export default function FeaturesSection() {
             {t('features.badge')}
           </div>
           <h3 className="text-3xl md:text-4xl lg:text-[40px] font-bold text-gray-900 mb-6 leading-[1.2]">
-            {t('features.title1')}<br className="hidden md:block"/> {t('features.title2')} <span className="text-[#5B3DF5]">{t('features.title3')}</span>
+            {t('features.title1')}<br className="hidden md:block" /> {t('features.title2')} <span className="text-[#5B3DF5]">{t('features.title3')}</span>
           </h3>
         </div>
 

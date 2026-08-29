@@ -60,7 +60,7 @@ export default function WorkCta() {
                 className="flex flex-wrap items-center gap-x-8 gap-y-4"
               >
                 {[
-                  '{t('work.cta.btn_free')} 7 ngày',
+                  `${t('work.cta.btn_free')} 7 ngày`,
                   t('work.cta.check2'),
                   t('work.cta.check3')
                 ].map((text, idx) => (
