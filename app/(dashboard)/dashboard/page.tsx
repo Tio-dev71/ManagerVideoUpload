@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { STATUS_CONFIG, PLATFORM_CONFIG } from '@/lib/utils';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 interface DashboardStats {
   scheduled: number;
@@ -39,6 +40,7 @@ interface RecentPost {
 
 export default function DashboardPage() {
   const { data: session } = useSession();
+  const { t } = useLanguage();
   const [stats, setStats] = useState<DashboardStats>({ scheduled: 0, published: 0, failed: 0, total: 0 });
   const [recentPosts, setRecentPosts] = useState<RecentPost[]>([]);
   const [loading, setLoading] = useState(true);
@@ -82,28 +84,28 @@ export default function DashboardPage() {
 
   const statCards = [
     {
-      label: 'Scheduled',
+      label: t('dashboard.stat.scheduled'),
       value: stats.scheduled,
       icon: Clock,
       color: 'text-blue-600',
       bg: 'bg-blue-50',
     },
     {
-      label: 'Published',
+      label: t('dashboard.stat.published'),
       value: stats.published,
       icon: CheckCircle2,
       color: 'text-emerald-600',
       bg: 'bg-emerald-50',
     },
     {
-      label: 'Failed',
+      label: t('dashboard.stat.failed'),
       value: stats.failed,
       icon: AlertCircle,
       color: 'text-red-500',
       bg: 'bg-red-50',
     },
     {
-      label: 'Total Posts',
+      label: t('dashboard.stat.total'),
       value: stats.total,
       icon: TrendingUp,
       color: 'text-purple-600',
@@ -116,10 +118,10 @@ export default function DashboardPage() {
       {/* Page header */}
       <div>
         <h1 className="text-[28px] font-semibold tracking-tight">
-          Welcome back{session?.user?.name ? `, ${session.user.name}` : ''}
+          {t('dashboard.welcome')}{session?.user?.name ? `, ${session.user.name}` : ''}
         </h1>
         <p className="text-[var(--color-muted-foreground)] mt-1">
-          Manage your video posts across all platforms
+          {t('dashboard.subtitle')}
         </p>
       </div>
 
@@ -131,9 +133,9 @@ export default function DashboardPage() {
               <Link2 className="w-5 h-5 text-white" />
             </div>
             <div className="flex-1">
-              <h3 className="text-[17px] font-semibold mb-1">Connect your channels</h3>
+              <h3 className="text-[17px] font-semibold mb-1">{t('dashboard.onboarding.title')}</h3>
               <p className="text-[14px] text-[var(--color-muted-foreground)] mb-4">
-                Connect your social accounts to start posting videos automatically.
+                {t('dashboard.onboarding.desc')}
               </p>
               <div className="flex flex-wrap gap-3">
                 <Link
@@ -195,9 +197,9 @@ export default function DashboardPage() {
               <PlusCircle className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h3 className="text-[17px] font-semibold">Create New Reel</h3>
+              <h3 className="text-[17px] font-semibold">{t('dashboard.quick.create')}</h3>
               <p className="text-[13px] text-[var(--color-muted-foreground)]">
-                Upload a video and schedule it for Facebook, Instagram, or YouTube
+                {t('dashboard.subtitle')}
               </p>
             </div>
           </div>
@@ -208,12 +210,12 @@ export default function DashboardPage() {
       {/* Recent Posts */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-[19px] font-semibold">Recent Posts</h2>
+          <h2 className="text-[19px] font-semibold">{t('dashboard.recent.title')}</h2>
           <Link
             href="/posts"
             className="text-[14px] text-[var(--color-primary)] hover:underline inline-flex items-center gap-1"
           >
-            View all
+            {t('dashboard.recent.view_all')}
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
@@ -235,13 +237,13 @@ export default function DashboardPage() {
           ) : recentPosts.length === 0 ? (
             <div className="p-12 text-center">
               <PlayCircle className="w-12 h-12 text-[var(--color-muted-foreground)] mx-auto mb-3 opacity-40" />
-              <p className="text-[15px] font-medium text-[var(--color-foreground)]">No posts yet</p>
+              <p className="text-[15px] font-medium text-[var(--color-foreground)]">{t('dashboard.recent.empty')}</p>
               <p className="text-[13px] text-[var(--color-muted-foreground)] mt-1">
-                Create your first reel to get started
+                {t('dashboard.recent.empty_desc')}
               </p>
               <Link href="/create" className="btn-primary inline-flex items-center gap-2 mt-4 text-[14px]">
                 <PlusCircle className="w-4 h-4" />
-                Create Reel
+                {t('dashboard.recent.create_first')}
               </Link>
             </div>
           ) : (

@@ -8,7 +8,22 @@ export async function POST(req: Request) {
 
     if (!email || !password) {
       return NextResponse.json(
-        { error: 'Vui lòng nhập đầy đủ email và mật khẩu.' },
+        { error: 'MISSING_FIELDS' },
+        { status: 400 }
+      );
+    }
+
+    // Password validation: min 8 chars, uppercase, lowercase, number
+    if (password.length < 8) {
+      return NextResponse.json(
+        { error: 'PASSWORD_TOO_SHORT' },
+        { status: 400 }
+      );
+    }
+
+    if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password)) {
+      return NextResponse.json(
+        { error: 'PASSWORD_WEAK' },
         { status: 400 }
       );
     }
@@ -22,7 +37,7 @@ export async function POST(req: Request) {
 
     if (existingUser) {
       return NextResponse.json(
-        { error: 'Email này đã được sử dụng.' },
+        { error: 'EMAIL_EXISTS' },
         { status: 400 }
       );
     }
@@ -47,13 +62,13 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json(
-      { message: 'Đăng ký thành công.', user: { id: user.id, email: user.email } },
+      { message: 'OK', user: { id: user.id, email: user.email } },
       { status: 201 }
     );
   } catch (error) {
-    console.error('Lỗi đăng ký:', error);
+    console.error('Register error:', error);
     return NextResponse.json(
-      { error: 'Đã xảy ra lỗi trong quá trình đăng ký.' },
+      { error: 'REGISTER_FAILED' },
       { status: 500 }
     );
   }

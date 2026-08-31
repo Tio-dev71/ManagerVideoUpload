@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useState, Suspense, useMemo } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -8,6 +8,28 @@ import Link from 'next/link';
 import { Loader2, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
+
+// Error code → translation key mapping
+const ERROR_MAP: Record<string, string> = {
+  MISSING_FIELDS: 'auth.register.error_missing_fields',
+  EMAIL_EXISTS: 'auth.register.error_email_exists',
+  REGISTER_FAILED: 'auth.register.error_register_failed',
+};
+
+function getPasswordStrength(password: string): { level: number; key: string } {
+  if (!password) return { level: 0, key: '' };
+  
+  let score = 0;
+  if (password.length >= 8) score++;
+  if (/[A-Z]/.test(password)) score++;
+  if (/[a-z]/.test(password)) score++;
+  if (/[0-9]/.test(password)) score++;
+  if (/[^A-Za-z0-9]/.test(password)) score++;
+
+  if (score <= 2) return { level: 1, key: 'auth.register.password_strength.weak' };
+  if (score <= 3) return { level: 2, key: 'auth.register.password_strength.medium' };
+  return { level: 3, key: 'auth.register.password_strength.strong' };
+}
 
 function RegisterForm() {
   const { t } = useLanguage();
@@ -21,17 +43,28 @@ function RegisterForm() {
   
   const router = useRouter();
 
+  const passwordStrength = useMemo(() => getPasswordStrength(password), [password]);
+
+  const strengthColors = ['', 'bg-red-500', 'bg-yellow-500', 'bg-emerald-500'];
+  const strengthWidths = ['w-0', 'w-1/3', 'w-2/3', 'w-full'];
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim() || !password.trim()) return;
     
     if (password !== confirmPassword) {
-      toast.error('Mật khẩu xác nhận không khớp.');
+      toast.error(t('auth.register.error_password_mismatch'));
       return;
     }
 
-    if (password.length < 6) {
-      toast.error('Mật khẩu phải có ít nhất 6 ký tự.');
+    if (password.length < 8) {
+      toast.error(t('auth.register.error_password_short'));
+      return;
+    }
+
+    // Check for uppercase, lowercase, and number
+    if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password)) {
+      toast.error(t('auth.register.error_password_weak'));
       return;
     }
 
@@ -53,12 +86,14 @@ function RegisterForm() {
       const data = await response.json();
 
       if (!response.ok) {
-        toast.error(data.error || 'Lỗi đăng ký.');
+        // Map error code to translated message
+        const errorKey = ERROR_MAP[data.error] || 'auth.register.error_generic';
+        toast.error(t(errorKey));
         setLoading(false);
         return;
       }
 
-      toast.success('Đăng ký thành công! Đang đăng nhập...');
+      toast.success(t('auth.register.success'));
       
       // Auto login after register
       const result = await signIn('credentials', {
@@ -68,14 +103,14 @@ function RegisterForm() {
       });
 
       if (result?.error) {
-        toast.error('Lỗi khi đăng nhập tự động. Vui lòng đăng nhập thủ công.');
+        toast.error(t('auth.register.error_auto_login'));
         router.push('/login');
       } else if (result?.ok) {
         window.location.href = '/dashboard';
       }
 
     } catch (error) {
-      toast.error('Đã xảy ra lỗi. Vui lòng thử lại.');
+      toast.error(t('auth.register.error_generic'));
       setLoading(false);
     }
   };
@@ -85,7 +120,7 @@ function RegisterForm() {
     try {
       await signIn('google', { callbackUrl: '/dashboard' });
     } catch (error) {
-      toast.error('Không thể đăng nhập bằng Google.');
+      toast.error(t('auth.register.error_google'));
       setGoogleLoading(false);
     }
   };
@@ -125,7 +160,7 @@ function RegisterForm() {
               type="text"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              placeholder="Ví dụ: Nguyễn Văn A"
+              placeholder={t('auth.register.placeholder_name') as string}
               className="input-apple"
               required
               disabled={loading || googleLoading}
@@ -161,11 +196,28 @@ function RegisterForm() {
               className="input-apple"
               disabled={loading || googleLoading}
             />
+            {/* Password Strength Indicator */}
+            {password.length > 0 && (
+              <div className="space-y-1.5">
+                <div className="h-1.5 w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                  <div 
+                    className={`h-full rounded-full transition-all duration-300 ${strengthWidths[passwordStrength.level]} ${strengthColors[passwordStrength.level]}`}
+                  />
+                </div>
+                <p className={`text-xs font-medium ${
+                  passwordStrength.level === 1 ? 'text-red-500' : 
+                  passwordStrength.level === 2 ? 'text-yellow-600' : 
+                  'text-emerald-600'
+                }`}>
+                  {t(passwordStrength.key)}
+                </p>
+              </div>
+            )}
           </div>
 
           <div className="space-y-2">
             <label htmlFor="confirmPassword" className="block text-sm font-medium text-[var(--color-foreground)]">
-              Xác nhận mật khẩu
+              {t('auth.register.confirm_password')}
             </label>
             <input
               id="confirmPassword"

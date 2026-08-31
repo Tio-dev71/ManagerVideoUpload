@@ -37,14 +37,14 @@ function LoginForm() {
       });
 
       if (result?.error) {
-        toast.error('Email hoặc mật khẩu không đúng.');
+        toast.error(t('auth.login.error_credentials'));
         setLoading(false);
       } else if (result?.ok) {
-        toast.success('Đăng nhập thành công!');
+        toast.success(t('auth.login.success'));
         window.location.href = callbackUrl;
       }
     } catch {
-      toast.error('Đã xảy ra lỗi. Vui lòng thử lại.');
+      toast.error(t('auth.login.error_generic'));
       setLoading(false);
     }
   };
@@ -54,7 +54,7 @@ function LoginForm() {
     try {
       await signIn('google', { callbackUrl });
     } catch (error) {
-      toast.error('Không thể đăng nhập bằng Google.');
+      toast.error(t('auth.login.error_google'));
       setGoogleLoading(false);
     }
   };
