@@ -2,6 +2,13 @@ import { Queue } from 'bullmq';
 import IORedis from 'ioredis';
 import 'dotenv/config';
 
+console.log("=== QUEUE INIT ===");
+console.log("CWD:", process.cwd());
+console.log("REDIS_URL defined?", !!process.env.REDIS_URL);
+if (process.env.REDIS_URL) {
+  console.log("REDIS_URL starts with:", process.env.REDIS_URL.substring(0, 10));
+}
+
 const connection = new IORedis(process.env.REDIS_URL || 'redis://localhost:6379', {
   maxRetriesPerRequest: null,
   lazyConnect: true,
