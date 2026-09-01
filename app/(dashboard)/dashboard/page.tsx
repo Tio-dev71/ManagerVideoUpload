@@ -55,7 +55,7 @@ export default function DashboardPage() {
           fetch('/api/posts/stats'),
           fetch('/api/posts?limit=5'),
         ]);
-        
+
         if (statsRes.ok) {
           const statsData = await statsRes.json();
           setStats(statsData);

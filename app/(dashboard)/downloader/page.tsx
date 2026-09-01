@@ -318,9 +318,8 @@ export default function DownloaderPage() {
                           
                           <div className="flex items-center gap-2 w-full sm:w-auto mt-2 sm:mt-0">
                             <a
-                              href={media.url}
-                              target="_blank"
-                              rel="noreferrer noopener"
+                              href={`/api/proxy-download?url=${encodeURIComponent(media.url)}&filename=video-${Date.now()}`}
+                              download
                               className="btn-secondary flex-1 sm:flex-none py-2 text-[13px]"
                             >
                               <Download className="w-3.5 h-3.5" />
