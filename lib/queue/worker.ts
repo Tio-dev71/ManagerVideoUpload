@@ -1,5 +1,6 @@
 import { Worker, Job } from 'bullmq';
 import IORedis from 'ioredis';
+import 'dotenv/config';
 import { PrismaClient } from '@prisma/client';
 import { getPublisher } from '../publishers';
 
