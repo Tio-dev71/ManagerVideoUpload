@@ -528,6 +528,8 @@
   "auth.login.success": "Đăng nhập thành công!",
   "auth.login.error_generic": "Đã xảy ra lỗi. Vui lòng thử lại.",
   "auth.login.error_google": "Không thể đăng nhập bằng Google.",
+  "auth.login.forgot_password": "Quên mật khẩu?",
+
 
   "dashboard.welcome": "Chào mừng trở lại",
   "dashboard.subtitle": "Quản lý video đăng bài trên tất cả nền tảng",

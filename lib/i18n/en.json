@@ -525,9 +525,10 @@
   "auth.register.password_strength.strong": "Strong",
 
   "auth.login.error_credentials": "Incorrect email or password.",
-  "auth.login.success": "Login successful!",
+  "auth.login.success": "Signed in successfully!",
   "auth.login.error_generic": "An error occurred. Please try again.",
   "auth.login.error_google": "Unable to sign in with Google.",
+  "auth.login.forgot_password": "Forgot password?",
 
   "dashboard.welcome": "Welcome back",
   "dashboard.subtitle": "Manage your video posts across all platforms",

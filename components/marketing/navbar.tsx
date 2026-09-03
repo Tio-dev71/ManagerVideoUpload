@@ -53,7 +53,7 @@ function NavbarContent() {
             </div>
             <Link href="#features" className="text-gray-600 hover:text-[#5B3DF5] px-3 py-2 rounded-md text-[14px] font-medium transition-colors">{t('nav.features')}</Link>
             <Link href="#platforms" className="text-gray-600 hover:text-[#5B3DF5] px-3 py-2 rounded-md text-[14px] font-medium transition-colors">{t('nav.platforms')}</Link>
-            <Link href="#pricing" className="text-gray-600 hover:text-[#5B3DF5] px-3 py-2 rounded-md text-[14px] font-medium transition-colors">{t('nav.pricing')}</Link>
+            <Link href="/pricing" className="text-gray-600 hover:text-[#5B3DF5] px-3 py-2 rounded-md text-[14px] font-medium transition-colors">{t('nav.pricing')}</Link>
             <div className="relative group">
               <button className="flex items-center gap-1 text-gray-600 hover:text-[#5B3DF5] px-3 py-2 rounded-md text-[14px] font-medium transition-colors">
                 {t('nav.resources')}
@@ -103,7 +103,7 @@ function NavbarContent() {
             <Link href="#products" className="text-gray-600 hover:text-[#5B3DF5] block px-3 py-2 rounded-md text-base font-medium">{t('nav.products')}</Link>
             <Link href="#features" className="text-gray-600 hover:text-[#5B3DF5] block px-3 py-2 rounded-md text-base font-medium">{t('nav.features')}</Link>
             <Link href="#platforms" className="text-gray-600 hover:text-[#5B3DF5] block px-3 py-2 rounded-md text-base font-medium">{t('nav.platforms')}</Link>
-            <Link href="#pricing" className="text-gray-600 hover:text-[#5B3DF5] block px-3 py-2 rounded-md text-base font-medium">{t('nav.pricing')}</Link>
+            <Link href="/pricing" className="text-gray-600 hover:text-[#5B3DF5] block px-3 py-2 rounded-md text-base font-medium">{t('nav.pricing')}</Link>
           </div>
           <div className="px-4 py-4 border-t border-gray-100">
             {session ? (
