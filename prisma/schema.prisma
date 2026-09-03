@@ -56,6 +56,7 @@ model Workspace {
   id        String   @id @default(cuid())
   name      String
   isActive  Boolean  @default(true)
+  plan      SubscriptionPlan @default(FREE)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -66,6 +67,22 @@ model Workspace {
   posts          Post[]
   publishLogs    PublishLog[]
   facebookAccounts FacebookAccount[]
+}
+
+enum SubscriptionPlan {
+  FREE
+  PRO
+  ENTERPRISE
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
 }
 
 model User {

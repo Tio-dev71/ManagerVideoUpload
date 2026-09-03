@@ -114,9 +114,9 @@ function LoginForm() {
               <label htmlFor="password" className="block text-sm font-medium text-[var(--color-foreground)]">
                 {t('auth.login.password')}
               </label>
-              {/* <Link href="/forgot-password" className="text-xs font-medium text-[var(--color-primary)] hover:text-[var(--color-primary-hover)]">
-                Quên mật khẩu?
-              </Link> */}
+              <Link href="/forgot-password" className="text-xs font-medium text-[var(--color-primary)] hover:text-[var(--color-primary-hover)]">
+                {t('auth.login.forgot_password', { defaultValue: 'Quên mật khẩu?' })}
+              </Link>
             </div>
             <input
               id="password"
