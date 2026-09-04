@@ -21,9 +21,9 @@ function SePayCheckoutContent() {
       // In a real app, you would create an Order record in DB first and use the Order ID
       // Here we just generate a random code prefixed with TPF
       const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-      setCode(\`TPF\${randomSuffix}\`);
+      setCode(`TPF${randomSuffix}`);
     } else {
-      setCode(\`TPF\${Math.floor(10000 + Math.random() * 90000)}\`);
+      setCode(`TPF${Math.floor(10000 + Math.random() * 90000)}`);
     }
   }, [session]);
 
@@ -33,7 +33,7 @@ function SePayCheckoutContent() {
   
   // Create a VietQR image via SePay or VietQR
   const qrUrl = accountNo && code
-    ? \`https://qr.sepay.vn/img?bank=\${bankId}&acc=\${accountNo}&amount=\${amount}&des=\${code}\`
+    ? `https://qr.sepay.vn/img?bank=${bankId}&acc=${accountNo}&amount=${amount}&des=${code}`
     : '';
 
   const amountStr = parseInt(amount).toLocaleString('vi-VN');
@@ -102,7 +102,7 @@ function SePayCheckoutContent() {
         </div>
 
         <div className="bg-[var(--color-secondary)] p-4 border-t border-[var(--color-border)]">
-          <Link href={\`/thanh-toan/ket-qua?plan=\${plan}&code=\${code}\`} className="w-full block">
+          <Link href={`/thanh-toan/ket-qua?plan=${plan}&code=${code}`} className="w-full block">
             <button className="w-full flex justify-center items-center gap-2 py-3 px-4 rounded-xl font-semibold border border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white transition-all duration-200">
               <RefreshCw className="h-4 w-4" />
               Tôi đã chuyển khoản xong

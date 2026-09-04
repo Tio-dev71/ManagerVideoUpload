@@ -72,10 +72,10 @@ export default function PricingPage() {
           {PLANS.map((plan, index) => (
             <div 
               key={plan.id}
-              className={\`card-apple p-8 relative flex flex-col \${
+              className={`card-apple p-8 relative flex flex-col ${
                 plan.popular ? 'border-2 border-[var(--color-primary)] shadow-xl' : 'border border-[var(--color-border)]'
-              }\`}
-              style={{ animationDelay: \`\${index * 150}ms\` }}
+              }`}
+              style={{ animationDelay: `${index * 150}ms` }}
             >
               {plan.popular && (
                 <div className="absolute top-0 right-0 transform translate-x-2 -translate-y-4">
@@ -106,12 +106,12 @@ export default function PricingPage() {
 
               <div className="mt-auto">
                 <Link 
-                  href={plan.price === 0 ? '/login' : \`/thanh-toan/sepay?plan=\${plan.id}&amount=\${plan.price}\`}
-                  className={\`w-full flex justify-center items-center py-3 px-4 rounded-xl font-semibold transition-all duration-200 \${
+                  href={plan.price === 0 ? '/login' : `/thanh-toan/sepay?plan=${plan.id}&amount=${plan.price}`}
+                  className={`w-full flex justify-center items-center py-3 px-4 rounded-xl font-semibold transition-all duration-200 ${
                     plan.popular 
                       ? 'bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)] shadow-md hover:shadow-lg hover:-translate-y-0.5' 
                       : 'bg-[var(--color-secondary)] text-[var(--color-secondary-foreground)] hover:bg-[var(--color-border)]'
-                  }\`}
+                  }`}
                 >
                   {plan.buttonText}
                 </Link>

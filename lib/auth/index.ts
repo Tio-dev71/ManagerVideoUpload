@@ -6,6 +6,7 @@ import prisma from '@/lib/db';
 import bcrypt from 'bcryptjs';
 
 const nextAuthResult = NextAuth({
+  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || 'ToolAutoTop123456789!@#LongSecretString123',
   adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
@@ -76,10 +77,5 @@ const nextAuthResult = NextAuth({
   trustHost: true,
 });
 
-export const handlers = nextAuthResult.handlers;
-export const signIn = nextAuthResult.signIn;
-export const signOut = nextAuthResult.signOut;
+export const { handlers, auth, signIn, signOut } = nextAuthResult;
 
-export const auth = async (...args: any[]) => {
-  return (nextAuthResult.auth as any)(...args);
-};
