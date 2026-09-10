@@ -1,6 +1,6 @@
 import { Queue } from 'bullmq';
 import IORedis from 'ioredis';
-import 'dotenv/config';
+
 
 console.log("=== QUEUE INIT ===");
 console.log("CWD:", process.cwd());
