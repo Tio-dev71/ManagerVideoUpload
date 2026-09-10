@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { ArrowLeft, RefreshCw, QrCode } from 'lucide-react';
 import { Suspense, useEffect, useState } from 'react';
-import { useSession } from 'next-auth/react';
+import { useSession } from '@/lib/supabase/useSession';
 
 function SePayCheckoutContent() {
   const searchParams = useSearchParams();

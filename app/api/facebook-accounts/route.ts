@@ -115,3 +115,32 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
+
+export async function PATCH(req: NextRequest) {
+  try {
+    const session = await auth();
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { ids, proxy } = await req.json();
+
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return NextResponse.json({ error: 'IDs array is required' }, { status: 400 });
+    }
+
+    const updated = await prisma.facebookAccount.updateMany({
+      where: {
+        id: { in: ids }
+      },
+      data: {
+        proxy: proxy === '' ? null : proxy
+      }
+    });
+
+    return NextResponse.json({ success: true, count: updated.count });
+  } catch (error: any) {
+    console.error('Failed to update facebook accounts:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+}

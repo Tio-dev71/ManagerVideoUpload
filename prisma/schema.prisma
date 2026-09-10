@@ -90,6 +90,7 @@ model User {
   email         String    @unique
   name          String?
   password      String?
+  licenseKey    String?   @unique
   role          Role      @default(STAFF)
   emailVerified DateTime?
   image         String?
@@ -106,6 +107,7 @@ model User {
   socialAccounts SocialAccount[]
   userCredentials UserCredential[]
   invitedEmails  AllowedEmail[]
+  userApiKeys    UserApiKey[]
 }
 
 enum Role {
@@ -371,4 +373,24 @@ model AutomationLog {
 
   @@index([profileId])
   @@index([actionType])
+}
+
+// ──────────────────────────────────────────────
+// Per-User Encrypted API Keys
+// ──────────────────────────────────────────────
+
+model UserApiKey {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  keyName   String   // e.g. "GEMINI", "DEEPSEEK", "OPENAI"
+  encrypted String   @db.Text  // AES-256-GCM encrypted value
+  iv        String   // Initialization vector (hex)
+  authTag   String   // GCM auth tag (hex)
+  hint      String?  // Last 4 chars for display only
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, keyName])
+  @@index([userId])
 }

@@ -2,8 +2,9 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
-import { signOut, useSession } from 'next-auth/react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useSession } from '@/lib/supabase/useSession';
+import { createClient } from '@/lib/supabase/client';
 import {
   LayoutDashboard,
   PlusCircle,
@@ -25,21 +26,10 @@ import { useState } from 'react';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 
-const navigation = [
+const navigation: any[] = [
   { key: 'sidebar.dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { key: 'sidebar.live', href: '/live', icon: Play },
-  { key: 'sidebar.posts', href: '/posts', icon: Calendar },
-  { key: 'sidebar.downloader', href: '/downloader', icon: Download },
-  { key: 'sidebar.fb_accounts', href: '/accounts', icon: Users },
-  { key: 'sidebar.proxies', href: '/proxies', icon: Globe },
-  { key: 'sidebar.automation', href: '/automation', icon: Play },
-  { key: 'sidebar.history', href: '/history', icon: Activity },
 ];
-
-const adminNavigation = [
-  { key: 'sidebar.team', href: '/team', icon: Users },
-  { key: 'sidebar.settings', href: '/settings', icon: Settings },
-];
+const adminNavigation: any[] = [];
 
 const superAdminNavigation = [
   { key: 'sidebar.workspaces', href: '/super-admin', icon: Building2 },
@@ -53,15 +43,21 @@ export function Sidebar() {
   const { t } = useLanguage();
 
   const isSuperAdmin = session?.user?.role === 'SUPER_ADMIN';
-  const isAdmin = session?.user?.role === 'ADMIN' || isSuperAdmin;
   
   let allNavItems = [...navigation];
-  if (isAdmin) allNavItems = [...allNavItems, ...adminNavigation];
   if (isSuperAdmin) allNavItems = [...allNavItems, ...superAdminNavigation];
 
   const isActive = (href: string) => {
     if (href === '/dashboard') return pathname === '/dashboard';
     return pathname.startsWith(href);
+  };
+
+  const supabase = createClient();
+  const router = useRouter();
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.push('/login');
   };
 
   return (
@@ -156,42 +152,7 @@ export function Sidebar() {
             })}
           </div>
 
-          {/* Admin section */}
-          {isAdmin && (
-            <div className="mt-5 pt-5 border-t border-[var(--color-sidebar-border)]">
-              {!collapsed && (
-                <p className="px-3 mb-2 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-muted-foreground)]">
-                  {t('sidebar.admin')}
-                </p>
-              )}
-              <div className="space-y-1">
-                {adminNavigation.map((item) => {
-                  const active = isActive(item.href);
-                  const Icon = item.icon;
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      onClick={() => setMobileOpen(false)}
-                      className={`
-                        flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium
-                        transition-all duration-200
-                        ${active
-                          ? 'bg-[var(--color-sidebar-active-bg)] text-[var(--color-sidebar-active)] font-semibold'
-                          : 'text-[var(--color-muted-foreground)] hover:bg-[var(--color-muted)] hover:text-[var(--color-foreground)]'
-                        }
-                        ${collapsed ? 'justify-center px-2' : ''}
-                      `}
-                      title={collapsed ? (t(item.key) as string) : undefined}
-                    >
-                      <Icon className={`w-[18px] h-[18px] flex-shrink-0 ${active ? 'text-[var(--color-sidebar-active)]' : ''}`} />
-                      {!collapsed && <span>{t(item.key)}</span>}
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-          )}
+
 
           {/* Super Admin section */}
           {isSuperAdmin && (
@@ -272,7 +233,7 @@ export function Sidebar() {
               <div className="flex items-center gap-1 ml-auto">
                 <ThemeToggle />
                 <button
-                  onClick={() => signOut({ callbackUrl: '/login' })}
+                  onClick={handleSignOut}
                   className="p-1.5 rounded-lg hover:bg-[var(--color-muted)] transition-colors"
                   title={t('sidebar.sign_out') as string}
                 >

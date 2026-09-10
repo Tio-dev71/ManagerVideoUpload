@@ -9,6 +9,8 @@ import { Loader2, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 
+import { createClient } from '@/lib/supabase/client';
+
 // Error code → translation key mapping
 const ERROR_MAP: Record<string, string> = {
   MISSING_FIELDS: 'auth.register.error_missing_fields',
@@ -42,6 +44,7 @@ function RegisterForm() {
   const [googleLoading, setGoogleLoading] = useState(false);
   
   const router = useRouter();
+  const supabase = createClient();
 
   const passwordStrength = useMemo(() => getPasswordStrength(password), [password]);
 
@@ -71,24 +74,18 @@ function RegisterForm() {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const { error } = await supabase.auth.signUp({
+        email: email.trim().toLowerCase(),
+        password: password,
+        options: {
+          data: {
+            full_name: fullName,
+          },
         },
-        body: JSON.stringify({
-          name: fullName,
-          email: email,
-          password: password,
-        }),
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        // Map error code to translated message
-        const errorKey = ERROR_MAP[data.error] || 'auth.register.error_generic';
-        toast.error(t(errorKey));
+      if (error) {
+        toast.error(error.message);
         setLoading(false);
         return;
       }
@@ -96,16 +93,15 @@ function RegisterForm() {
       toast.success(t('auth.register.success'));
       
       // Auto login after register
-      const result = await signIn('credentials', {
+      const { error: signInError } = await supabase.auth.signInWithPassword({
         email: email.trim().toLowerCase(),
         password,
-        redirect: false,
       });
 
-      if (result?.error) {
+      if (signInError) {
         toast.error(t('auth.register.error_auto_login'));
         router.push('/login');
-      } else if (result?.ok) {
+      } else {
         window.location.href = '/dashboard';
       }
 
@@ -118,7 +114,16 @@ function RegisterForm() {
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
     try {
-      await signIn('google', { callbackUrl: '/dashboard' });
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
+        },
+      });
+      if (error) {
+        toast.error(error.message);
+        setGoogleLoading(false);
+      }
     } catch (error) {
       toast.error(t('auth.register.error_google'));
       setGoogleLoading(false);

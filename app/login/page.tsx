@@ -9,6 +9,8 @@ import { Loader2, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 
+import { createClient } from '@/lib/supabase/client';
+
 function LoginForm() {
   const { t } = useLanguage();
   const [email, setEmail] = useState('');
@@ -20,6 +22,8 @@ function LoginForm() {
   const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
   const errorParam = searchParams.get('error');
 
+  const supabase = createClient();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim() || !password.trim()) return;
@@ -29,17 +33,15 @@ function LoginForm() {
     try {
       const normalizedEmail = email.trim().toLowerCase();
 
-      const result = await signIn('credentials', {
+      const { error } = await supabase.auth.signInWithPassword({
         email: normalizedEmail,
         password,
-        redirect: false,
-        callbackUrl,
       });
 
-      if (result?.error) {
-        toast.error(t('auth.login.error_credentials'));
+      if (error) {
+        toast.error(error.message === 'Invalid login credentials' ? t('auth.login.error_credentials') : error.message);
         setLoading(false);
-      } else if (result?.ok) {
+      } else {
         toast.success(t('auth.login.success'));
         window.location.href = callbackUrl;
       }
@@ -52,7 +54,16 @@ function LoginForm() {
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
     try {
-      await signIn('google', { callbackUrl });
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(callbackUrl)}`,
+        },
+      });
+      if (error) {
+        toast.error(error.message);
+        setGoogleLoading(false);
+      }
     } catch (error) {
       toast.error(t('auth.login.error_google'));
       setGoogleLoading(false);

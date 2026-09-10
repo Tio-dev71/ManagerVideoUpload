@@ -48,7 +48,7 @@ export class AutomationEngine {
     }
   }
 
-  static async randomInteract(page: Page, config: TaskConfig, profileId: string, chance = 0.3) {
+  static async randomInteract(page: Page, config: TaskConfig, profileId: string, chance = 0.3, interactedPosts: Set<string> = new Set()) {
     const action = Math.random();
     if (action > chance) return;
 
@@ -114,6 +114,13 @@ export class AutomationEngine {
             }
           } catch(e) {}
           
+          if (text && interactedPosts.has(text)) {
+             return { clicked: false, postText: '' }; // Already interacted with this post
+          }
+          if (text) {
+             interactedPosts.add(text);
+          }
+          
           const target = commentBtn.closest('[role="button"]') || commentBtn;
           (target as HTMLElement).click();
           return { clicked: true, postText: text };
@@ -148,7 +155,8 @@ export class AutomationEngine {
           if (config.useAiComment && (apiKey || deepseekKey) && postText && postText.trim().length > 10) {
             console.log('Generating AI comment for: ' + postText.substring(0, 30).replace(/\n/g, ' ') + '...');
             
-            const prompt = `You are a normal Facebook user. Write a short, natural, friendly comment in Vietnamese for this post: "${postText}". Only return the comment text. Do not use quotes or hashtags.`;
+            const prompt = `You are a normal Facebook user. Write a short, natural, friendly comment in Vietnamese for this post: "${postText}".
+CRITICAL INSTRUCTION: Return ONLY the raw comment text. Do NOT wrap it in quotes. Do NOT add hashtags. Do NOT add conversational text like "Bình luận:". Just the exact text to type.`;
             
             try {
               if (deepseekKey) {
@@ -221,7 +229,8 @@ export class AutomationEngine {
           if (box) box.focus();
         });
 
-        await page.keyboard.type(finalComment, { delay: 50 });
+        // Use insertText instead of type to prevent Facebook draft.js/lexical bugs
+        await page.keyboard.insertText(finalComment);
         await this.safeWait(page, 500, profileId);
         await page.keyboard.press('Enter');
 
@@ -262,6 +271,7 @@ export class AutomationEngine {
   }
 
   static async taskFbFarmReels(page: Page, config: TaskConfig, profileId: string) {
+    const interactedPosts = new Set<string>();
     let reelsUrl = config.targetUrl || 'https://www.facebook.com/reels/';
 
     if (!config.targetUrl) {
@@ -278,7 +288,7 @@ export class AutomationEngine {
       for (let i = 0; i < config.actionCount; i++) {
         console.log(`Watching reel ${i + 1}/${config.actionCount}`);
         await this.safeWait(page, 10000 + Math.random() * 15000, profileId);
-        await this.randomInteract(page, config, profileId, 0.2);
+        await this.randomInteract(page, config, profileId, 0.2, interactedPosts);
 
         if (Math.random() > 0.8 && i > 0) {
           await page.keyboard.press('ArrowUp');
@@ -319,7 +329,7 @@ export class AutomationEngine {
       if (clicked) {
         console.log(`Watching fanpage reel ${i + 1}/${config.actionCount}`);
         await this.safeWait(page, 10000 + Math.random() * 15000, profileId);
-        await this.randomInteract(page, config, profileId, 0.2);
+        await this.randomInteract(page, config, profileId, 0.2, interactedPosts);
       } else {
         console.log(`Could not find reel ${i + 1}`);
         break;
@@ -328,6 +338,7 @@ export class AutomationEngine {
   }
 
   static async taskFbAutoInteract(page: Page, config: TaskConfig, profileId: string) {
+    const interactedPosts = new Set<string>();
     const targetUrl = config.targetUrl || 'https://www.facebook.com/';
     console.log(`Farming feed at ${targetUrl}`);
     await page.goto(targetUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
@@ -336,7 +347,7 @@ export class AutomationEngine {
     for (let i = 0; i < config.actionCount; i++) {
       console.log(`Scrolling feed ${i + 1}/${config.actionCount}`);
       await this.humanScroll(page, profileId, 2);
-      await this.randomInteract(page, config, profileId, 0.4);
+      await this.randomInteract(page, config, profileId, 0.4, interactedPosts);
     }
   }
 
@@ -361,6 +372,27 @@ export class AutomationEngine {
     console.log(`Navigating to ${url}...`);
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
     await this.safeWait(page, 4000 + Math.random() * 2000, profileId);
+
+    // Auto join group if not joined
+    const joined = await page.evaluate(() => {
+      let btns = Array.from(document.querySelectorAll('div[role="button"], span'));
+      let joinBtn = btns.find(b => {
+        let txt = ((b as HTMLElement).innerText || '').toLowerCase().trim();
+        let aria = (b.getAttribute('aria-label') || '').toLowerCase().trim();
+        return (txt === 'tham gia nhóm' || txt === 'join group' || aria === 'tham gia nhóm' || aria === 'join group');
+      });
+      if (joinBtn && joinBtn.getBoundingClientRect().width > 0) {
+        const target = joinBtn.closest('div[role="button"]') || joinBtn;
+        (target as HTMLElement).click();
+        return true;
+      }
+      return false;
+    });
+    
+    if (joined) {
+      console.log('Clicked Join Group, waiting 5 seconds...');
+      await this.safeWait(page, 5000, profileId);
+    }
 
     let addedCount = 0;
     let scrollAttempts = 0;
@@ -420,6 +452,27 @@ export class AutomationEngine {
     console.log(`Navigating to ${url}...`);
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
     await this.safeWait(page, 4000 + Math.random() * 2000, profileId);
+
+    // Auto join group if not joined
+    const joined = await page.evaluate(() => {
+      let btns = Array.from(document.querySelectorAll('div[role="button"], span'));
+      let joinBtn = btns.find(b => {
+        let txt = ((b as HTMLElement).innerText || '').toLowerCase().trim();
+        let aria = (b.getAttribute('aria-label') || '').toLowerCase().trim();
+        return (txt === 'tham gia nhóm' || txt === 'join group' || aria === 'tham gia nhóm' || aria === 'join group');
+      });
+      if (joinBtn && joinBtn.getBoundingClientRect().width > 0) {
+        const target = joinBtn.closest('div[role="button"]') || joinBtn;
+        (target as HTMLElement).click();
+        return true;
+      }
+      return false;
+    });
+    
+    if (joined) {
+      console.log('Clicked Join Group, waiting 5 seconds...');
+      await this.safeWait(page, 5000, profileId);
+    }
 
     const opened = await page.evaluate(() => {
       const inviteSelectors = [
@@ -632,7 +685,8 @@ export class AutomationEngine {
         } catch(e) {}
 
         if (config.useAiComment && (apiKey || deepseekKey) && postText && postText.trim().length > 10) {
-          const prompt = `You are a normal Facebook user. Write a short, natural, friendly comment in Vietnamese for this post: "${postText}". Only return the comment text. Do not use quotes or hashtags.`;
+          const prompt = `You are a normal Facebook user. Write a short, natural, friendly comment in Vietnamese for this post: "${postText}".
+CRITICAL INSTRUCTION: Return ONLY the raw comment text. Do NOT wrap it in quotes. Do NOT add hashtags. Do NOT add conversational text like "Bình luận:". Just the exact text to type.`;
           
           if (deepseekKey) {
             const dsRes = await fetch(deepseekBaseUrl, {
@@ -678,7 +732,7 @@ export class AutomationEngine {
       }
 
       console.log('Sending comment: ' + finalComment);
-      await page.keyboard.type(finalComment, { delay: 30 + Math.random() * 50 });
+      await page.keyboard.insertText(finalComment);
       await this.safeWait(page, 1000, profileId);
       await page.keyboard.press('Enter');
       await this.safeWait(page, 2000, profileId);

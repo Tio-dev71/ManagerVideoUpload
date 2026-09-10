@@ -1,17 +1,33 @@
 'use client';
 
 import Link from 'next/link';
-import { useSession, SessionProvider } from 'next-auth/react';
-import { Menu, X, ChevronDown } from 'lucide-react';
-import { useState } from 'react';
 import Image from 'next/image';
+import { Menu, X, ChevronDown } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
+import { useEffect, useState as useReactState } from 'react';
 import LanguageSwitcher from '@/components/ui/language-switcher';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 function NavbarContent() {
-  const { data: session } = useSession();
-  const [isOpen, setIsOpen] = useState(false);
+  const [session, setSession] = useReactState<any>(null);
+  const [isOpen, setIsOpen] = useReactState(false);
   const { t } = useLanguage();
+  
+  const supabase = createClient();
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [supabase.auth]);
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100 transition-all duration-300">
@@ -53,6 +69,7 @@ function NavbarContent() {
             </div>
             <Link href="#features" className="text-gray-600 hover:text-[#5B3DF5] px-3 py-2 rounded-md text-[14px] font-medium transition-colors">{t('nav.features')}</Link>
             <Link href="#platforms" className="text-gray-600 hover:text-[#5B3DF5] px-3 py-2 rounded-md text-[14px] font-medium transition-colors">{t('nav.platforms')}</Link>
+            <Link href="/video-downloader" className="text-gray-600 hover:text-[#5B3DF5] px-3 py-2 rounded-md text-[14px] font-medium transition-colors">Download Video</Link>
             <Link href="/pricing" className="text-gray-600 hover:text-[#5B3DF5] px-3 py-2 rounded-md text-[14px] font-medium transition-colors">{t('nav.pricing')}</Link>
             <div className="relative group">
               <button className="flex items-center gap-1 text-gray-600 hover:text-[#5B3DF5] px-3 py-2 rounded-md text-[14px] font-medium transition-colors">
@@ -128,9 +145,5 @@ function NavbarContent() {
 }
 
 export default function Navbar() {
-  return (
-    <SessionProvider>
-      <NavbarContent />
-    </SessionProvider>
-  );
+  return <NavbarContent />;
 }

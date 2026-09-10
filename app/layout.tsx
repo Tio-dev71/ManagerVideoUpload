@@ -10,6 +10,7 @@ import { Toaster } from "sonner";
 
 import { ThemeProvider } from "@/components/theme-provider";
 import { LanguageProvider } from "@/lib/i18n/LanguageContext";
+import AuthProvider from "@/components/auth-provider";
 
 export const metadata: Metadata = {
   title: "Topify — Auto-post Videos to Social Media",
@@ -25,26 +26,28 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} antialiased min-h-screen bg-white text-gray-900 font-sans`} suppressHydrationWarning>
-        <LanguageProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            {children}
-            <Toaster
-              position="top-right"
-              richColors
-              closeButton
-              toastOptions={{
-                style: {
-                  fontFamily: 'var(--font-sans)',
-                },
-              }}
-            />
-          </ThemeProvider>
-        </LanguageProvider>
+        <AuthProvider>
+          <LanguageProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              {children}
+              <Toaster
+                position="top-right"
+                richColors
+                closeButton
+                toastOptions={{
+                  style: {
+                    fontFamily: 'var(--font-sans)',
+                  },
+                }}
+              />
+            </ThemeProvider>
+          </LanguageProvider>
+        </AuthProvider>
       </body>
     </html>
   );

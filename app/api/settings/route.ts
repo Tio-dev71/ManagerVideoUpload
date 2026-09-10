@@ -2,7 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import prisma from '@/lib/db';
 
-const ALLOWED_KEYS = ['META_APP_ID', 'META_APP_SECRET', 'GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET'];
+const ALLOWED_KEYS = [
+  'META_APP_ID', 'META_APP_SECRET', 
+  'GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET',
+  'GEMINI_API_KEY', 'DEEPSEEK_API_KEY', 'OPENAI_API_KEY', 'AI_MODEL'
+];
 
 // GET /api/settings - Fetch settings
 export async function GET() {

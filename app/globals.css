@@ -8,40 +8,40 @@
 
 @theme {
   /* Primary */
-  --color-primary: #E11D48;
-  --color-primary-hover: #BE123C;
-  --color-primary-soft: #FFE4E6;
+  --color-primary: #5B3DF5;
+  --color-primary-hover: #4A2DE0;
+  --color-primary-soft: #EEECFE;
   --color-primary-foreground: #FFFFFF;
 
   /* Background */
-  --color-background: #FFF1F2;
-  --color-foreground: #881337;
+  --color-background: #F8F9FA;
+  --color-foreground: #111827;
 
   /* Surface */
   --color-card: #FFFFFF;
-  --color-card-foreground: #881337;
+  --color-card-foreground: #111827;
   --color-surface: #FFFFFF;
-  --color-surface-soft: #FFE4E6;
+  --color-surface-soft: #F3F4F6;
 
   /* Muted */
-  --color-muted: #F0ECF2;
-  --color-muted-foreground: #9F1239;
+  --color-muted: #F3F4F6;
+  --color-muted-foreground: #6B7280;
 
   /* Border */
-  --color-border: #FECDD3;
-  --color-input: #FECDD3;
-  --color-ring: #E11D48;
+  --color-border: #E5E7EB;
+  --color-input: #E5E7EB;
+  --color-ring: #5B3DF5;
 
   /* Secondary */
-  --color-secondary: #FB7185;
+  --color-secondary: #8B5CF6;
   --color-secondary-foreground: #FFFFFF;
 
   /* Destructive */
-  --color-destructive: #DC2626;
+  --color-destructive: #EF4444;
   --color-destructive-foreground: #FFFFFF;
 
   /* Accent */
-  --color-accent: #2563EB;
+  --color-accent: #3B82F6;
   --color-accent-foreground: #FFFFFF;
 
   /* Semantic */
@@ -56,10 +56,10 @@
 
   /* Sidebar */
   --color-sidebar: #FFFFFF;
-  --color-sidebar-foreground: #881337;
-  --color-sidebar-border: #FECDD3;
-  --color-sidebar-active: #E11D48;
-  --color-sidebar-active-bg: #FFE4E6;
+  --color-sidebar-foreground: #111827;
+  --color-sidebar-border: #E5E7EB;
+  --color-sidebar-active: #5B3DF5;
+  --color-sidebar-active-bg: #EEECFE;
 
   /* Font */
   --font-sans: 'Fira Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -259,7 +259,7 @@ body {
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, #E11D48, #2563EB);
+  background: linear-gradient(90deg, #5B3DF5, #3B82F6);
 }
 
 /* ──────────────────────────────────────────────
@@ -267,7 +267,7 @@ body {
    ────────────────────────────────────────────── */
 
 .btn-primary {
-  background: linear-gradient(135deg, #E11D48, #BE123C);
+  background: linear-gradient(135deg, #5B3DF5, #4A2DE0);
   color: #FFFFFF;
   border-radius: var(--radius-md);
   font-weight: 600;
@@ -276,12 +276,12 @@ body {
   transition: all 0.2s ease;
   border: none;
   cursor: pointer;
-  box-shadow: 0 1px 3px rgba(225, 29, 72, 0.3);
+  box-shadow: 0 1px 3px rgba(91, 61, 245, 0.3);
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, #BE123C, #9F1239);
-  box-shadow: 0 4px 12px rgba(225, 29, 72, 0.35);
+  background: linear-gradient(135deg, #4A2DE0, #3A1DC0);
+  box-shadow: 0 4px 12px rgba(91, 61, 245, 0.35);
   transform: translateY(-1px);
 }
 
@@ -687,7 +687,7 @@ body {
    ────────────────────────────────────────────── */
 
 .text-gradient {
-  background: linear-gradient(135deg, #E11D48, #2563EB);
+  background: linear-gradient(135deg, #5B3DF5, #3B82F6);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

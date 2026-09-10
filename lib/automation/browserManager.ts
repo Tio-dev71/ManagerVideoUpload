@@ -61,7 +61,7 @@ export const browserManager = {
     }
 
     const options: any = {
-      headless: false,
+      headless: true,
       args: [
         '--disable-notifications',
         '--disable-save-password-bubble',

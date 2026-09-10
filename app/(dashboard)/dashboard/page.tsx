@@ -1,308 +1,227 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
+import { useSession } from '@/lib/supabase/useSession';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import {
-  PlusCircle,
-  Calendar,
-  CheckCircle2,
-  AlertCircle,
-  PlayCircle,
-  TrendingUp,
-  Clock,
-  ArrowRight,
-  Link2,
-  Zap,
-  Loader2,
+import { 
+  Key, 
+  Copy, 
+  Check, 
+  Download, 
+  ShieldCheck,
+  CreditCard,
+  MonitorSmartphone,
+  Video,
+  Users
 } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
-import { STATUS_CONFIG, PLATFORM_CONFIG } from '@/lib/utils';
-import { useLanguage } from '@/lib/i18n/LanguageContext';
+import { toast } from 'sonner';
 
-interface DashboardStats {
-  scheduled: number;
-  published: number;
-  failed: number;
-  total: number;
+interface LicenseData {
+  licenseKey: string;
+  plan: 'FREE' | 'PRO' | 'ENTERPRISE';
+  usage: {
+    videosUploaded: number;
+  };
 }
 
-interface RecentPost {
-  id: string;
-  title: string;
-  status: string;
-  scheduledAt: string | null;
-  publishedAt: string | null;
-  createdAt: string;
-  platforms: { platform: string; status: string }[];
-  createdBy: { name: string | null; email: string };
-}
+const PLAN_LIMITS = {
+  FREE: { videos: 10, workspaces: 1, fanpages: 1 },
+  PRO: { videos: 100, workspaces: 3, fanpages: 5 },
+  ENTERPRISE: { videos: 'Không giới hạn', workspaces: 'Không giới hạn', fanpages: 'Không giới hạn' },
+};
 
-export default function DashboardPage() {
+const PLAN_NAMES = {
+  FREE: 'Khởi đầu (Miễn phí)',
+  PRO: 'Chuyên nghiệp',
+  ENTERPRISE: 'Doanh nghiệp',
+};
+
+export default function AccountPortalPage() {
   const { data: session } = useSession();
-  const { t } = useLanguage();
-  const [stats, setStats] = useState<DashboardStats>({ scheduled: 0, published: 0, failed: 0, total: 0 });
-  const [recentPosts, setRecentPosts] = useState<RecentPost[]>([]);
+  const [data, setData] = useState<LicenseData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [hasConnections, setHasConnections] = useState(true);
-
-  const isAdmin = session?.user?.role === 'ADMIN';
+  const [copied, setCopied] = useState(false);
+  const [showKey, setShowKey] = useState(false);
 
   useEffect(() => {
-    async function fetchData() {
+    async function fetchLicense() {
       try {
-        const [statsRes, postsRes] = await Promise.all([
-          fetch('/api/posts/stats'),
-          fetch('/api/posts?limit=5'),
-        ]);
-
-        if (statsRes.ok) {
-          const statsData = await statsRes.json();
-          setStats(statsData);
+        const res = await fetch('/api/user/license');
+        if (res.ok) {
+          const json = await res.json();
+          setData(json);
         }
-        if (postsRes.ok) {
-          const postsData = await postsRes.json();
-          setRecentPosts(postsData.posts || []);
-        }
-
-        // Check social connections
-        if (isAdmin) {
-          const connRes = await fetch('/api/social/status');
-          if (connRes.ok) {
-            const connData = await connRes.json();
-            setHasConnections(connData.connected > 0);
-          }
-        }
-      } catch (e) {
-        console.error('Failed to fetch dashboard data:', e);
+      } catch (error) {
+        console.error(error);
+        toast.error('Không thể tải thông tin bản quyền');
       } finally {
         setLoading(false);
       }
     }
-    fetchData();
-  }, [isAdmin]);
+    fetchLicense();
+  }, []);
 
-  const statCards = [
-    {
-      label: t('dashboard.stat.scheduled'),
-      value: stats.scheduled,
-      icon: Clock,
-      color: 'text-blue-600',
-      bg: 'bg-blue-50',
-    },
-    {
-      label: t('dashboard.stat.published'),
-      value: stats.published,
-      icon: CheckCircle2,
-      color: 'text-emerald-600',
-      bg: 'bg-emerald-50',
-    },
-    {
-      label: t('dashboard.stat.failed'),
-      value: stats.failed,
-      icon: AlertCircle,
-      color: 'text-red-500',
-      bg: 'bg-red-50',
-    },
-    {
-      label: t('dashboard.stat.total'),
-      value: stats.total,
-      icon: TrendingUp,
-      color: 'text-purple-600',
-      bg: 'bg-purple-50',
-    },
-  ];
+  const handleCopy = () => {
+    if (data?.licenseKey) {
+      navigator.clipboard.writeText(data.licenseKey);
+      setCopied(true);
+      toast.success('Đã sao chép License Key');
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const getUsagePercentage = () => {
+    if (!data) return 0;
+    if (data.plan === 'ENTERPRISE') return 0;
+    const limit = PLAN_LIMITS[data.plan].videos as number;
+    return Math.min(100, (data.usage.videosUploaded / limit) * 100);
+  };
 
   return (
-    <div className="space-y-8 animate-fade-in">
-      {/* Page header */}
+    <div className="max-w-5xl mx-auto space-y-8 animate-fade-in p-2 sm:p-6">
       <div>
-        <h1 className="text-[28px] font-semibold tracking-tight">
-          {t('dashboard.welcome')}{session?.user?.name ? `, ${session.user.name}` : ''}
+        <h1 className="text-[28px] font-semibold tracking-tight text-[var(--color-foreground)]">
+          Tổng quan Tài khoản
         </h1>
         <p className="text-[var(--color-muted-foreground)] mt-1">
-          {t('dashboard.subtitle')}
+          Quản lý khóa bản quyền và gói cước hệ thống của bạn.
         </p>
       </div>
 
-      {/* Onboarding banner — Admin only, no connections */}
-      {isAdmin && !hasConnections && !loading && (
-        <div className="card-apple p-6 border-[var(--color-primary)] border-opacity-30 bg-gradient-to-r from-[var(--color-primary-soft)] to-transparent">
-          <div className="flex items-start gap-4">
-            <div className="w-11 h-11 rounded-2xl bg-[var(--color-primary)] flex items-center justify-center flex-shrink-0">
-              <Link2 className="w-5 h-5 text-white" />
-            </div>
-            <div className="flex-1">
-              <h3 className="text-[17px] font-semibold mb-1">{t('dashboard.onboarding.title')}</h3>
-              <p className="text-[14px] text-[var(--color-muted-foreground)] mb-4">
-                {t('dashboard.onboarding.desc')}
-              </p>
-              <div className="flex flex-wrap gap-3">
-                <Link
-                  href="/settings"
-                  className="btn-primary inline-flex items-center gap-2 text-[14px] py-2 px-4"
-                >
-                  <Zap className="w-4 h-4" />
-                  Connect Meta
-                </Link>
-                <Link
-                  href="/settings"
-                  className="btn-secondary inline-flex items-center gap-2 text-[14px] py-2 px-4"
-                >
-                  Connect YouTube
-                </Link>
-                <Link
-                  href="/settings"
-                  className="btn-secondary inline-flex items-center gap-2 text-[14px] py-2 px-4"
-                >
-                  Connect Google Drive
-                </Link>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        {/* License Key Card */}
+        <div className="card-apple p-6 border border-[var(--color-border)] flex flex-col justify-between">
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center flex-shrink-0">
+                <Key className="w-5 h-5 text-purple-600" />
+              </div>
+              <div>
+                <h2 className="text-[17px] font-semibold">License Key (Khoá đăng nhập)</h2>
+                <p className="text-[13px] text-[var(--color-muted-foreground)]">
+                  Sử dụng mã này để đăng nhập vào Desktop App. Tuyệt đối không chia sẻ mã này cho người khác.
+                </p>
               </div>
             </div>
-          </div>
-        </div>
-      )}
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {statCards.map((card) => (
-          <div key={card.label} className="card-apple p-5">
             {loading ? (
-              <div className="space-y-3">
-                <div className="skeleton w-10 h-10 rounded-xl" />
-                <div className="skeleton w-16 h-8 rounded-lg" />
-                <div className="skeleton w-20 h-4 rounded" />
-              </div>
+              <div className="h-12 bg-gray-100 animate-pulse rounded-xl mt-6"></div>
             ) : (
-              <>
-                <div className={`w-10 h-10 rounded-xl ${card.bg} flex items-center justify-center mb-3`}>
-                  <card.icon className={`w-5 h-5 ${card.color}`} />
+              <div className="mt-6 space-y-3">
+                <div className="flex items-center gap-2">
+                  <div className="relative flex-1">
+                    <input 
+                      type={showKey ? "text" : "password"}
+                      value={data?.licenseKey || ''}
+                      readOnly
+                      className="w-full bg-[var(--color-background)] border border-[var(--color-border)] rounded-xl py-3 px-4 text-[15px] font-mono tracking-widest text-[var(--color-foreground)] focus:outline-none"
+                    />
+                  </div>
+                  <button
+                    onClick={handleCopy}
+                    className="btn-secondary h-[46px] px-4 flex items-center gap-2"
+                  >
+                    {copied ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
+                    {copied ? 'Đã copy' : 'Copy'}
+                  </button>
                 </div>
-                <p className="text-[28px] font-semibold tracking-tight">{card.value}</p>
-                <p className="text-[13px] text-[var(--color-muted-foreground)] mt-0.5">{card.label}</p>
-              </>
+                <div className="flex justify-between items-center px-1">
+                  <button 
+                    onClick={() => setShowKey(!showKey)}
+                    className="text-[13px] text-purple-600 font-medium hover:underline"
+                  >
+                    {showKey ? 'Ẩn mã' : 'Hiển thị mã'}
+                  </button>
+                  <span className="flex items-center gap-1.5 text-[12px] text-emerald-600 font-medium">
+                    <ShieldCheck className="w-3.5 h-3.5" /> Mã hóa an toàn AES-256
+                  </span>
+                </div>
+              </div>
             )}
           </div>
-        ))}
-      </div>
-
-      {/* CTA Button */}
-      <Link
-        href="/create"
-        className="block card-apple card-apple-interactive p-6 group"
-      >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-[var(--color-foreground)] flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
-              <PlusCircle className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h3 className="text-[17px] font-semibold">{t('dashboard.quick.create')}</h3>
-              <p className="text-[13px] text-[var(--color-muted-foreground)]">
-                {t('dashboard.subtitle')}
-              </p>
-            </div>
+          
+          <div className="mt-8 pt-5 border-t border-[var(--color-border)]">
+            <Link 
+              href="/download" 
+              className="w-full btn-primary py-3 rounded-xl flex items-center justify-center gap-2 shadow-sm"
+            >
+              <MonitorSmartphone className="w-5 h-5" />
+              Tải Desktop App (Windows/macOS)
+            </Link>
           </div>
-          <ArrowRight className="w-5 h-5 text-[var(--color-muted-foreground)] group-hover:translate-x-1 transition-transform" />
-        </div>
-      </Link>
-
-      {/* Recent Posts */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-[19px] font-semibold">{t('dashboard.recent.title')}</h2>
-          <Link
-            href="/posts"
-            className="text-[14px] text-[var(--color-primary)] hover:underline inline-flex items-center gap-1"
-          >
-            {t('dashboard.recent.view_all')}
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
         </div>
 
-        <div className="card-apple overflow-hidden">
-          {loading ? (
-            <div className="p-6 space-y-4">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="flex items-center gap-4">
-                  <div className="skeleton w-12 h-12 rounded-xl" />
-                  <div className="flex-1 space-y-2">
-                    <div className="skeleton w-48 h-4 rounded" />
-                    <div className="skeleton w-32 h-3 rounded" />
-                  </div>
-                  <div className="skeleton w-20 h-6 rounded-full" />
+        {/* Subscription Card */}
+        <div className="card-apple p-6 border border-[var(--color-border)] bg-gradient-to-br from-white to-gray-50 dark:from-[var(--color-card)] dark:to-[var(--color-background)]">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
+                <CreditCard className="w-5 h-5 text-blue-600" />
+              </div>
+              <h2 className="text-[17px] font-semibold">Gói cước của bạn</h2>
+            </div>
+            {loading ? (
+              <div className="w-20 h-6 bg-gray-200 animate-pulse rounded-full"></div>
+            ) : (
+              <span className={`px-3 py-1 rounded-full text-[12px] font-bold tracking-wide uppercase
+                ${data?.plan === 'PRO' ? 'bg-blue-100 text-blue-700' 
+                : data?.plan === 'ENTERPRISE' ? 'bg-purple-100 text-purple-700' 
+                : 'bg-gray-100 text-gray-700'}
+              `}>
+                {PLAN_NAMES[data?.plan || 'FREE']}
+              </span>
+            )}
+          </div>
+
+          {!loading && data && (
+            <div className="space-y-6">
+              {/* Progress Bar */}
+              <div>
+                <div className="flex justify-between text-[13px] mb-2 font-medium">
+                  <span className="text-[var(--color-muted-foreground)]">Sử dụng tháng này</span>
+                  <span className={getUsagePercentage() >= 90 ? 'text-red-500' : 'text-[var(--color-foreground)]'}>
+                    {data.usage.videosUploaded} / {PLAN_LIMITS[data.plan].videos} Videos
+                  </span>
                 </div>
-              ))}
+                {data.plan !== 'ENTERPRISE' && (
+                  <div className="w-full bg-[var(--color-border)] rounded-full h-2.5 overflow-hidden">
+                    <div 
+                      className={`h-2.5 rounded-full transition-all duration-500 ${
+                        getUsagePercentage() >= 90 ? 'bg-red-500' : 'bg-blue-500'
+                      }`}
+                      style={{ width: `${getUsagePercentage()}%` }}
+                    ></div>
+                  </div>
+                )}
+              </div>
+
+              {/* Limits */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-white dark:bg-[var(--color-background)] p-4 rounded-xl border border-[var(--color-border)]">
+                  <Video className="w-5 h-5 text-gray-400 mb-2" />
+                  <p className="text-[12px] text-[var(--color-muted-foreground)] uppercase font-semibold">Tải lên</p>
+                  <p className="text-[15px] font-medium">{PLAN_LIMITS[data.plan].videos} video/tháng</p>
+                </div>
+                <div className="bg-white dark:bg-[var(--color-background)] p-4 rounded-xl border border-[var(--color-border)]">
+                  <Users className="w-5 h-5 text-gray-400 mb-2" />
+                  <p className="text-[12px] text-[var(--color-muted-foreground)] uppercase font-semibold">Tài khoản FB</p>
+                  <p className="text-[15px] font-medium">{PLAN_LIMITS[data.plan].fanpages} Fanpage</p>
+                </div>
+              </div>
+
+              <div className="pt-2">
+                <Link 
+                  href="/pricing"
+                  className="w-full px-4 py-3 bg-[var(--color-background)] border border-[var(--color-primary)] text-[var(--color-primary)] font-medium text-[14px] rounded-xl flex items-center justify-center hover:bg-[var(--color-primary)] hover:text-white transition-colors"
+                >
+                  Nâng cấp gói cước
+                </Link>
+              </div>
             </div>
-          ) : recentPosts.length === 0 ? (
-            <div className="p-12 text-center">
-              <PlayCircle className="w-12 h-12 text-[var(--color-muted-foreground)] mx-auto mb-3 opacity-40" />
-              <p className="text-[15px] font-medium text-[var(--color-foreground)]">{t('dashboard.recent.empty')}</p>
-              <p className="text-[13px] text-[var(--color-muted-foreground)] mt-1">
-                {t('dashboard.recent.empty_desc')}
-              </p>
-              <Link href="/create" className="btn-primary inline-flex items-center gap-2 mt-4 text-[14px]">
-                <PlusCircle className="w-4 h-4" />
-                {t('dashboard.recent.create_first')}
-              </Link>
-            </div>
-          ) : (
-            <table className="table-apple">
-              <thead>
-                <tr>
-                  <th>Title</th>
-                  <th>Platforms</th>
-                  <th>Schedule</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recentPosts.map((post) => {
-                  const statusConfig = STATUS_CONFIG[post.status as keyof typeof STATUS_CONFIG];
-                  return (
-                    <tr key={post.id}>
-                      <td>
-                        <Link href={`/posts/${post.id}`} className="hover:text-[var(--color-primary)] transition-colors">
-                          <p className="font-medium text-[14px] truncate max-w-[200px]">{post.title}</p>
-                          <p className="text-[12px] text-[var(--color-muted-foreground)]">
-                            by {post.createdBy.name || post.createdBy.email.split('@')[0]}
-                          </p>
-                        </Link>
-                      </td>
-                      <td>
-                        <div className="flex gap-1.5">
-                          {post.platforms.map((p) => {
-                            const config = PLATFORM_CONFIG[p.platform as keyof typeof PLATFORM_CONFIG];
-                            return (
-                              <span
-                                key={p.platform}
-                                className="w-2 h-2 rounded-full"
-                                style={{ backgroundColor: config?.color }}
-                                title={config?.name}
-                              />
-                            );
-                          })}
-                        </div>
-                      </td>
-                      <td className="text-[13px] text-[var(--color-muted-foreground)]">
-                        {post.scheduledAt
-                          ? formatDistanceToNow(new Date(post.scheduledAt), { addSuffix: true })
-                          : 'Immediate'}
-                      </td>
-                      <td>
-                        {statusConfig && (
-                          <span className={`badge ${statusConfig.color}`}>
-                            {statusConfig.label}
-                          </span>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
           )}
         </div>
+
       </div>
     </div>
   );

@@ -48,3 +48,26 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Failed to create task' }, { status: 500 });
   }
 }
+
+export async function PATCH(req: NextRequest) {
+  try {
+    const data = await req.json();
+    if (!data.id) return NextResponse.json({ error: 'Missing ID' }, { status: 400 });
+
+    const updateData: any = {};
+    if (data.status !== undefined) updateData.status = data.status;
+    if (data.name !== undefined) updateData.name = data.name;
+    if (data.type !== undefined) updateData.type = data.type;
+    if (data.config !== undefined) updateData.config = data.config;
+    if (data.profileIds !== undefined) updateData.profileIds = data.profileIds;
+
+    const task = await prisma.automationTask.update({
+      where: { id: data.id },
+      data: updateData
+    });
+    return NextResponse.json(task);
+  } catch (error) {
+    console.error('Failed to update task:', error);
+    return NextResponse.json({ error: 'Failed to update task' }, { status: 500 });
+  }
+}

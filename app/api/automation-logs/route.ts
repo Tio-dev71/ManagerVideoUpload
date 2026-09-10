@@ -40,3 +40,22 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
+export async function POST(req: Request) {
+  try {
+    const data = await req.json();
+    const log = await prisma.automationLog.create({
+      data: {
+        profileId: data.profileId,
+        accountName: data.accountName,
+        actionType: data.actionType,
+        link: data.link,
+        message: data.message,
+      }
+    });
+    return NextResponse.json(log);
+  } catch (error: any) {
+    console.error('Error creating automation log:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
