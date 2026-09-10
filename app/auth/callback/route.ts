@@ -17,8 +17,6 @@ export async function GET(request: Request) {
         // Sync the profile after a successful OAuth exchange
         const { data: { user } } = await supabase.auth.getUser()
         if (user && user.email) {
-          /* 
-          // TEMPORARILY DISABLED TO DEBUG NATIVE PRISMA CRASH
           try {
             // Sync to Prisma User table
             await prisma.user.upsert({
@@ -40,7 +38,6 @@ export async function GET(request: Request) {
             console.error("Prisma upsert error in auth callback:", dbError);
             return NextResponse.redirect(`${origin}/login?error=database_sync_failed`);
           }
-          */
         }
 
         const forwardedHost = request.headers.get('x-forwarded-host') 
