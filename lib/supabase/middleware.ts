@@ -28,7 +28,15 @@ export async function updateSession(request: NextRequest) {
     },
   })
 
-  const { data: { user } } = await supabase.auth.getUser()
+  let user = null
+  try {
+    const { data } = await supabase.auth.getUser()
+    user = data.user
+  } catch (err) {
+    console.error("Middleware Supabase getUser error:", err)
+    // Continue without user if fetch fails
+  }
+  
   const pathname = request.nextUrl.pathname
 
   // App routes that require authentication
