@@ -39,7 +39,7 @@ jobs:
 
       - name: Build Electron App
         working-directory: electron-app
-        run: npm run dist
+        run: npm run dist -- -p never
 
       - name: Upload Windows Artifact
         if: matrix.os == 'windows-latest'
