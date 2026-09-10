@@ -125,7 +125,15 @@ async function runPlaywrightLogin(accountData) {
       options.locale = fp.locale;
       options.timezoneId = fp.timezoneId;
 
-      browser = await chromium.launchPersistentContext(userDataDir, options);
+      try {
+        options.channel = 'chrome'; // Thử dùng Google Chrome trước
+        browser = await chromium.launchPersistentContext(userDataDir, options);
+      } catch (e) {
+        console.log('[Playwright] Chrome không khả dụng, thử dùng Edge...');
+        options.channel = 'msedge'; // Fallback sang Microsoft Edge
+        browser = await chromium.launchPersistentContext(userDataDir, options);
+      }
+      
       browser.proxyConfigStr = proxy || ''; // Save current proxy to detect changes later
       
       browser.on('close', () => activeBrowsers.delete(profileId));

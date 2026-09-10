@@ -55,7 +55,14 @@ async function runAutomationStub(profileId, actionType, config) {
         timezoneId: 'Asia/Ho_Chi_Minh',
       };
 
-      browser = await chromium.launchPersistentContext(userDataDir, options);
+      try {
+        options.channel = 'chrome'; // Thử dùng Google Chrome trước
+        browser = await chromium.launchPersistentContext(userDataDir, options);
+      } catch (e) {
+        console.log('[Automation] Chrome không khả dụng, thử dùng Edge...');
+        options.channel = 'msedge'; // Fallback sang Microsoft Edge
+        browser = await chromium.launchPersistentContext(userDataDir, options);
+      }
       
       browser.on('close', () => activeBrowsers.delete(profileId));
       activeBrowsers.set(profileId, browser);
