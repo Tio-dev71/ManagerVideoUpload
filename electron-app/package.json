@@ -2,6 +2,10 @@
   "name": "electron-app",
   "version": "1.0.2",
   "description": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Tio-dev71/ManagerVideoUpload.git"
+  },
   "main": "main.js",
   "scripts": {
     "start": "concurrently \"npm run start:frontend\" \"wait-on http://localhost:5173 && electron .\"",
