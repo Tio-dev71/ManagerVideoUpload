@@ -78,19 +78,6 @@ export default function DownloadPage() {
           </div>
         </div>
 
-        {/* GitHub Releases Link as Fallback */}
-        <div className="mt-16 text-center">
-          <p className="text-gray-500 mb-4">Bạn không tìm thấy phiên bản phù hợp?</p>
-          <a 
-            href="https://github.com/Tio-dev71/ManagerVideoUpload/releases" 
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium bg-blue-50 px-6 py-3 rounded-full transition-colors"
-          >
-            Xem toàn bộ các phiên bản phát hành trên GitHub
-            <ExternalLink className="w-4 h-4" />
-          </a>
-        </div>
       </main>
     </div>
   );
