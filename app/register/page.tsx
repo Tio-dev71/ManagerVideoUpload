@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, Suspense, useMemo } from 'react';
-import { signIn } from 'next-auth/react';
+
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
