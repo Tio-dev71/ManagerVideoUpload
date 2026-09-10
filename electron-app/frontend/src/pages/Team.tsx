@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Users, Plus, Shield, ShieldAlert, Mail, UserPlus, Trash2 } from 'lucide-react';
+import { Users, Mail, UserPlus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import api from '../lib/axios';
 

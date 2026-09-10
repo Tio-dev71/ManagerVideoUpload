@@ -15,7 +15,7 @@ export default function Settings() {
   const fetchSettings = async () => {
     try {
       const res = await api.get('/settings');
-      let currentSettings = { ...res.data?.settings } || {};
+      let currentSettings = res.data?.settings || {};
 
       // Load per-user API keys
       try {
