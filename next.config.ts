@@ -4,6 +4,8 @@ const nextConfig: NextConfig = {
 
   // Allow large file uploads (2GB)
   experimental: {
+    cpus: 1,
+    memoryBasedWorkersCount: true,
     serverActions: {
       bodySizeLimit: '2000mb',
     },
