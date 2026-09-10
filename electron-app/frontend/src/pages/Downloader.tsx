@@ -42,7 +42,7 @@ export default function DownloaderPage() {
   useEffect(() => {
     const fetchAccounts = async () => {
       try {
-        const res = await fetch('/api/facebook-accounts');
+        const res = await fetch('https://topify.vn/api/facebook-accounts');
         const data = await res.json();
         if (Array.isArray(data)) setAccounts(data);
       } catch (e) {}
@@ -60,7 +60,7 @@ export default function DownloaderPage() {
     setAutoPostSuccess('');
 
     try {
-      const res = await fetch('/api/downloader', {
+      const res = await fetch('https://topify.vn/api/downloader', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -95,7 +95,7 @@ export default function DownloaderPage() {
     setAutoPostSuccess('');
 
     try {
-      const res = await fetch('/api/autopost', {
+      const res = await fetch('https://topify.vn/api/autopost', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

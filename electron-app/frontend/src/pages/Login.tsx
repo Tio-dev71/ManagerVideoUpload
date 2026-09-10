@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import axios from 'axios';
 
 // Dùng đường dẫn tương đối để đi qua Vite Proxy
-const API_URL = '/api';
+const API_URL = 'https://topify.vn/api';
 
 export default function Login() {
   const [licenseKey, setLicenseKey] = useState('');

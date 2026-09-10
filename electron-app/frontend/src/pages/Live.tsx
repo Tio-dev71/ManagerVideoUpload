@@ -17,7 +17,7 @@ export default function LiveDashboardPage() {
 
   useEffect(() => {
     // Fetch accounts first to map profileIds to names
-    fetch('/api/facebook-accounts')
+    fetch('https://topify.vn/api/facebook-accounts')
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
@@ -35,7 +35,7 @@ export default function LiveDashboardPage() {
     // Poll for active profiles every 3 seconds
     const fetchActive = async () => {
       try {
-        const res = await fetch('/api/dashboard/live');
+        const res = await fetch('https://topify.vn/api/dashboard/live');
         const data = await res.json();
         if (data.activeProfiles) {
           setActiveProfileIds(data.activeProfiles);

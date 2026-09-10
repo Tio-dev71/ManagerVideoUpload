@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create a custom axios instance
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: 'https://topify.vn/api',
 });
 
 // Add a request interceptor
@@ -31,7 +31,7 @@ api.interceptors.response.use(
       // Token expired or invalid, clear local storage and redirect to login
       localStorage.removeItem('topify_token');
       localStorage.removeItem('topify_user');
-      window.location.href = '/login';
+      window.location.href = '#/login';
     }
     return Promise.reject(error);
   }

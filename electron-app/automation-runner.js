@@ -12,7 +12,7 @@ async function stopTask(taskId) {
 
 async function logHistory(profileId, actionType, link, message) {
   try {
-    await fetch('http://localhost:3000/api/automation-logs', {
+    await fetch('https://topify.vn/api/automation-logs', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ profileId, actionType, link, message })
