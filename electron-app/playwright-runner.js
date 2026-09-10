@@ -122,7 +122,11 @@ async function runPlaywrightLogin(accountData) {
         args: [
           '--disable-notifications',
           '--disable-save-password-bubble',
-          '--start-maximized'
+          '--disable-features=PasswordManager,CredentialManagementAPI',
+          '--start-maximized',
+          '--disable-blink-features=AutomationControlled',
+          '--disable-infobars',
+          '--no-sandbox'
         ],
         viewport: null
       };
@@ -154,6 +158,10 @@ async function runPlaywrightLogin(accountData) {
       
       browser.proxyConfigStr = proxy || ''; // Save current proxy to detect changes later
       
+      await browser.addInitScript(() => {
+        Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
+      });
+
       browser.on('close', () => activeBrowsers.delete(profileId));
       activeBrowsers.set(profileId, browser);
     }

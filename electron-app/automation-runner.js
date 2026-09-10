@@ -47,7 +47,10 @@ async function runAutomationStub(profileId, actionType, config) {
           '--disable-notifications',
           '--disable-save-password-bubble',
           '--disable-features=PasswordManager,CredentialManagementAPI',
-          '--start-maximized'
+          '--start-maximized',
+          '--disable-blink-features=AutomationControlled',
+          '--disable-infobars',
+          '--no-sandbox'
         ],
         viewport: null,
         userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
@@ -64,6 +67,11 @@ async function runAutomationStub(profileId, actionType, config) {
         browser = await chromium.launchPersistentContext(userDataDir, options);
       }
       
+      
+      await browser.addInitScript(() => {
+        Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
+      });
+
       browser.on('close', () => activeBrowsers.delete(profileId));
       activeBrowsers.set(profileId, browser);
       isNewBrowser = true;

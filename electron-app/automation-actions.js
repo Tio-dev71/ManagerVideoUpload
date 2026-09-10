@@ -7,6 +7,13 @@ async function safeWait(page, ms) {
   await page.waitForTimeout(ms);
 }
 
+async function humanType(page, text) {
+  for (const char of text) {
+    await page.keyboard.type(char, { delay: Math.floor(Math.random() * 40) + 20 });
+    if (Math.random() > 0.9) await safeWait(page, Math.floor(Math.random() * 150) + 50);
+  }
+}
+
 // AI Comment Generator
 async function generateAIComment(postContent, aiSettings = {}) {
   const modelType = aiSettings.AI_MODEL || 'gemini-1.5-flash';
@@ -133,7 +140,7 @@ async function randomInteract(page, config, profileId, chance = 0.3) {
 
   if (isLike) {
     console.log('Liking a post/reel');
-    await page.evaluate(() => {
+    const likeHandle = await page.evaluateHandle(() => {
       function isVisible(el) {
         const rect = el.getBoundingClientRect();
         return rect.top >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight);
@@ -144,14 +151,25 @@ async function randomInteract(page, config, profileId, chance = 0.3) {
         const target = validLikes[Math.floor(Math.random() * validLikes.length)];
         const container = target.closest('div[role="article"], div[data-pagelet^="FeedUnit"]') || target;
         container.setAttribute('data-topify-liked', 'true');
-        target.click();
+        return target;
       }
+      return null;
     });
+
+    const likeEl = likeHandle.asElement();
+    if (likeEl) {
+      try {
+        await likeEl.hover();
+        await safeWait(page, 100 + Math.random() * 200);
+        await likeEl.click();
+      } catch (e) {}
+    }
+    await likeHandle.dispose();
     await safeWait(page, 2000);
   } else if ((config.comments && config.comments.length > 0) || config.useAiComment) {
     console.log('Commenting on a post/reel');
     
-    const { clicked, postText } = await page.evaluate(() => {
+    const commentResult = await page.evaluateHandle(() => {
       if (!window._topifyCommented) window._topifyCommented = new Set();
       function isVisible(el) {
         const rect = el.getBoundingClientRect();
@@ -198,15 +216,33 @@ async function randomInteract(page, config, profileId, chance = 0.3) {
           }
         } catch(e) {}
         
-        if (text && window._topifyCommented.has(text)) return { clicked: false, postText: '' };
+        if (text && window._topifyCommented.has(text)) return { element: null, postText: '' };
         if (text) window._topifyCommented.add(text);
 
         const target = commentBtn.closest('[role="button"]') || commentBtn;
-        target.click();
-        return { clicked: true, postText: text };
+        return { element: target, postText: text };
       }
-      return { clicked: false, postText: '' };
+      return { element: null, postText: '' };
     });
+
+    const commentData = await commentResult.jsonValue();
+    const commentElHandle = await commentResult.evaluateHandle(r => r.element);
+    const commentEl = commentElHandle.asElement();
+    
+    let clicked = false;
+    let postText = commentData?.postText || '';
+
+    if (commentEl) {
+      try {
+        await commentEl.hover();
+        await safeWait(page, 100 + Math.random() * 200);
+        await commentEl.click();
+        clicked = true;
+      } catch (e) {}
+    }
+    
+    await commentElHandle.dispose();
+    await commentResult.dispose();
 
     if (clicked) {
       await safeWait(page, 3000);
@@ -230,7 +266,7 @@ async function randomInteract(page, config, profileId, chance = 0.3) {
         if (box) box.focus();
       });
 
-      await page.keyboard.type(finalComment, { delay: 50 });
+      await humanType(page, finalComment);
       await safeWait(page, 500);
       await page.keyboard.press('Enter');
 
@@ -268,10 +304,18 @@ async function taskFbFarmReels(page, config, profileId) {
     await page.goto(reelsUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
     await safeWait(page, 5000);
 
-    await page.evaluate(() => {
-      const reel = document.querySelector('a[href*="/reel/"]');
-      if (reel) reel.click();
+    const reelHandle = await page.evaluateHandle(() => {
+      return document.querySelector('a[href*="/reel/"]');
     });
+    const reelEl = reelHandle.asElement();
+    if (reelEl) {
+      try {
+        await reelEl.hover();
+        await safeWait(page, 100);
+        await reelEl.click();
+      } catch (e) {}
+    }
+    await reelHandle.dispose();
     await safeWait(page, 5000);
 
     for (let i = 0; i < config.actionCount; i++) {
@@ -305,17 +349,27 @@ async function taskFbFarmReels(page, config, profileId) {
       await humanScroll(page, config, Math.floor(i / 4));
     }
 
-    const clicked = await page.evaluate((index) => {
+    const reelHandle = await page.evaluateHandle((index) => {
       const reels = Array.from(document.querySelectorAll('a[href*="/reel/"]'));
       if (reels.length > index) {
-        reels[index].click();
-        return true;
+        return reels[index];
       } else if (reels.length > 0) {
-        reels[Math.floor(Math.random() * reels.length)].click();
-        return true;
+        return reels[Math.floor(Math.random() * reels.length)];
       }
-      return false;
+      return null;
     }, i);
+
+    const reelEl = reelHandle.asElement();
+    let clicked = false;
+    if (reelEl) {
+      try {
+        await reelEl.hover();
+        await safeWait(page, 100);
+        await reelEl.click();
+        clicked = true;
+      } catch (e) {}
+    }
+    await reelHandle.dispose();
 
     if (clicked) {
       console.log(`Watching fanpage reel ${i + 1}/${config.actionCount}`);
@@ -363,19 +417,29 @@ async function taskFbAddFriendsGroup(page, config, profileId) {
   await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
   await safeWait(page, 4000 + Math.random() * 2000);
 
-  const joined = await page.evaluate(() => {
+  const joinHandle = await page.evaluateHandle(() => {
     let btns = Array.from(document.querySelectorAll('div[role="button"], span'));
     let joinBtn = btns.find(b => {
       let t = (b.innerText || '').toLowerCase().trim();
       return t === 'tham gia nhóm' || t === 'tham gia' || t === 'join group' || t === 'join';
     });
     if (joinBtn) {
-      let target = joinBtn.closest('[role="button"]') || joinBtn;
-      target.click();
-      return true;
+      return joinBtn.closest('[role="button"]') || joinBtn;
     }
-    return false;
+    return null;
   });
+  
+  const joinEl = joinHandle.asElement();
+  let joined = false;
+  if (joinEl) {
+    try {
+      await joinEl.hover();
+      await safeWait(page, 100);
+      await joinEl.click();
+      joined = true;
+    } catch(e) {}
+  }
+  await joinHandle.dispose();
   if (joined) {
     console.log('Clicked Join Group, waiting...');
     await safeWait(page, 5000);
@@ -433,25 +497,35 @@ async function taskFbInviteToGroup(page, config, profileId) {
   await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
   await safeWait(page, 4000 + Math.random() * 2000);
 
-  const joined = await page.evaluate(() => {
+  const joinHandle = await page.evaluateHandle(() => {
     let btns = Array.from(document.querySelectorAll('div[role="button"], span'));
     let joinBtn = btns.find(b => {
       let t = (b.innerText || '').toLowerCase().trim();
       return t === 'tham gia nhóm' || t === 'tham gia' || t === 'join group' || t === 'join';
     });
     if (joinBtn) {
-      let target = joinBtn.closest('[role="button"]') || joinBtn;
-      target.click();
-      return true;
+      return joinBtn.closest('[role="button"]') || joinBtn;
     }
-    return false;
+    return null;
   });
+
+  const joinEl = joinHandle.asElement();
+  let joined = false;
+  if (joinEl) {
+    try {
+      await joinEl.hover();
+      await safeWait(page, 100);
+      await joinEl.click();
+      joined = true;
+    } catch(e) {}
+  }
+  await joinHandle.dispose();
   if (joined) {
     console.log('Clicked Join Group, waiting...');
     await safeWait(page, 5000);
   }
 
-  const opened = await page.evaluate(() => {
+  const inviteHandle = await page.evaluateHandle(() => {
     const inviteSelectors = ['div[aria-label="Mời"]', 'div[aria-label="Invite"]', 'div[aria-label*="Mời tham gia"]', 'div[role="button"]', 'a', 'span'];
     let allBtns = Array.from(document.querySelectorAll(inviteSelectors.join(', ')));
     let inviteBtn = allBtns.find(el => {
@@ -464,28 +538,47 @@ async function taskFbInviteToGroup(page, config, profileId) {
     });
 
     if (inviteBtn) {
-      const target = inviteBtn.closest('[role="button"]') || inviteBtn;
-      target.click();
-      return true;
+      return inviteBtn.closest('[role="button"]') || inviteBtn;
     }
-    return false;
+    return null;
   });
+
+  const inviteEl = inviteHandle.asElement();
+  let opened = false;
+  if (inviteEl) {
+    try {
+      await inviteEl.hover();
+      await safeWait(page, 100);
+      await inviteEl.click();
+      opened = true;
+    } catch(e) {}
+  }
+  await inviteHandle.dispose();
 
   if (opened) {
     console.log('Opened Invite dialog');
     await safeWait(page, 3000);
 
-    await page.evaluate(() => {
+    const subBtnHandle = await page.evaluateHandle(() => {
       let spans = Array.from(document.querySelectorAll('span'));
       let subBtn = spans.find(span => {
         let text = span.innerText?.toLowerCase() || '';
         return text.includes('mời bạn bè trên facebook') || text.includes('invite facebook friends');
       });
       if (subBtn) {
-        const target = subBtn.closest('[role="button"]') || subBtn;
-        target.click();
+        return subBtn.closest('[role="button"]') || subBtn;
       }
+      return null;
     });
+    const subEl = subBtnHandle.asElement();
+    if (subEl) {
+      try {
+        await subEl.hover();
+        await safeWait(page, 100);
+        await subEl.click();
+      } catch(e) {}
+    }
+    await subBtnHandle.dispose();
     await safeWait(page, 3000);
 
     let invitedCount = 0;
@@ -526,19 +619,29 @@ async function taskFbInviteToGroup(page, config, profileId) {
       }
     }
 
-    const sent = await page.evaluate(() => {
+    const sendBtnHandle = await page.evaluateHandle(() => {
       let spans = Array.from(document.querySelectorAll('div[role="button"] span'));
       let sendBtn = spans.find(span => {
         let txt = (span.innerText || '').toLowerCase().trim();
         return txt.includes('gửi lời mời') || txt.includes('send invites') || txt === 'gửi' || txt === 'send';
       });
       if (sendBtn) {
-        const target = sendBtn.closest('[role="button"]') || sendBtn;
-        target.click();
-        return true;
+        return sendBtn.closest('[role="button"]') || sendBtn;
       }
-      return false;
+      return null;
     });
+
+    const sendEl = sendBtnHandle.asElement();
+    let sent = false;
+    if (sendEl) {
+      try {
+        await sendEl.hover();
+        await safeWait(page, 100);
+        await sendEl.click();
+        sent = true;
+      } catch(e) {}
+    }
+    await sendBtnHandle.dispose();
 
     if (sent) console.log(`Sent invites for batch of ${invitedCount}.`);
     else {
@@ -569,7 +672,7 @@ async function taskFbBuffPost(page, config, profileId) {
   // Removed humanScroll(page, 1) to prevent Reels/Watch from snapping to the next video
 
   console.log('Liking post...');
-  await page.evaluate(() => {
+  const likeHandle = await page.evaluateHandle(() => {
     function isVisible(el) {
       const rect = el.getBoundingClientRect();
       return rect.top >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight);
@@ -577,12 +680,23 @@ async function taskFbBuffPost(page, config, profileId) {
     const dialog = document.querySelector('div[role="dialog"]');
     const container = dialog || document;
     const likes = Array.from(container.querySelectorAll('div[aria-label="Thích"], div[aria-label="Like"], div[aria-label="Bày tỏ cảm xúc"], div[aria-label="Thích bài viết"]')).filter(isVisible);
-    if (likes.length > 0) likes[0].click();
+    if (likes.length > 0) return likes[0];
+    return null;
   });
+
+  const likeEl = likeHandle.asElement();
+  if (likeEl) {
+    try {
+      await likeEl.hover();
+      await safeWait(page, 100);
+      await likeEl.click();
+    } catch(e) {}
+  }
+  await likeHandle.dispose();
 
   await safeWait(page, 3000);
 
-  const { clicked, postText } = await page.evaluate(() => {
+  const commentResult = await page.evaluateHandle(() => {
     function isVisible(el) {
       const rect = el.getBoundingClientRect();
       return rect.top >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight);
@@ -602,20 +716,37 @@ async function taskFbBuffPost(page, config, profileId) {
     let text = '';
     if (commentBtn) {
       try {
-        let container = commentBtn.closest('div[role="article"], div[data-pagelet^="FeedUnit"], div[data-pagelet^="GroupFeed"], div[aria-posinset]');
-        if (container) {
-          const messageBlock = container.querySelector('div[data-ad-preview="message"]');
+        let commentContainer = commentBtn.closest('div[role="article"], div[data-pagelet^="FeedUnit"], div[data-pagelet^="GroupFeed"], div[aria-posinset]');
+        if (commentContainer) {
+          const messageBlock = commentContainer.querySelector('div[data-ad-preview="message"]');
           if (messageBlock) {
             text = messageBlock.innerText;
           }
         }
       } catch(e) {}
       const target = commentBtn.closest('[role="button"]') || commentBtn;
-      target.click();
-      return { clicked: true, postText: text };
+      return { element: target, postText: text };
     }
-    return { clicked: false, postText: '' };
+    return { element: null, postText: '' };
   });
+
+  const commentData = await commentResult.jsonValue();
+  const commentElHandle = await commentResult.evaluateHandle(r => r.element);
+  const commentEl = commentElHandle.asElement();
+  
+  let clicked = false;
+  let postText = commentData?.postText || '';
+
+  if (commentEl) {
+    try {
+      await commentEl.hover();
+      await safeWait(page, 100);
+      await commentEl.click();
+      clicked = true;
+    } catch(e) {}
+  }
+  await commentElHandle.dispose();
+  await commentResult.dispose();
 
   if (clicked) {
     await safeWait(page, 3000);
@@ -635,7 +766,7 @@ async function taskFbBuffPost(page, config, profileId) {
     }
 
     console.log('Sending comment: ' + finalComment);
-    await page.keyboard.type(finalComment, { delay: 30 + Math.random() * 50 });
+    await humanType(page, finalComment);
     await safeWait(page, 1000);
     await page.keyboard.press('Enter');
     await safeWait(page, 2000);
