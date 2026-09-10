@@ -121,21 +121,18 @@ async function startAutomationTask(taskData) {
   console.log(`[Automation] Starting Task ${taskId} with ${profileIds.length} profiles`);
   
   stopFlags.delete(taskId);
-  const results = [];
   
-  // Run sequentially to save resources, can be made parallel later
-  for (const profileId of profileIds) {
+  // Run in parallel to process multiple accounts at the same time
+  const promises = profileIds.map(async (profileId) => {
     if (stopFlags.has(taskId)) {
       console.log(`[Automation] Task ${taskId} was stopped. Bỏ qua profile ${profileId}`);
-      results.push({ success: false, profileId, error: 'Task stopped by user' });
-      continue;
+      return { success: false, profileId, error: 'Task stopped by user' };
     }
+    const profileConfig = { ...config, checkStop: () => stopFlags.has(taskId) };
+    return await runAutomationStub(profileId, actionType, profileConfig);
+  });
 
-    config.checkStop = () => stopFlags.has(taskId);
-    const result = await runAutomationStub(profileId, actionType, config);
-    results.push(result);
-  }
-  
+  const results = await Promise.all(promises);
   stopFlags.delete(taskId);
   return { success: true, results };
 }

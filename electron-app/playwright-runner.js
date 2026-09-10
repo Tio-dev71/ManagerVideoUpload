@@ -54,23 +54,41 @@ function parseProxy(proxyStr) {
   return null;
 }
 
-// Generate TOTP code using pure JS (no external dependency)
 function generateTOTP(secret) {
   try {
+    const cleanSecret = (secret || '')
+      .toUpperCase()
+      .replace(/[^A-Z2-7]/g, (char) => {
+        if (char === '0') return 'O';
+        if (char === '1') return 'I';
+        if (char === '8') return 'B';
+        if (char === '9') return 'Q';
+        return '';
+      });
+
     // Try using otpauth if available
     const { TOTP, Secret } = require('otpauth');
     const totp = new TOTP({
       algorithm: 'SHA1',
       digits: 6,
       period: 30,
-      secret: Secret.fromBase32(secret.replace(/\s+/g, '').toUpperCase())
+      secret: Secret.fromBase32(cleanSecret)
     });
     return totp.generate();
   } catch (e) {
     // Fallback: try totp-generator
     try {
+      const cleanSecret = (secret || '')
+        .toUpperCase()
+        .replace(/[^A-Z2-7]/g, (char) => {
+          if (char === '0') return 'O';
+          if (char === '1') return 'I';
+          if (char === '8') return 'B';
+          if (char === '9') return 'Q';
+          return '';
+        });
       const { TOTP: TotpGen } = require('totp-generator');
-      const { otp } = TotpGen.generate(secret.replace(/\s+/g, '').toUpperCase());
+      const { otp } = TotpGen.generate(cleanSecret);
       return otp;
     } catch (e2) {
       console.error('[TOTP] Both otpauth and totp-generator failed:', e.message, e2.message);

@@ -271,11 +271,21 @@ export default function FacebookAccounts() {
     }
     
     try {
+      const cleanSecret = account.twoFactorCode
+        .toUpperCase()
+        .replace(/[^A-Z2-7]/g, (char) => {
+          if (char === '0') return 'O';
+          if (char === '1') return 'I';
+          if (char === '8') return 'B';
+          if (char === '9') return 'Q';
+          return '';
+        });
+
       const totp = new OTPAuth.TOTP({
         algorithm: 'SHA1',
         digits: 6,
         period: 30,
-        secret: OTPAuth.Secret.fromBase32(account.twoFactorCode.replace(/\s+/g, ''))
+        secret: OTPAuth.Secret.fromBase32(cleanSecret)
       });
       const otp = totp.generate();
       navigator.clipboard.writeText(otp);
