@@ -37,8 +37,49 @@ jobs:
         working-directory: electron-app
         run: npm install
 
-      - name: Build and Publish Electron App
+      - name: Build Electron App
         working-directory: electron-app
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npm run dist -- -p always
+        run: npm run dist
+
+      - name: Upload Windows Artifact
+        if: matrix.os == 'windows-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-app
+          path: electron-app/dist/*.exe
+          retention-days: 1
+
+      - name: Upload Mac Artifact
+        if: matrix.os == 'macos-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: mac-app
+          path: electron-app/dist/*.dmg
+          retention-days: 1
+
+  deploy:
+    name: Deploy to VPS
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Windows Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-app
+          path: ./downloads
+
+      - name: Download Mac Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: mac-app
+          path: ./downloads
+
+      - name: Copy files to VPS via SCP
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          source: "./downloads/*"
+          target: "/var/www/downloads"
+          strip_components: 1
