@@ -31,15 +31,11 @@ export async function updateSession(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   const pathname = request.nextUrl.pathname
 
-  // Public routes that don't require auth
-  const publicRoutes = [
-    '/', '/login', '/register', '/forgot-password', '/reset-password',
-    '/terms', '/privacy-policy', '/video-downloader', '/api/social/meta/callbackk'
-  ]
-  const isPublicRoute = publicRoutes.includes(pathname) || pathname.startsWith('/api/') || pathname.startsWith('/_next/') || pathname.includes('.')
+  // App routes that require authentication
+  const protectedPrefixes = ['/dashboard', '/super-admin', '/thanh-toan']
+  const isProtectedRoute = protectedPrefixes.some(prefix => pathname.startsWith(prefix))
   
-  // App dashboard routes require authentication
-  if (!isPublicRoute && !user) {
+  if (isProtectedRoute && !user) {
     const redirectUrl = new URL('/login', request.url)
     redirectUrl.searchParams.set('callbackUrl', pathname)
     return NextResponse.redirect(redirectUrl)
