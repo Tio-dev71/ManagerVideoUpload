@@ -1,6 +1,6 @@
 {
   "name": "electron-app",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "",
   "repository": {
     "type": "git",
@@ -16,6 +16,7 @@
   "build": {
     "appId": "com.topify.automation",
     "productName": "Topify Automation",
+    "artifactName": "Topify-Automation-${version}-${os}.${ext}",
     "publish": {
       "provider": "github"
     },
