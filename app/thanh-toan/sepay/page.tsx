@@ -9,10 +9,10 @@ import { useSession } from '@/lib/supabase/useSession';
 function SePayCheckoutContent() {
   const searchParams = useSearchParams();
   const { data: session } = useSession();
-  
+
   const plan = searchParams.get('plan') || 'PRO';
   const amount = searchParams.get('amount') || '0';
-  
+
   const [code, setCode] = useState('');
 
   useEffect(() => {
@@ -30,7 +30,7 @@ function SePayCheckoutContent() {
   const bankId = process.env.NEXT_PUBLIC_BANK_ID || 'MB';
   const accountNo = process.env.NEXT_PUBLIC_BANK_ACCOUNT_NO || '0123456789';
   const accountName = process.env.NEXT_PUBLIC_BANK_ACCOUNT_NAME || 'NGUYEN VAN A';
-  
+
   // Create a VietQR image via SePay or VietQR
   const qrUrl = accountNo && code
     ? `https://qr.sepay.vn/img?bank=${bankId}&acc=${accountNo}&amount=${amount}&des=${code}`
@@ -94,9 +94,9 @@ function SePayCheckoutContent() {
               Đang khởi tạo mã QR...
             </div>
           )}
-          
+
           <div className="rounded-lg bg-blue-50 dark:bg-blue-900/20 p-4 text-sm text-blue-700 dark:text-blue-400">
-            <span className="font-bold block mb-1">Lưu ý:</span> 
+            <span className="font-bold block mb-1">Lưu ý:</span>
             Hệ thống sẽ tự động xác nhận giao dịch trong vòng 1-3 phút. Bạn không cần làm gì thêm sau khi chuyển tiền thành công.
           </div>
         </div>
