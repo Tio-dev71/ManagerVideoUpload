@@ -15,7 +15,7 @@ export const auth = async (...args: any[]) => {
       
       return {
         user: {
-          id: decoded.id,
+          id: decoded.sub || decoded.id,
           role: decoded.role,
           workspaceId: decoded.workspaceId,
         }

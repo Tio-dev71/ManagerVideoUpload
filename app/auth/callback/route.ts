@@ -16,22 +16,27 @@ export async function GET(request: Request) {
       // Sync the profile after a successful OAuth exchange
       const { data: { user } } = await supabase.auth.getUser()
       if (user && user.email) {
-        // Sync to Prisma User table
-        await prisma.user.upsert({
-          where: { email: user.email },
-          update: {
-            name: user.user_metadata?.full_name || user.user_metadata?.name || user.email.split('@')[0],
-            image: user.user_metadata?.avatar_url || '',
-            emailVerified: new Date(),
-          },
-          create: {
-            email: user.email,
-            name: user.user_metadata?.full_name || user.user_metadata?.name || user.email.split('@')[0],
-            image: user.user_metadata?.avatar_url || '',
-            emailVerified: new Date(),
-            role: 'STAFF',
-          }
-        })
+        try {
+          // Sync to Prisma User table
+          await prisma.user.upsert({
+            where: { email: user.email },
+            update: {
+              name: user.user_metadata?.full_name || user.user_metadata?.name || user.email.split('@')[0],
+              image: user.user_metadata?.avatar_url || '',
+              emailVerified: new Date(),
+            },
+            create: {
+              email: user.email,
+              name: user.user_metadata?.full_name || user.user_metadata?.name || user.email.split('@')[0],
+              image: user.user_metadata?.avatar_url || '',
+              emailVerified: new Date(),
+              role: 'STAFF',
+            }
+          })
+        } catch (dbError) {
+          console.error("Prisma upsert error in auth callback:", dbError);
+          return NextResponse.redirect(`${origin}/login?error=database_sync_failed`);
+        }
       }
 
       const forwardedHost = request.headers.get('x-forwarded-host') 

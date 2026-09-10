@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: 'standalone',
+
   // Allow large file uploads (2GB)
   experimental: {
     serverActions: {
