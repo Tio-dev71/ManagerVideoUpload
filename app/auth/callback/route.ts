@@ -9,47 +9,52 @@ export async function GET(request: Request) {
   // if "next" is in param, use it as the redirect URL
   const next = searchParams.get('next') ?? '/dashboard'
 
-  if (code) {
-    const supabase = await createClient()
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
-    if (!error) {
-      // Sync the profile after a successful OAuth exchange
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user && user.email) {
-        try {
-          // Sync to Prisma User table
-          await prisma.user.upsert({
-            where: { email: user.email },
-            update: {
-              name: user.user_metadata?.full_name || user.user_metadata?.name || user.email.split('@')[0],
-              image: user.user_metadata?.avatar_url || '',
-              emailVerified: new Date(),
-            },
-            create: {
-              email: user.email,
-              name: user.user_metadata?.full_name || user.user_metadata?.name || user.email.split('@')[0],
-              image: user.user_metadata?.avatar_url || '',
-              emailVerified: new Date(),
-              role: 'STAFF',
-            }
-          })
-        } catch (dbError) {
-          console.error("Prisma upsert error in auth callback:", dbError);
-          return NextResponse.redirect(`${origin}/login?error=database_sync_failed`);
+  try {
+    if (code) {
+      const supabase = await createClient()
+      const { error } = await supabase.auth.exchangeCodeForSession(code)
+      if (!error) {
+        // Sync the profile after a successful OAuth exchange
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user && user.email) {
+          try {
+            // Sync to Prisma User table
+            await prisma.user.upsert({
+              where: { email: user.email },
+              update: {
+                name: user.user_metadata?.full_name || user.user_metadata?.name || user.email.split('@')[0],
+                image: user.user_metadata?.avatar_url || '',
+                emailVerified: new Date(),
+              },
+              create: {
+                email: user.email,
+                name: user.user_metadata?.full_name || user.user_metadata?.name || user.email.split('@')[0],
+                image: user.user_metadata?.avatar_url || '',
+                emailVerified: new Date(),
+                role: 'STAFF',
+              }
+            })
+          } catch (dbError) {
+            console.error("Prisma upsert error in auth callback:", dbError);
+            return NextResponse.redirect(`${origin}/login?error=database_sync_failed`);
+          }
+        }
+
+        const forwardedHost = request.headers.get('x-forwarded-host') 
+        const isLocalEnv = process.env.NODE_ENV === 'development'
+        
+        if (isLocalEnv) {
+          return NextResponse.redirect(`${origin}${next}`)
+        } else if (forwardedHost) {
+          return NextResponse.redirect(`https://${forwardedHost}${next}`)
+        } else {
+          return NextResponse.redirect(`${origin}${next}`)
         }
       }
-
-      const forwardedHost = request.headers.get('x-forwarded-host') 
-      const isLocalEnv = process.env.NODE_ENV === 'development'
-      
-      if (isLocalEnv) {
-        return NextResponse.redirect(`${origin}${next}`)
-      } else if (forwardedHost) {
-        return NextResponse.redirect(`https://${forwardedHost}${next}`)
-      } else {
-        return NextResponse.redirect(`${origin}${next}`)
-      }
     }
+  } catch (err) {
+    console.error("Global error in auth callback:", err);
+    return NextResponse.redirect(`${origin}/login?error=auth_callback_crashed`);
   }
 
   // return the user to an error page with instructions
