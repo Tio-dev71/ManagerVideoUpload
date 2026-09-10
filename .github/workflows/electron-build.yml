@@ -1,0 +1,41 @@
+name: Build and Release Electron App
+
+on:
+  push:
+    tags:
+      - 'v*' # Trigger workflow only on version tags (e.g., v1.0.0)
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # Update to your desired Node version
+
+      - name: Install Frontend Dependencies
+        working-directory: electron-app/frontend
+        run: npm install
+
+      - name: Build Frontend
+        working-directory: electron-app/frontend
+        run: npm run build
+
+      - name: Install Electron App Dependencies
+        working-directory: electron-app
+        run: npm install
+
+      - name: Build and Publish Electron App
+        working-directory: electron-app
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run dist -- -p always

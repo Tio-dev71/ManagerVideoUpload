@@ -12,6 +12,9 @@
   "build": {
     "appId": "com.topify.automation",
     "productName": "Topify Automation",
+    "publish": {
+      "provider": "github"
+    },
     "win": {
       "target": "nsis"
     },
