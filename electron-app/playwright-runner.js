@@ -36,6 +36,19 @@ function parseProxy(proxyStr) {
       }
       return result;
     }
+    // Format: user:pass@host:port
+    if (proxyStr.includes('@') && !proxyStr.includes('://')) {
+      const [credentials, hostPort] = proxyStr.split('@');
+      const [username, password] = credentials.split(':');
+      const [host, port] = (hostPort || '').split(':');
+      if (host && port) {
+        return {
+          server: `http://${host}:${port}`,
+          username,
+          password
+        };
+      }
+    }
     
     // Format: host:port or host:port:user:pass
     const parts = proxyStr.trim().split(':');
@@ -139,7 +152,7 @@ async function runPlaywrightLogin(accountData) {
         if (proxyConfig) {
           console.log('[Playwright] Using proxy:', proxyConfig.server);
           if (proxyConfig.username && proxyConfig.password) {
-            const proxyUrl = `${proxyConfig.server.startsWith('http') ? '' : 'http://'}${encodeURIComponent(proxyConfig.username)}:${encodeURIComponent(proxyConfig.password)}@${proxyConfig.server.replace('http://', '').replace('https://', '')}`;
+            const proxyUrl = `http://${encodeURIComponent(proxyConfig.username)}:${encodeURIComponent(proxyConfig.password)}@${proxyConfig.server.replace('http://', '').replace('https://', '')}`;
             anonymizedProxyUrl = await anonymizeProxy(proxyUrl);
             console.log('[Playwright] Anonymized proxy:', anonymizedProxyUrl);
             options.proxy = { server: anonymizedProxyUrl };

@@ -83,7 +83,7 @@ export const browserManager = {
       if (proxyConfig) {
         console.log(`[BrowserManager] Applying proxy for ${profileId}: ${proxyConfig.server}`);
         if (proxyConfig.username && proxyConfig.password) {
-          const proxyUrl = `${proxyConfig.server.startsWith('http') ? '' : 'http://'}${encodeURIComponent(proxyConfig.username)}:${encodeURIComponent(proxyConfig.password)}@${proxyConfig.server.replace('http://', '').replace('https://', '')}`;
+          const proxyUrl = `http://${encodeURIComponent(proxyConfig.username)}:${encodeURIComponent(proxyConfig.password)}@${proxyConfig.server.replace('http://', '').replace('https://', '')}`;
           anonymizedProxyUrl = await anonymizeProxy(proxyUrl);
           console.log(`[BrowserManager] Anonymized proxy: ${anonymizedProxyUrl}`);
           options.proxy = { server: anonymizedProxyUrl };

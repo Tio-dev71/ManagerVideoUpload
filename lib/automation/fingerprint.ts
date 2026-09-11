@@ -94,6 +94,20 @@ export function parseProxy(proxyStr?: string | null) {
       password: parts[3]
     };
   }
+
+  // Format: user:pass@ip:port
+  if (proxyStr.includes('@') && !proxyStr.includes('://')) {
+    const [credentials, hostPort] = proxyStr.split('@');
+    const [username, password] = credentials.split(':');
+    const [host, port] = (hostPort || '').split(':');
+    if (host && port) {
+      return {
+        server: `http://${host}:${port}`,
+        username,
+        password
+      };
+    }
+  }
   
   // Format: http://user:pass@ip:port or http://ip:port
   if (proxyStr.startsWith('http://') || proxyStr.startsWith('https://') || proxyStr.startsWith('socks5://')) {
