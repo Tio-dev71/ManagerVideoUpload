@@ -67,17 +67,11 @@ function NavbarContent() {
                 </Link>
               </div>
             </div>
-            <Link href="#features" className="text-gray-600 hover:text-[#5B3DF5] px-3 py-2 rounded-md text-[14px] font-medium transition-colors">{t('nav.features')}</Link>
-            <Link href="#platforms" className="text-gray-600 hover:text-[#5B3DF5] px-3 py-2 rounded-md text-[14px] font-medium transition-colors">{t('nav.platforms')}</Link>
+            <Link href="/features" className="text-gray-600 hover:text-[#5B3DF5] px-3 py-2 rounded-md text-[14px] font-medium transition-colors">{t('nav.features')}</Link>
+            <Link href="/platforms" className="text-gray-600 hover:text-[#5B3DF5] px-3 py-2 rounded-md text-[14px] font-medium transition-colors">{t('nav.platforms')}</Link>
             <Link href="/video-downloader" className="text-gray-600 hover:text-[#5B3DF5] px-3 py-2 rounded-md text-[14px] font-medium transition-colors">Download Video</Link>
             <Link href="/pricing" className="text-gray-600 hover:text-[#5B3DF5] px-3 py-2 rounded-md text-[14px] font-medium transition-colors">{t('nav.pricing')}</Link>
-            <div className="relative group">
-              <button className="flex items-center gap-1 text-gray-600 hover:text-[#5B3DF5] px-3 py-2 rounded-md text-[14px] font-medium transition-colors">
-                {t('nav.resources')}
-                <ChevronDown className="w-3 h-3 text-gray-400 group-hover:text-[#5B3DF5] transition-transform group-hover:rotate-180" />
-              </button>
-            </div>
-            <Link href="#about" className="text-gray-600 hover:text-[#5B3DF5] px-3 py-2 rounded-md text-[14px] font-medium transition-colors">{t('nav.about')}</Link>
+            <Link href="/about" className="text-gray-600 hover:text-[#5B3DF5] px-3 py-2 rounded-md text-[14px] font-medium transition-colors">{t('nav.about')}</Link>
           </div>
 
           {/* Right Actions */}
@@ -117,10 +111,11 @@ function NavbarContent() {
       {isOpen && (
         <div className="lg:hidden bg-white border-b border-gray-100 shadow-xl">
           <div className="px-4 pt-2 pb-3 space-y-1">
-            <Link href="#products" className="text-gray-600 hover:text-[#5B3DF5] block px-3 py-2 rounded-md text-base font-medium">{t('nav.products')}</Link>
-            <Link href="#features" className="text-gray-600 hover:text-[#5B3DF5] block px-3 py-2 rounded-md text-base font-medium">{t('nav.features')}</Link>
-            <Link href="#platforms" className="text-gray-600 hover:text-[#5B3DF5] block px-3 py-2 rounded-md text-base font-medium">{t('nav.platforms')}</Link>
+            <Link href="/products" className="text-gray-600 hover:text-[#5B3DF5] block px-3 py-2 rounded-md text-base font-medium">{t('nav.products')}</Link>
+            <Link href="/features" className="text-gray-600 hover:text-[#5B3DF5] block px-3 py-2 rounded-md text-base font-medium">{t('nav.features')}</Link>
+            <Link href="/platforms" className="text-gray-600 hover:text-[#5B3DF5] block px-3 py-2 rounded-md text-base font-medium">{t('nav.platforms')}</Link>
             <Link href="/pricing" className="text-gray-600 hover:text-[#5B3DF5] block px-3 py-2 rounded-md text-base font-medium">{t('nav.pricing')}</Link>
+            <Link href="/about" className="text-gray-600 hover:text-[#5B3DF5] block px-3 py-2 rounded-md text-base font-medium">{t('nav.about')}</Link>
           </div>
           <div className="px-4 py-4 border-t border-gray-100">
             {session ? (

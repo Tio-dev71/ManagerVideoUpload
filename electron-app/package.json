@@ -41,6 +41,7 @@
   "dependencies": {
     "dotenv": "^17.4.2",
     "playwright": "^1.63.0",
+    "proxy-chain": "^3.0.1",
     "totp-generator": "^2.0.1"
   }
 }

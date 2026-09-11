@@ -9,7 +9,6 @@ import { useSession } from '@/lib/supabase/useSession';
 function SePayCheckoutContent() {
   const searchParams = useSearchParams();
   const { data: session } = useSession();
-
   const plan = searchParams.get('plan') || 'PRO';
   const amount = searchParams.get('amount') || '0';
 

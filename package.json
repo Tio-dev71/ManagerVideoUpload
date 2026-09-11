@@ -41,6 +41,7 @@
     "node-fetch": "^2.7.0",
     "nodemailer": "^7.0.13",
     "playwright": "^1.63.0",
+    "proxy-chain": "^3.0.1",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "scheduler": "^0.27.0",

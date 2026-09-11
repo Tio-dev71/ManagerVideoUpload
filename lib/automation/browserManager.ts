@@ -3,6 +3,7 @@ import path from 'path';
 import os from 'os';
 import fs from 'fs';
 import { getOrGenerateFingerprint, parseProxy } from './fingerprint';
+import { anonymizeProxy, closeAnonymizedProxy } from 'proxy-chain';
 
 declare global {
   var activeBrowsers: Map<string, BrowserContext>;
@@ -26,6 +27,10 @@ export const browserManager = {
     // Auto-remove when disconnected
     browser.on('close', () => {
       global.activeBrowsers.delete(profileId);
+      const anonymizedProxy = (browser as any)._anonymizedProxyUrl;
+      if (anonymizedProxy) {
+        closeAnonymizedProxy(anonymizedProxy, true).catch(console.error);
+      }
     });
   },
   removeBrowser: (profileId: string) => {
@@ -72,11 +77,19 @@ export const browserManager = {
     };
 
     // Apply Proxy
+    let anonymizedProxyUrl: string | undefined;
     if (proxyStr) {
       const proxyConfig = parseProxy(proxyStr);
       if (proxyConfig) {
         console.log(`[BrowserManager] Applying proxy for ${profileId}: ${proxyConfig.server}`);
-        options.proxy = proxyConfig;
+        if (proxyConfig.username && proxyConfig.password) {
+          const proxyUrl = `${proxyConfig.server.startsWith('http') ? '' : 'http://'}${encodeURIComponent(proxyConfig.username)}:${encodeURIComponent(proxyConfig.password)}@${proxyConfig.server.replace('http://', '').replace('https://', '')}`;
+          anonymizedProxyUrl = await anonymizeProxy(proxyUrl);
+          console.log(`[BrowserManager] Anonymized proxy: ${anonymizedProxyUrl}`);
+          options.proxy = { server: anonymizedProxyUrl };
+        } else {
+          options.proxy = { server: proxyConfig.server };
+        }
       }
     }
 
@@ -90,12 +103,19 @@ export const browserManager = {
 
     browser = await chromium.launchPersistentContext(userDataDir, options);
     
+    if (anonymizedProxyUrl) {
+      (browser as any)._anonymizedProxyUrl = anonymizedProxyUrl;
+    }
+
     // Inject hardware fingerprint
     await browser.addInitScript(fingerprint.initScript);
 
     // Auto manage state
     browser.on('close', () => {
       global.activeBrowsers.delete(profileId);
+      if (anonymizedProxyUrl) {
+        closeAnonymizedProxy(anonymizedProxyUrl, true).catch(console.error);
+      }
     });
     global.activeBrowsers.set(profileId, browser);
 

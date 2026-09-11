@@ -2,6 +2,7 @@ const { chromium } = require('playwright');
 const path = require('path');
 const os = require('os');
 const fs = require('fs');
+const { anonymizeProxy, closeAnonymizedProxy } = require('proxy-chain');
 
 const activeBrowsers = new Map();
 
@@ -132,11 +133,19 @@ async function runPlaywrightLogin(accountData) {
       };
 
       // Parse and set proxy
+      let anonymizedProxyUrl;
       if (proxy) {
         const proxyConfig = parseProxy(proxy);
         if (proxyConfig) {
           console.log('[Playwright] Using proxy:', proxyConfig.server);
-          options.proxy = proxyConfig;
+          if (proxyConfig.username && proxyConfig.password) {
+            const proxyUrl = `${proxyConfig.server.startsWith('http') ? '' : 'http://'}${encodeURIComponent(proxyConfig.username)}:${encodeURIComponent(proxyConfig.password)}@${proxyConfig.server.replace('http://', '').replace('https://', '')}`;
+            anonymizedProxyUrl = await anonymizeProxy(proxyUrl);
+            console.log('[Playwright] Anonymized proxy:', anonymizedProxyUrl);
+            options.proxy = { server: anonymizedProxyUrl };
+          } else {
+            options.proxy = { server: proxyConfig.server };
+          }
         } else {
           console.warn('[Playwright] Failed to parse proxy string:', proxy);
         }
@@ -162,7 +171,13 @@ async function runPlaywrightLogin(accountData) {
         Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
       });
 
-      browser.on('close', () => activeBrowsers.delete(profileId));
+      browser.on('close', () => {
+        activeBrowsers.delete(profileId);
+        const anonymizedProxy = browser._anonymizedProxyUrl;
+        if (anonymizedProxy) {
+          closeAnonymizedProxy(anonymizedProxy, true).catch(console.error);
+        }
+      });
       activeBrowsers.set(profileId, browser);
     }
 
