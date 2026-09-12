@@ -68,7 +68,7 @@ function parseProxy(proxyStr) {
   return null;
 }
 
-function generateTOTP(secret) {
+async function generateTOTP(secret) {
   try {
     const cleanSecret = (secret || '')
       .toUpperCase()
@@ -102,7 +102,7 @@ function generateTOTP(secret) {
           return '';
         });
       const { TOTP: TotpGen } = require('totp-generator');
-      const { otp } = TotpGen.generate(cleanSecret);
+      const { otp } = await TotpGen.generate(cleanSecret);
       return otp;
     } catch (e2) {
       console.error('[TOTP] Both otpauth and totp-generator failed:', e.message, e2.message);
@@ -287,7 +287,7 @@ async function runPlaywrightLogin(accountData) {
     if (isTwoFactor) {
       if (!twoFactorCode) throw new Error('Yêu cầu mã 2FA nhưng không có Secret Key');
 
-      const token = generateTOTP(twoFactorCode);
+      const token = await generateTOTP(twoFactorCode);
       console.log('[Playwright] Generated 2FA token, entering...');
       
       const codeInput = page.locator('#approvals_code');

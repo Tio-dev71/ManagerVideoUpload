@@ -17,7 +17,7 @@ export function getOrGenerateFingerprint(profileId: string) {
 
   // Generate new one if not exists or failed to read
   const fingerprint = getRandomFingerprint();
-  
+
   try {
     if (!fs.existsSync(userDataDir)) {
       fs.mkdirSync(userDataDir, { recursive: true });
@@ -41,19 +41,19 @@ export function getRandomFingerprint() {
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.15',
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36'
   ];
-  
+
   const locales = ['vi-VN', 'en-US', 'en-GB'];
   const timezones = ['Asia/Ho_Chi_Minh', 'America/New_York', 'Europe/London'];
-  
+
   // Choose random properties
   const userAgent = userAgents[Math.floor(Math.random() * userAgents.length)];
   const locale = locales[Math.floor(Math.random() * locales.length)];
   const timezoneId = timezones[Math.floor(Math.random() * timezones.length)];
-  
+
   // Random hardware specs
   const hardwareConcurrency = [4, 6, 8, 12, 16][Math.floor(Math.random() * 5)];
   const deviceMemory = [4, 8, 16][Math.floor(Math.random() * 3)];
-  
+
   const initScript = `
     // Override hardware concurrency
     Object.defineProperty(navigator, 'hardwareConcurrency', {
@@ -81,10 +81,10 @@ export function getRandomFingerprint() {
 
 export function parseProxy(proxyStr?: string | null) {
   if (!proxyStr) return undefined;
-  
+
   // Strip whitespace
   proxyStr = proxyStr.trim();
-  
+
   // Format: ip:port:user:pass
   const parts = proxyStr.split(':');
   if (parts.length === 4) {
@@ -108,7 +108,7 @@ export function parseProxy(proxyStr?: string | null) {
       };
     }
   }
-  
+
   // Format: http://user:pass@ip:port or http://ip:port
   if (proxyStr.startsWith('http://') || proxyStr.startsWith('https://') || proxyStr.startsWith('socks5://')) {
     try {
@@ -122,11 +122,11 @@ export function parseProxy(proxyStr?: string | null) {
       return undefined;
     }
   }
-  
+
   // Format: ip:port
   if (parts.length === 2) {
     return { server: `http://${parts[0]}:${parts[1]}` };
   }
-  
+
   return { server: proxyStr };
 }

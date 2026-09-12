@@ -36,23 +36,41 @@ export default function DownloaderClient() {
     setResult(null);
 
     try {
+      // Clean up YouTube URLs to remove playlist and radio params that might confuse the API
+      let finalUrl = url.trim();
+      try {
+        const urlObj = new URL(finalUrl);
+        if (urlObj.hostname.includes('youtube.com') || urlObj.hostname.includes('youtu.be')) {
+          urlObj.searchParams.delete('list');
+          urlObj.searchParams.delete('index');
+          urlObj.searchParams.delete('start_radio');
+          finalUrl = urlObj.toString();
+        }
+      } catch (e) {
+        // ignore parse error
+      }
+
       const res = await fetch('/api/downloader', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ url }),
+        body: JSON.stringify({ url: finalUrl }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || 'Failed to fetch video details');
+        throw new Error(data.error || data.message || 'Lỗi khi lấy thông tin video');
+      }
+
+      if (data.error === true) {
+        throw new Error(data.message || 'Không tìm thấy link tải cho video này. Có thể video bị giới hạn, bản quyền hoặc riêng tư.');
       }
 
       setResult(data);
     } catch (err: any) {
-      setError(err.message || 'An unexpected error occurred');
+      setError(err.message || 'Đã có lỗi bất ngờ xảy ra');
     } finally {
       setLoading(false);
     }
