@@ -11,6 +11,8 @@ import Downloader from './pages/Downloader';
 import Live from './pages/Live';
 import Settings from './pages/Settings';
 import Team from './pages/Team';
+import Posts from './pages/Posts';
+import CreatePost from './pages/CreatePost';
 import Layout from './components/layout/Layout';
 import {
   Calendar,
@@ -30,15 +32,11 @@ function App() {
           <Route path="/accounts" element={<FacebookAccounts />} />
 
           <Route path="/live" element={<Live />} />
-          <Route path="/posts" element={
-            <PlaceholderPage title="Bài viết" description="Quản lý bài viết đang được chuyển sang Desktop App." icon={<Calendar className="w-8 h-8 text-gray-400" />} />
-          } />
+          <Route path="/posts" element={<Posts />} />
           <Route path="/posts/:id" element={
             <PlaceholderPage title="Chi tiết bài viết" description="Trang chi tiết bài viết đang được phát triển." icon={<Calendar className="w-8 h-8 text-gray-400" />} />
           } />
-          <Route path="/create" element={
-            <PlaceholderPage title="Tạo bài đăng" description="Tính năng tạo bài đăng đang được chuyển sang Desktop App." icon={<Calendar className="w-8 h-8 text-gray-400" />} />
-          } />
+          <Route path="/create" element={<CreatePost />} />
           <Route path="/downloader" element={<Downloader />} />
           <Route path="/proxies" element={<Proxies />} />
           <Route path="/automation" element={<Automation />} />
