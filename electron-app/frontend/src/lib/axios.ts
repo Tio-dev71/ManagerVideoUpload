@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create a custom axios instance
 const api = axios.create({
-  baseURL: 'https://topify.vn/api',
+  baseURL: import.meta.env.DEV ? '/api' : 'https://topify.vn/api',
 });
 
 // Add a request interceptor

@@ -1,5 +1,7 @@
+'use client';
+
 import { useState, useCallback, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import {
   Upload,
   Film,
@@ -9,10 +11,11 @@ import {
   Send,
   Clock,
   Info,
+  CheckCircle2,
+  MessageCircle,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import api from '../lib/axios';
-import { PLATFORM_CONFIG } from '../lib/utils';
+import { isAllowedVideoType, formatFileSize, PLATFORM_CONFIG } from '@/lib/utils';
 
 type Platform = 'FACEBOOK_REELS' | 'INSTAGRAM_REELS' | 'YOUTUBE_SHORTS';
 type PublishMode = 'now' | 'schedule';
@@ -31,20 +34,8 @@ interface UploadedVideo {
   hashtags: string;
 }
 
-const isAllowedVideoType = (type: string) => {
-  return ['video/mp4', 'video/quicktime', 'video/webm'].includes(type);
-};
-
-const formatFileSize = (bytes: number) => {
-  if (bytes === 0) return '0 Bytes';
-  const k = 1024;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-};
-
-export default function CreatePost() {
-  const navigate = useNavigate();
+export default function CreateReelPage() {
+  const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Upload state
@@ -63,11 +54,11 @@ export default function CreatePost() {
   const handleUpload = useCallback(async (files: FileList | File[]) => {
     const validFiles = Array.from(files).filter(f => {
       if (!isAllowedVideoType(f.type)) {
-        toast.error(`Định dạng không hợp lệ: ${f.name}`);
+        toast.error(`Invalid file type: ${f.name}`);
         return false;
       }
       if (f.size > 2000 * 1024 * 1024) {
-        toast.error(`File quá lớn (Tối đa 2GB): ${f.name}`);
+        toast.error(`File too large: ${f.name}`);
         return false;
       }
       return true;
@@ -86,24 +77,35 @@ export default function CreatePost() {
       formData.append('video', file);
 
       try {
-        const res = await api.post('/upload', formData);
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        });
 
-        if (res.status === 200 || res.status === 201) {
-          const result = res.data;
+        if (res.ok) {
+          const result = await res.json();
           setVideos((prev) => [
             ...prev,
             {
               ...result,
-              title: result.titleFromFileName || file.name,
+              title: result.titleFromFileName,
               caption: '',
               firstComment: '',
               hashtags: '',
             },
           ]);
           successCount++;
+        } else {
+          const errorText = await res.text();
+          try {
+            const errorJson = JSON.parse(errorText);
+            toast.error(`Failed: ${errorJson.error || res.statusText}`);
+          } catch {
+            toast.error(`Failed: ${res.statusText}`);
+          }
         }
-      } catch (error: any) {
-        toast.error(`Lỗi tải lên: ${error.response?.data?.error || file.name}`);
+      } catch (error) {
+        toast.error(`Failed to upload ${file.name}`);
       }
     }
 
@@ -111,7 +113,7 @@ export default function CreatePost() {
     setTimeout(() => {
       setUploading(false);
       setUploadProgress(0);
-      if (successCount > 0) toast.success(`Đã tải lên ${successCount} video`);
+      if (successCount > 0) toast.success(`Uploaded ${successCount} video(s)`);
     }, 500);
 
   }, []);
@@ -167,15 +169,15 @@ export default function CreatePost() {
     e.preventDefault();
 
     if (videos.length === 0) {
-      toast.error('Vui lòng tải lên ít nhất 1 video.');
+      toast.error('Please upload at least one video.');
       return;
     }
     if (platforms.length === 0) {
-      toast.error('Vui lòng chọn ít nhất 1 nền tảng.');
+      toast.error('Please select at least one platform.');
       return;
     }
     if (publishMode === 'schedule' && !scheduledAt) {
-      toast.error('Vui lòng chọn ngày và giờ đăng.');
+      toast.error('Please select a schedule date and time.');
       return;
     }
 
@@ -184,22 +186,29 @@ export default function CreatePost() {
 
     for (const video of videos) {
       try {
-        const res = await api.post('/posts', {
-          title: video.title.trim() || video.titleFromFileName,
-          caption: video.caption.trim() || null,
-          firstComment: video.firstComment.trim() || null,
-          hashtags: video.hashtags.trim() || null,
-          videoAssetId: video.id,
-          platforms,
-          publishMode,
-          scheduledAt: publishMode === 'schedule' ? new Date(scheduledAt).toISOString() : null,
+        const res = await fetch('/api/posts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: video.title.trim() || video.titleFromFileName,
+            caption: video.caption.trim() || null,
+            firstComment: video.firstComment.trim() || null,
+            hashtags: video.hashtags.trim() || null,
+            videoAssetId: video.id,
+            platforms,
+            publishMode,
+            scheduledAt: publishMode === 'schedule' ? new Date(scheduledAt).toISOString() : null,
+          }),
         });
 
-        if (res.status === 200 || res.status === 201) {
+        if (res.ok) {
           successCount++;
+        } else {
+          const error = await res.json();
+          toast.error(`Error with ${video.originalFileName}: ${error.error}`);
         }
       } catch (error: any) {
-        toast.error(`Lỗi tạo bài viết cho ${video.originalFileName}: ${error.response?.data?.error || 'Lỗi không xác định'}`);
+        toast.error(`Failed to create post for ${video.originalFileName}`);
       }
     }
 
@@ -208,10 +217,10 @@ export default function CreatePost() {
     if (successCount > 0) {
       toast.success(
         publishMode === 'now'
-          ? `Đang đăng ${successCount} video!`
-          : `Đã lên lịch ${successCount} video!`
+          ? `Publishing ${successCount} reel(s)!`
+          : `Scheduled ${successCount} reel(s)!`
       );
-      navigate('/posts');
+      router.push('/posts');
     }
   };
 
@@ -222,9 +231,9 @@ export default function CreatePost() {
       {/* Header */}
       <div className="page-header mb-8">
         <div>
-          <h1 className="page-title">Tạo bài đăng</h1>
+          <h1 className="page-title">Create Reels</h1>
           <p className="page-subtitle">
-            Tải lên video và lên lịch đăng bài hàng loạt
+            Upload multiple videos to publish in bulk
           </p>
         </div>
       </div>
@@ -251,9 +260,9 @@ export default function CreatePost() {
             <div className="space-y-4">
               <Loader2 className="w-10 h-10 mx-auto text-[var(--color-primary)] animate-spin" />
               <div>
-                <p className="text-[15px] font-medium">Đang tải video lên...</p>
+                <p className="text-[15px] font-medium">Uploading videos...</p>
                 <p className="text-[13px] text-[var(--color-muted-foreground)] mt-1">
-                  {uploadProgress}% hoàn thành
+                  {uploadProgress}% complete
                 </p>
               </div>
               <div className="w-full max-w-[240px] mx-auto h-1.5 bg-[var(--color-muted)] rounded-full overflow-hidden">
@@ -265,15 +274,15 @@ export default function CreatePost() {
             </div>
           ) : (
             <div className="space-y-3">
-              <div className="w-16 h-16 mx-auto rounded-2xl bg-[var(--color-muted)] flex items-center justify-center cursor-pointer hover:bg-gray-200 transition-colors">
+              <div className="w-16 h-16 mx-auto rounded-2xl bg-[var(--color-muted)] flex items-center justify-center">
                 <Upload className="w-7 h-7 text-[var(--color-muted-foreground)]" />
               </div>
               <div>
                 <p className="text-[15px] font-medium">
-                  Kéo thả video vào đây hoặc <span className="text-[var(--color-primary)] cursor-pointer">chọn tệp</span>
+                  Drop videos here or <span className="text-[var(--color-primary)]">browse</span>
                 </p>
                 <p className="text-[13px] text-[var(--color-muted-foreground)] mt-1">
-                  Hỗ trợ MP4, MOV, WebM (Tối đa 2GB mỗi file)
+                  Upload multiple MP4, MOV, or WebM (up to 2GB each)
                 </p>
               </div>
             </div>
@@ -284,7 +293,7 @@ export default function CreatePost() {
         {videos.length > 0 && (
           <div className="space-y-6 animate-fade-in">
             <h3 className="text-[16px] font-medium border-b border-[var(--color-border)] pb-2">
-              Chi tiết video ({videos.length})
+              Video Details ({videos.length})
             </h3>
             <div className="grid gap-6">
               {videos.map(v => (
@@ -293,7 +302,7 @@ export default function CreatePost() {
                     type="button"
                     onClick={() => removeVideo(v.id)}
                     className="absolute top-4 right-4 p-2 rounded-xl bg-red-50 text-red-500 hover:bg-red-100 transition-colors"
-                    title="Xoá video"
+                    title="Remove video"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -309,11 +318,11 @@ export default function CreatePost() {
                           value={v.title}
                           onChange={(e) => updateVideoField(v.id, 'title', e.target.value)}
                           className="input-apple py-2 px-3 text-[14px] font-medium w-full"
-                          placeholder="Tiêu đề video"
+                          placeholder="Video Title"
                           required
                         />
                         <p className="text-[12px] text-[var(--color-muted-foreground)] mt-1">
-                          {formatFileSize(v.size)} • {(v.mimeType || 'video/mp4').split('/')[1].toUpperCase()}
+                          {formatFileSize(v.size)} • {v.mimeType.split('/')[1].toUpperCase()}
                         </p>
                       </div>
                     </div>
@@ -324,8 +333,8 @@ export default function CreatePost() {
                       <textarea
                         value={v.caption}
                         onChange={(e) => updateVideoField(v.id, 'caption', e.target.value)}
-                        className="input-apple min-h-[80px] resize-y text-[13px] py-2"
-                        placeholder="Nội dung bài viết..."
+                        className="input-apple min-h-[80px] resize-y text-[13px]"
+                        placeholder="Caption / Description..."
                         rows={2}
                       />
                     </div>
@@ -334,7 +343,7 @@ export default function CreatePost() {
                         type="text"
                         value={v.hashtags}
                         onChange={(e) => updateVideoField(v.id, 'hashtags', e.target.value)}
-                        className="input-apple text-[13px] py-2"
+                        className="input-apple text-[13px]"
                         placeholder="#viral #trending"
                       />
                     </div>
@@ -343,8 +352,8 @@ export default function CreatePost() {
                         type="text"
                         value={v.firstComment}
                         onChange={(e) => updateVideoField(v.id, 'firstComment', e.target.value)}
-                        className="input-apple text-[13px] py-2"
-                        placeholder="Tự động bình luận đầu tiên..."
+                        className="input-apple text-[13px]"
+                        placeholder="Auto First Comment..."
                       />
                     </div>
                   </div>
@@ -361,7 +370,7 @@ export default function CreatePost() {
             {/* Platform Selection */}
             <div>
               <label className="block text-[14px] font-medium mb-3">
-                Chọn nền tảng
+                Select Platforms
               </label>
               <div className="flex flex-wrap gap-3">
                 {(Object.entries(PLATFORM_CONFIG) as [Platform, typeof PLATFORM_CONFIG[keyof typeof PLATFORM_CONFIG]][]).map(
@@ -372,8 +381,8 @@ export default function CreatePost() {
                         key={key}
                         type="button"
                         onClick={() => togglePlatform(key)}
-                        className={`platform-chip px-4 py-2 rounded-xl text-sm flex items-center gap-2 border transition-all ${selected ? 'border-transparent' : 'border-gray-200 hover:border-gray-300 bg-white'}`}
-                        style={selected ? { color: config.color, backgroundColor: `${config.color}14`, borderColor: `${config.color}30` } : {}}
+                        className={`platform-chip ${selected ? 'selected bg-opacity-10' : 'bg-[var(--color-muted)] text-[var(--color-muted-foreground)]'}`}
+                        style={selected ? { color: config.color, backgroundColor: `${config.color}14` } : {}}
                       >
                         <Film className="w-4 h-4" />
                         {config.name}
@@ -387,7 +396,7 @@ export default function CreatePost() {
                 <div className="mt-3 p-3 rounded-xl bg-amber-50 border border-amber-100 flex items-start gap-2.5">
                   <Info className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
                   <p className="text-[13px] text-amber-700">
-                    Đối với YouTube Shorts, hãy sử dụng video dọc dưới 60 giây để có kết quả tốt nhất.
+                    For YouTube Shorts, use vertical video under 60 seconds for best results.
                   </p>
                 </div>
               )}
@@ -396,7 +405,7 @@ export default function CreatePost() {
             {/* Publish Mode */}
             <div>
               <label className="block text-[14px] font-medium mb-3">
-                Chế độ đăng
+                Publish Mode
               </label>
               <div className="flex gap-3">
                 <button
@@ -405,8 +414,8 @@ export default function CreatePost() {
                   className={`flex-1 p-4 rounded-2xl border-2 text-left transition-all ${publishMode === 'now' ? 'border-[var(--color-primary)] bg-[var(--color-primary-soft)] text-[var(--color-primary)]' : 'border-[var(--color-border)] bg-white hover:border-gray-300'}`}
                 >
                   <Send className={`w-5 h-5 mb-2 ${publishMode === 'now' ? 'text-[var(--color-primary)]' : 'text-[var(--color-muted-foreground)]'}`} />
-                  <p className="text-[14px] font-medium">Đăng ngay</p>
-                  <p className={`text-[12px] mt-0.5 ${publishMode === 'now' ? 'text-[var(--color-primary)] opacity-80' : 'text-[var(--color-muted-foreground)]'}`}>Xuất bản ngay lập tức</p>
+                  <p className="text-[14px] font-medium">Post Now</p>
+                  <p className={`text-[12px] mt-0.5 ${publishMode === 'now' ? 'text-[var(--color-primary)] opacity-80' : 'text-[var(--color-muted-foreground)]'}`}>Publish immediately</p>
                 </button>
                 <button
                   type="button"
@@ -414,8 +423,8 @@ export default function CreatePost() {
                   className={`flex-1 p-4 rounded-2xl border-2 text-left transition-all ${publishMode === 'schedule' ? 'border-[var(--color-primary)] bg-[var(--color-primary-soft)] text-[var(--color-primary)]' : 'border-[var(--color-border)] bg-white hover:border-gray-300'}`}
                 >
                   <Calendar className={`w-5 h-5 mb-2 ${publishMode === 'schedule' ? 'text-[var(--color-primary)]' : 'text-[var(--color-muted-foreground)]'}`} />
-                  <p className="text-[14px] font-medium">Lên lịch</p>
-                  <p className={`text-[12px] mt-0.5 ${publishMode === 'schedule' ? 'text-[var(--color-primary)] opacity-80' : 'text-[var(--color-muted-foreground)]'}`}>Chọn ngày & giờ</p>
+                  <p className="text-[14px] font-medium">Schedule</p>
+                  <p className={`text-[12px] mt-0.5 ${publishMode === 'schedule' ? 'text-[var(--color-primary)] opacity-80' : 'text-[var(--color-muted-foreground)]'}`}>Pick date & time</p>
                 </button>
               </div>
             </div>
@@ -424,13 +433,13 @@ export default function CreatePost() {
             {publishMode === 'schedule' && (
               <div className="animate-fade-in">
                 <label className="block text-[14px] font-medium mb-1.5">
-                  Ngày & Giờ lên lịch
+                  Schedule Date & Time
                 </label>
                 <input
                   type="datetime-local"
                   value={scheduledAt}
                   onChange={(e) => setScheduledAt(e.target.value)}
-                  className="input-apple w-full py-2 px-3"
+                  className="input-apple"
                   min={new Date().toISOString().slice(0, 16)}
                   required
                 />
@@ -447,17 +456,17 @@ export default function CreatePost() {
                 {submitting ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    {publishMode === 'now' ? 'Đang xuất bản...' : 'Đang lên lịch...'}
+                    {publishMode === 'now' ? 'Publishing All...' : 'Scheduling All...'}
                   </>
                 ) : publishMode === 'now' ? (
                   <>
                     <Send className="w-4 h-4" />
-                    Đăng ngay {videos.length} Video
+                    Publish All {videos.length} Video(s)
                   </>
                 ) : (
                   <>
                     <Clock className="w-4 h-4" />
-                    Lên lịch {videos.length} Video
+                    Schedule All {videos.length} Video(s)
                   </>
                 )}
               </button>

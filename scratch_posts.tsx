@@ -1,17 +1,23 @@
+'use client';
+
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 import {
+  Calendar,
   Film,
   Search,
+  Filter,
+  MoreHorizontal,
   Eye,
   Trash2,
   RotateCcw,
   PlayCircle,
+  Loader2,
 } from 'lucide-react';
-import { format } from 'date-fns';
+import { formatDistanceToNow, format } from 'date-fns';
 import { toast } from 'sonner';
-import api from '../lib/axios';
-import { STATUS_CONFIG, PLATFORM_CONFIG } from '../lib/utils';
+import { STATUS_CONFIG, PLATFORM_CONFIG } from '@/lib/utils';
 
 type StatusFilter = 'ALL' | 'DRAFT' | 'SCHEDULED' | 'PUBLISHING' | 'PUBLISHED' | 'FAILED';
 
@@ -29,14 +35,15 @@ interface PostItem {
 }
 
 const filterTabs: { label: string; value: StatusFilter }[] = [
-  { label: 'Tất cả', value: 'ALL' },
-  { label: 'Đã lên lịch', value: 'SCHEDULED' },
-  { label: 'Đang đăng', value: 'PUBLISHING' },
-  { label: 'Đã đăng', value: 'PUBLISHED' },
-  { label: 'Thất bại', value: 'FAILED' },
+  { label: 'All', value: 'ALL' },
+  { label: 'Scheduled', value: 'SCHEDULED' },
+  { label: 'Publishing', value: 'PUBLISHING' },
+  { label: 'Published', value: 'PUBLISHED' },
+  { label: 'Failed', value: 'FAILED' },
 ];
 
-export default function Posts() {
+export default function PostsPage() {
+  const { data: session } = useSession();
   const [posts, setPosts] = useState<PostItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<StatusFilter>('ALL');
@@ -51,40 +58,44 @@ export default function Posts() {
     try {
       const params = new URLSearchParams();
       if (filter !== 'ALL') params.set('status', filter);
-      const res = await api.get(`/posts?${params}`);
-      if (res.data) {
-        setPosts(res.data.posts || []);
+      const res = await fetch(`/api/posts?${params}`);
+      if (res.ok) {
+        const data = await res.json();
+        setPosts(data.posts || []);
       }
     } catch (e) {
       console.error('Failed to fetch posts:', e);
-      toast.error('Không thể tải danh sách bài viết');
     } finally {
       setLoading(false);
     }
   }
 
   async function deletePost(id: string) {
-    if (!window.confirm('Bạn có chắc chắn muốn xoá bài viết này không?')) return;
+    if (!confirm('Are you sure you want to delete this post?')) return;
     try {
-      const res = await api.delete(`/posts/${id}`);
-      if (res.status === 200) {
-        toast.success('Đã xoá bài viết');
+      const res = await fetch(`/api/posts/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        toast.success('Post deleted');
         setPosts((prev) => prev.filter((p) => p.id !== id));
+      } else {
+        toast.error('Failed to delete post');
       }
     } catch {
-      toast.error('Lỗi khi xoá bài viết');
+      toast.error('Failed to delete post');
     }
   }
 
   async function retryPost(id: string) {
     try {
-      const res = await api.post(`/posts/${id}/retry`);
-      if (res.status === 200) {
-        toast.success('Đang thử lại...');
+      const res = await fetch(`/api/posts/${id}/retry`, { method: 'POST' });
+      if (res.ok) {
+        toast.success('Retrying publish...');
         fetchPosts();
+      } else {
+        toast.error('Failed to retry');
       }
     } catch {
-      toast.error('Lỗi khi thử lại');
+      toast.error('Failed to retry');
     }
   }
 
@@ -97,30 +108,26 @@ export default function Posts() {
       {/* Header */}
       <div className="page-header">
         <div>
-          <h1 className="page-title">Bài viết</h1>
+          <h1 className="page-title">Posts</h1>
           <p className="page-subtitle">
-            Quản lý các bài viết đã lên lịch và đã đăng
+            Manage all your scheduled and published reels
           </p>
         </div>
-        <Link to="/create" className="btn-primary inline-flex items-center gap-2 text-[14px]">
+        <Link href="/create" className="btn-primary inline-flex items-center gap-2 text-[14px]">
           <Film className="w-4 h-4" />
-          Tạo bài đăng
+          New Reel
         </Link>
       </div>
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
         {/* Filter tabs */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide w-full">
+        <div className="tab-list overflow-x-auto">
           {filterTabs.map((tab) => (
             <button
               key={tab.value}
               onClick={() => setFilter(tab.value)}
-              className={`px-4 py-2 text-[14px] font-medium rounded-full whitespace-nowrap transition-colors ${
-                filter === tab.value
-                  ? 'bg-[var(--color-primary)] text-white shadow-sm'
-                  : 'bg-[var(--color-muted)] text-[var(--color-muted-foreground)] hover:bg-gray-200'
-              }`}
+              className={`tab-trigger whitespace-nowrap ${filter === tab.value ? 'active' : ''}`}
             >
               {tab.label}
             </button>
@@ -134,8 +141,8 @@ export default function Posts() {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Tìm kiếm bài viết..."
-            className="input-apple !pl-9 py-2 w-full"
+            placeholder="Search posts..."
+            className="input-apple !pl-9 py-2"
           />
         </div>
       </div>
@@ -159,17 +166,17 @@ export default function Posts() {
           <div className="p-16 text-center">
             <PlayCircle className="w-14 h-14 text-[var(--color-muted-foreground)] mx-auto mb-4 opacity-30" />
             <p className="text-[16px] font-medium text-[var(--color-foreground)]">
-              {filter !== 'ALL' ? `Không có bài viết ${filterTabs.find(t => t.value === filter)?.label.toLowerCase()}` : 'Chưa có bài viết nào'}
+              {filter !== 'ALL' ? `No ${filter.toLowerCase()} posts` : 'No posts yet'}
             </p>
             <p className="text-[14px] text-[var(--color-muted-foreground)] mt-1.5">
               {filter !== 'ALL'
-                ? 'Thử thay đổi bộ lọc của bạn'
-                : 'Tạo bài đăng đầu tiên của bạn để bắt đầu'}
+                ? 'Try changing your filter'
+                : 'Create your first reel to get started'}
             </p>
             {filter === 'ALL' && (
-              <Link to="/create" className="btn-primary inline-flex items-center gap-2 mt-5 text-[14px]">
+              <Link href="/create" className="btn-primary inline-flex items-center gap-2 mt-5 text-[14px]">
                 <Film className="w-4 h-4" />
-                Tạo bài đăng
+                Create Reel
               </Link>
             )}
           </div>
@@ -179,12 +186,12 @@ export default function Posts() {
               <thead>
                 <tr>
                   <th>Video</th>
-                  <th>Tiêu đề</th>
-                  <th>Người tạo</th>
-                  <th>Nền tảng</th>
-                  <th>Lịch đăng</th>
-                  <th>Trạng thái</th>
-                  <th className="text-right">Thao tác</th>
+                  <th>Title</th>
+                  <th>Created by</th>
+                  <th>Platforms</th>
+                  <th>Schedule</th>
+                  <th>Status</th>
+                  <th className="text-right">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -203,7 +210,7 @@ export default function Posts() {
                       </td>
                       <td>
                         <Link
-                          to={`/posts/${post.id}`}
+                          href={`/posts/${post.id}`}
                           className="hover:text-[var(--color-primary)] transition-colors"
                         >
                           <p className="font-medium text-[14px] truncate max-w-[200px]">
@@ -212,10 +219,10 @@ export default function Posts() {
                         </Link>
                       </td>
                       <td className="text-[13px] text-[var(--color-muted-foreground)]">
-                        {post.createdBy?.name || post.createdBy?.email?.split('@')[0] || 'Unknown'}
+                        {post.createdBy.name || post.createdBy.email.split('@')[0]}
                       </td>
                       <td>
-                        <div className="flex gap-1.5 flex-wrap">
+                        <div className="flex gap-1.5">
                           {post.platforms.map((p) => {
                             const config = PLATFORM_CONFIG[p.platform as keyof typeof PLATFORM_CONFIG];
                             return (
@@ -246,9 +253,9 @@ export default function Posts() {
                       <td>
                         <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                           <Link
-                            to={`/posts/${post.id}`}
+                            href={`/posts/${post.id}`}
                             className="p-1.5 rounded-lg hover:bg-[var(--color-muted)] transition-colors"
-                            title="Chi tiết"
+                            title="View details"
                           >
                             <Eye className="w-4 h-4 text-[var(--color-muted-foreground)]" />
                           </Link>
@@ -256,7 +263,7 @@ export default function Posts() {
                             <button
                               onClick={() => retryPost(post.id)}
                               className="p-1.5 rounded-lg hover:bg-amber-50 transition-colors"
-                              title="Thử lại"
+                              title="Retry"
                             >
                               <RotateCcw className="w-4 h-4 text-amber-600" />
                             </button>
@@ -264,7 +271,7 @@ export default function Posts() {
                           <button
                             onClick={() => deletePost(post.id)}
                             className="p-1.5 rounded-lg hover:bg-red-50 transition-colors"
-                            title="Xoá"
+                            title="Delete"
                           >
                             <Trash2 className="w-4 h-4 text-red-400" />
                           </button>

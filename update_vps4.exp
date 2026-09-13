@@ -1,0 +1,16 @@
+#!/usr/bin/expect -f
+set timeout -1
+spawn ssh -o StrictHostKeyChecking=no root@157.66.100.35
+expect "password:"
+send "Topmediacto!!!\r"
+expect "#"
+send "cd /var/www/topify\r"
+expect "#"
+send "git pull\r"
+expect "#"
+send "npm run build\r"
+expect "#"
+send "pm2 restart Topify\r"
+expect "#"
+send "exit\r"
+expect eof

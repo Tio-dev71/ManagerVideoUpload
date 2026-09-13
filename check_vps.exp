@@ -1,0 +1,6 @@
+#!/usr/bin/expect -f
+set timeout 10
+spawn ssh -o StrictHostKeyChecking=no root@157.66.100.35 "cat /var/www/topify/ecosystem.config.js"
+expect "*?assword:*"
+send "Topmediacto!!!\r"
+expect eof
