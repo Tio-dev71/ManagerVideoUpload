@@ -1,16 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Calendar,
   Film,
   Search,
-  Filter,
-  MoreHorizontal,
   Eye,
   Trash2,
   RotateCcw,
   PlayCircle,
-  Loader2,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
