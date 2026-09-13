@@ -9,7 +9,7 @@ module.exports = {
     {
       name: "Topify",
       script: "node_modules/next/dist/bin/next",
-      args: "start",
+      args: "start -p 3001",
       cwd: __dirname,
       env: {
         NODE_ENV: "production",
